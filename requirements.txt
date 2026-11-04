@@ -1,0 +1,52 @@
+# chart-sherpa -- Python dependencies
+#
+# ---------------------------------------------------------------------------
+# INSTALL TORCH FIRST, SEPARATELY. It is deliberately NOT listed below.
+# ---------------------------------------------------------------------------
+# The correct torch wheel depends on your GPU and CUDA version, and a plain
+# `pip install torch` pulls a default wheel that may not support your card --
+# silently replacing a working install with one that cannot see the GPU.
+#
+#   CUDA 12.8 (Blackwell: RTX 50-series, sm_120):
+#     pip install --index-url https://download.pytorch.org/whl/cu128 torch torchvision
+#
+#   CUDA 12.1 / 12.4 (Ada, Ampere):
+#     pip install --index-url https://download.pytorch.org/whl/cu124 torch torchvision
+#
+#   CPU only (evaluation of saved predictions; no training or inference):
+#     pip install torch torchvision
+#
+# Reference environment for the published results:
+#   Python 3.10, torch 2.12.0.dev20260408+cu128, RTX 5070 Ti Laptop (12.8 GB, sm_120)
+#
+# Blackwell note: sm_120 requires CUDA 12.8 and, at time of writing, a nightly
+# torch build. Stable releases on the default PyPI index will install but fail
+# at the first kernel launch. The notebook preflight cell checks for this.
+#
+# Then:  pip install -r requirements.txt
+# ---------------------------------------------------------------------------
+
+# --- Models and training ---------------------------------------------------
+transformers>=4.49.0      # floor: Qwen2.5-VL and Gemma 3 architecture support
+accelerate>=0.34.0
+peft>=0.13.0              # LoRA; full module paths for target_modules
+bitsandbytes>=0.44.0      # 4-bit NF4 quantization. Official Windows wheels
+                          # exist from 0.43; older versions need a fork.
+sentencepiece
+qwen-vl-utils             # Qwen2.5-VL image preprocessing helpers
+
+# --- Data ------------------------------------------------------------------
+datasets>=2.20.0
+huggingface_hub>=0.25.0
+pillow
+pandas
+numpy
+
+# --- Metrics ---------------------------------------------------------------
+scikit-learn              # macro-F1 on the CFPB classification side
+
+# --- Notebook runtime ------------------------------------------------------
+# Needed to run the .ipynb files and to render the huggingface_hub login
+# widget. Skip these if you only run the generated scripts.
+jupyterlab>=4.0.0
+ipywidgets>=8.0.0
