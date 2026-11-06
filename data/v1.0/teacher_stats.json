@@ -1,0 +1,105 @@
+{
+  "teacher": "Claude Opus",
+  "splits": {
+    "train": {
+      "labelled_by_teacher": 1672,
+      "original_items": 1378,
+      "original_rejected": 143,
+      "original_rejection_rate": 0.1038,
+      "original_rejected_by_source": {
+        "pew": 65,
+        "statista": 47,
+        "owid": 22,
+        "oecd": 9
+      },
+      "original_rejected_by_reason": {
+        "teacher_disputes_gold": 134,
+        "mark_colours_unreliable": 9
+      },
+      "replacement_candidates_labelled": 294,
+      "replacement_candidates_rejected": 70,
+      "replaced": 142,
+      "not_replaced": 1,
+      "final_total": 1449,
+      "final_teacher_verified": 1377,
+      "final_unanswerable": 72,
+      "final_by_source": {
+        "statista": 902,
+        "pew": 274,
+        "owid": 208,
+        "oecd": 65
+      },
+      "final_by_chart_type": {
+        "v_bar": 517,
+        "h_bar": 454,
+        "line": 297,
+        "pie": 181
+      },
+      "final_by_answer_type": {
+        "number": 972,
+        "text": 309,
+        "yes_no": 96,
+        "unanswerable": 72
+      },
+      "final_by_question_type": {
+        "arithmetic_comparison": 756,
+        "visual_reference": 368,
+        "retrieval": 253,
+        "unanswerable": 72
+      }
+    },
+    "val": {
+      "labelled_by_teacher": 200,
+      "original_items": 162,
+      "original_rejected": 13,
+      "original_rejection_rate": 0.0802,
+      "original_rejected_by_source": {
+        "owid": 5,
+        "statista": 3,
+        "pew": 3,
+        "oecd": 2
+      },
+      "original_rejected_by_reason": {
+        "teacher_disputes_gold": 12,
+        "mark_colours_unreliable": 1
+      },
+      "replacement_candidates_labelled": 38,
+      "replacement_candidates_rejected": 8,
+      "replaced": 13,
+      "not_replaced": 0,
+      "final_total": 170,
+      "final_teacher_verified": 162,
+      "final_unanswerable": 8,
+      "final_by_source": {
+        "statista": 93,
+        "owid": 45,
+        "pew": 17,
+        "oecd": 15
+      },
+      "final_by_chart_type": {
+        "h_bar": 62,
+        "v_bar": 51,
+        "line": 36,
+        "pie": 21
+      },
+      "final_by_answer_type": {
+        "number": 111,
+        "text": 44,
+        "unanswerable": 8,
+        "yes_no": 7
+      },
+      "final_by_question_type": {
+        "arithmetic_comparison": 87,
+        "visual_reference": 46,
+        "retrieval": 29,
+        "unanswerable": 8
+      }
+    },
+    "test": {
+      "items": 180,
+      "colour_items_swapped": 0,
+      "swaps": [],
+      "inputs_with_mark_colours_removed": 9
+    }
+  }
+}
