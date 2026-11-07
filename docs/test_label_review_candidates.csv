@@ -1,0 +1,13 @@
+id,image,check,question,current_gold,note
+test-multi_col_20806-945-unans,images/test/multi_col_20350.png,refusal label,What is the difference between highest and lowest respondents below 100 SEK?,null,Check whether the chart can answer it.
+test-two_col_24140-1180-unans,images/test/5904.png,refusal label,What is the highest percentage value in the chart?,null,Confirmed wrong: the chart shows 64 as the highest percentage.
+test-two_col_3220-731,images/test/two_col_3220.png,percent scale,How much did the unemployment rate decrease from 2006 to 2007?,0.19,Fractional gold on a percentage chart; may be a legitimate ratio.
+test-OECD_FINANCIAL_DISINCENTIVE_TO_RETURN_TO_WORK_AUS_DNK_LUX_NOR_SVN_000002-520-unans,images/test/10688218006639.png,refusal label,How many bars are there in the graph?,null,Check whether the chart can answer it.
+test-40414580016324-299-unans,images/test/multi_col_60698.png,refusal label,Is the average percentage of all the values lowet than 90?,null,Looks answerable from the chart; image not yet opened.
+test-8507-121,images/test/8507.png,percent scale,How many more people were very worried than very enthusiastic?,0.07,Fractional gold on a percentage chart; may be a legitimate ratio.
+test-two_col_41953-815,images/test/two_col_41953.png,percent scale,What is the ratio of diversified and apparel & accessories?,0.5,Fractional gold on a percentage chart; may be a legitimate ratio.
+test-two_col_62141-631-unans,images/test/47728567002301.png,refusal label,"2010 bar value 378.2, 2019 bar value 604.4, find the percentage increase?",null,Check whether the chart can answer it.
+test-multi_col_60035-982-unans,images/test/18315527000187.png,refusal label,Which color bar always yields the lowest value?,null,Check whether the chart can answer it.
+test-64197743003167-324-unans,images/test/two_col_60414.png,refusal label,What is the value of green bar?,null,Check whether the chart can answer it.
+test-two_col_24416-1205-unans,images/test/multi_col_40617.png,refusal label,what is the difference between retail and wholesale?,null,Check whether the chart can answer it.
+test-two_col_82105-1130-unans,images/test/3389.png,refusal label,What's the percentage of employees that never have stress?,null,Check whether the chart can answer it.
