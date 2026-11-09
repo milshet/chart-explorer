@@ -1,0 +1,50 @@
+
+===== Round 1: new chat, upload g001.png to g003.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g001: What's the percentage who say cyberattacks from China is very serious problems for the U.S.?
+g002: Is the sum of all the supporting services expenses across all years greater than the program services expense in 2018?
+g003: Is the average share of women in top two lowest wage occupations more than 90?
+
+===== Round 2: new chat, upload g004.png to g006.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g004: What's the average percentage value of the green line from 2014 to 2016?
+g005: Which bar is missing in the PwC stacked bars?
+g006: How many years have the same value for both investment and development?
+
+===== Round 3: new chat, upload g007.png to g009.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g007: Which country does grey indicate?
+g008: Find the ratio of median value of all bars and highest value?
+g009: What the sum of distribution production of corn of china and brazil country
+
+===== Round 4: new chat, upload g010.png to g012.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g010: What region contributes largest revenue?
+g011: How many points it moved from Mar 21 to May 21?
+g012: What is the difference between highest value of P & G and lowest value of Spectrum over the years?
+
+===== Round 5: new chat, upload g013.png to g015.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g013: The highest share of female minus the lowest share of female across all the departments gives what result?
+g014: In millions USD how much was generated to Kickstarter project in quarter 1 of 2014?
+g015: How much did California's GDP decrease from 2008 to 2009?
+
+===== Round 6: new chat, upload g016.png to g018.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g016: What is the total upland spot cotton price in the U.S. from 2017 to 2018?
+g017: How many data points were recorded above 20 %?
+g018: Which region is presented by the green bar?
+
+===== Round 7: new chat, upload g019.png to g021.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g019: What's the difference of value of highest value of red and lowest value of green line?
+g020: What is the highest weekly earnings of male?
+g021: Which has the least number of metro?
+
+===== Round 8: new chat, upload g022.png to g024.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g022: Which year recorded the highest market share in Jumbo over the years?
+g023: What is the average price of desserts when eating in the pubs and in the hotels in 2014?
+g024: Which year recorded the highest peak in corporate profits in Netherlands?
+
+===== Round 9: new chat, upload g025.png to g027.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g025: What is the value of lowest light blue bar?
+g026: What is the average of all the bars ?
+g027: What is the dividend per share in 2015?
+
+===== Round 10: new chat, upload g028.png to g030.png, paste PROMPT_CHATGPT.txt, then these 3 lines =====
+g028: What is the average of 1st, 2nd and 3rd highest value in blue bar?
+g029: What is the average between Financial and insurance activities and Consumer goods and services ?
+g030: What is the peak value of orange graph?

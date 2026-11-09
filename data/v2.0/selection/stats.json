@@ -1,0 +1,180 @@
+{
+  "seed": 2026,
+  "keep_domains": [
+    "economy",
+    "finance"
+  ],
+  "splits": {
+    "train": {
+      "raw_human_questions": 7398,
+      "excluded": {
+        "not_finance_or_economy": 4289,
+        "numeric_lookup_not_in_table": 371,
+        "colour_reference_annotation_lacks_colour": 204,
+        "text_answer_not_in_input": 54,
+        "colour_reference_not_in_chart": 41,
+        "colour_reference_ambiguous": 27,
+        "colour_answer_not_in_annotation": 24,
+        "table_unparseable": 24,
+        "colour_reference_conflicts_with_gold": 20,
+        "same_table_in_later_split": 18,
+        "asks_about_chart_appearance": 16,
+        "colour_answer_conflicts_with_annotation": 2,
+        "duplicate": 1,
+        "asks_about_title_but_chart_has_none": 1
+      },
+      "finance_economy_pool": 2306,
+      "selected_answerable": 1100,
+      "selected_unanswerable": 55,
+      "charts": 910,
+      "by_answer_type": {
+        "yes_no": 71,
+        "number": 789,
+        "text": 240,
+        "unanswerable": 55
+      },
+      "by_question_type": {
+        "visual_reference": 293,
+        "retrieval": 195,
+        "arithmetic_comparison": 612,
+        "unanswerable": 55
+      },
+      "by_source": {
+        "pew": 227,
+        "oecd": 63,
+        "statista": 739,
+        "owid": 126
+      }
+    },
+    "val": {
+      "raw_human_questions": 960,
+      "excluded": {
+        "not_finance_or_economy": 559,
+        "numeric_lookup_not_in_table": 44,
+        "colour_reference_annotation_lacks_colour": 16,
+        "colour_reference_not_in_chart": 8,
+        "table_unparseable": 8,
+        "colour_answer_not_in_annotation": 5,
+        "text_answer_not_in_input": 4,
+        "colour_reference_conflicts_with_gold": 2,
+        "same_table_in_later_split": 2,
+        "asks_about_chart_appearance": 2,
+        "colour_reference_ambiguous": 1
+      },
+      "finance_economy_pool": 309,
+      "selected_answerable": 130,
+      "selected_unanswerable": 7,
+      "charts": 115,
+      "by_answer_type": {
+        "number": 90,
+        "text": 37,
+        "unanswerable": 7,
+        "yes_no": 3
+      },
+      "by_question_type": {
+        "arithmetic_comparison": 71,
+        "retrieval": 22,
+        "visual_reference": 37,
+        "unanswerable": 7
+      },
+      "by_source": {
+        "statista": 85,
+        "owid": 25,
+        "pew": 15,
+        "oecd": 12
+      }
+    },
+    "test": {
+      "raw_human_questions": 1250,
+      "excluded": {
+        "not_finance_or_economy": 754,
+        "numeric_lookup_not_in_table": 32,
+        "colour_reference_annotation_lacks_colour": 29,
+        "table_unparseable": 8,
+        "colour_reference_ambiguous": 7,
+        "colour_answer_not_in_annotation": 6,
+        "colour_reference_conflicts_with_gold": 6,
+        "text_answer_not_in_input": 5,
+        "colour_reference_not_in_chart": 3,
+        "colour_answer_conflicts_with_annotation": 2
+      },
+      "finance_economy_pool": 398,
+      "selected_answerable": 171,
+      "selected_unanswerable": 9,
+      "charts": 143,
+      "by_answer_type": {
+        "text": 39,
+        "number": 122,
+        "yes_no": 10,
+        "unanswerable": 9
+      },
+      "by_question_type": {
+        "retrieval": 35,
+        "arithmetic_comparison": 96,
+        "visual_reference": 40,
+        "unanswerable": 9
+      },
+      "by_source": {
+        "oecd": 13,
+        "statista": 116,
+        "owid": 35,
+        "pew": 16
+      }
+    }
+  },
+  "all_domains": {
+    "train": {
+      "questions_after_structural_checks": 6595,
+      "by_domain": {
+        "other": 3608,
+        "finance_economy": 2306,
+        "health": 433,
+        "business": 248
+      },
+      "by_tag_any": {
+        "none": 3608,
+        "finance": 1423,
+        "economy": 1213,
+        "business": 865,
+        "health": 553
+      }
+    },
+    "val": {
+      "questions_after_structural_checks": 868,
+      "by_domain": {
+        "other": 458,
+        "finance_economy": 309,
+        "health": 78,
+        "business": 23
+      },
+      "by_tag_any": {
+        "none": 458,
+        "finance": 187,
+        "economy": 170,
+        "business": 104,
+        "health": 103
+      }
+    },
+    "test": {
+      "questions_after_structural_checks": 1152,
+      "by_domain": {
+        "other": 620,
+        "finance_economy": 398,
+        "health": 88,
+        "business": 46
+      },
+      "by_tag_any": {
+        "none": 620,
+        "finance": 239,
+        "economy": 213,
+        "business": 147,
+        "health": 112
+      }
+    }
+  },
+  "chart_overlap": {
+    "train_val": 0,
+    "train_test": 0,
+    "val_test": 0
+  }
+}
