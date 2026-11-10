@@ -8,3 +8,7 @@ venv/
 raw/
 *.zip
 ChartQA Dataset/
+
+# run outputs on the VM
+logs/
+.idea/
