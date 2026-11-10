@@ -27,6 +27,6 @@ cd "$SLURM_SUBMIT_DIR"
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
 
 python scripts/smoke_test.py \
-  --data-dir data/v1.0 \
+  --data-dir data/v2.0 \
   --variant image_only \
   --out "$HOME/runs/smoke-$SLURM_JOB_ID"

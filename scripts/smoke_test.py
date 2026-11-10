@@ -31,7 +31,7 @@ LORA_TARGETS = r"^(?!.*visual).*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj
 
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--data-dir", type=Path, default=Path("data/v1.0"))
+    p.add_argument("--data-dir", type=Path, default=Path("data/v2.0"))
     p.add_argument("--variant", default="image_only")
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--n-infer", type=int, default=5)
