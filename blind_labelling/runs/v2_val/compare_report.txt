@@ -1,0 +1,13 @@
+items 137 | exact 126 | close 0 | miss 11 | key order ok 137/137
+final confidence: high 123, medium 3, low 11
+  q0018 miss  gold=12 blind=24 (arithmetic_comparison) There are 12 horizontal stacked bars, each with 2 segments. Counting segments, 12 x 2 = 24; counting whole bar
+  q0053 miss  gold='[deloitte, pwc]' blind=None (arithmetic_comparison) Highest revenue shown is 47.6 billion USD; no firm exceeds 90 billion, so the question's premise is not suppor
+  q0054 miss  gold='northwest europe marker price' blind='Japan steam coal import cif price' (visual_reference) The brown/maroon bar is the second one, labelled Japan steam coal import cif price.
+  q0059 miss  gold='support' blind='Defense' (visual_reference) The green slice is connected to the label Defense 55.
+  q0065 miss  gold=4 blind=1 (arithmetic_comparison) Only two data points are marked, 2010 (~5%) and 2017 (~42%). Only 2017 is above 20%. If interpolating the stra
+  q0077 miss  gold=8.3 blind=8300 (arithmetic_comparison) (3.0 + 8.9 + 13.0) / 3 = 24.9 / 3 = 8.3 thousand million US dollars, i.e. 8300 million.
+  q0087 miss  gold=0.71 blind=71 (arithmetic_comparison) Spain's Keep euro bar is labelled 71%.
+  q0092 miss  gold=1.5 blind=1 (retrieval) The dark bar for Denmark is labelled 1%.
+  q0121 miss  gold=0.91 blind=91 (arithmetic_comparison) Highest is China 70, lowest is UK 21. Sum = 91.
+  q0129 miss  gold=1.993055556 blind=0.94 (arithmetic_comparison) Oppose 47, favor 50. Ratio 47/50 = 0.94.
+  q0135 miss  gold='footwear' blind=45.2 (visual_reference) Footwear has the highest share at 45.2%.

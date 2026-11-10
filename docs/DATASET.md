@@ -1,5 +1,7 @@
 # ChartQA VLM Capstone (Track A)
 
+> **Current dataset: ChartAudit-Fin v2.0** (`data/v2.0/`, finance and economics only, labelled blind). See `data/v2.0/README.md`. The v1.0 description below is kept for reference; v1.0 is superseded.
+
 IIITK Exec PG GenAI capstone: QLoRA fine-tuning of a ≤8B **vision-language** model (Qwen2.5-VL-7B / Qwen2-VL-7B) on ChartQA human-written questions, with grounded JSON answers.
 
 Dataset **ChartAudit v1.0**: ChartQA human-written questions selected and stratified for the project. Each item has the chart image, the question and an answer target with evidence and a short rationale, written by Claude Opus as teacher and checked by `scripts/check_teacher.py`.

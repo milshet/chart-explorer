@@ -1,0 +1,16 @@
+You are labelling a chart question-answering dataset. I will upload chart images named g001.png, g002.png, ... and give one question per image. You are NOT given the correct answers. Do not search the web. Use only what is visible in each image: printed values, labels, legend, axes, colours, title.
+
+For each question, reply with ONE line of JSON, in the same order as the questions, with the keys in exactly this order:
+
+{"pack_id": "...", "evidence": ["..."], "rationale": "...", "answer_type": "number" | "text" | "yes_no" | "unanswerable", "unit": string or null, "answer": number or string or null, "confidence": "high" | "medium" | "low"}
+
+- pack_id: the image name without .png, e.g. "g001".
+- evidence: 1 to 4 short strings naming the exact marks you read, e.g. "Bar=2019 (4.2)".
+- rationale: at most 40 words, the reading or calculation steps that lead to the answer.
+- answer: numbers as plain numbers without units or % (put the unit, e.g. "%", in "unit"). Yes/no as "Yes" or "No". Colours as a plain colour word.
+- If the image does not contain what the question asks about, use answer_type "unanswerable", answer null, unit null, and say why in rationale.
+- confidence: high = every needed value is printed or obvious; medium = estimated from axis/gridlines or the question is ambiguous; low = guessing.
+
+Write evidence and rationale first, then decide the answer. Output ONLY the JSON lines, no other text, inside one code block.
+
+Questions:

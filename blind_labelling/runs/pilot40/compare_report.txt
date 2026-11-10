@@ -1,0 +1,3 @@
+items 40 | exact 39 | close 0 | miss 1 | key order ok 40/40
+final confidence: high 39, medium 0, low 1
+  q0011 miss  gold='[10, 12]' blind=22 (retrieval) 10 + 12 = 22.

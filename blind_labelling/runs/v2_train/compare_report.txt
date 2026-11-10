@@ -1,0 +1,93 @@
+items 1155 | exact 1064 | close 6 | miss 85 | key order ok 1155/1155
+final confidence: high 1042, medium 28, low 85
+  q0013 miss  gold=12 blind=4 (arithmetic_comparison) Four distinct education levels appear (below upper secondary, upper secondary and post-secondary non-tertiary,
+  q0035 miss  gold=6 blind=None (retrieval) Denmark is not labelled in the pie; it could only be inside Other (8%), which is not separable.
+  q0048 miss  gold=None blind=1994 (unanswerable) The shortest bar is 26 at 1994 Lillehammer.
+  q0063 miss  gold=0.44 blind=44 (arithmetic_comparison) Maximum growth 45.4 and minimum 1.4; difference = 44.
+  q0064 miss  gold=2.185416667 blind=1.93 (arithmetic_comparison) Politics good 52 versus bad 27; ratio = 52 / 27 = 1.93.
+  q0089 miss  gold=0.46 blind=46 (arithmetic_comparison) The Total row shows Too much = 46.
+  q0119 close gold=51 blind=48 (visual_reference) The top leftmost bar is the green bar for White, labelled 48.
+  q0128 miss  gold='recovering strongly' blind=6 (retrieval) The 6% slice is 'Recovering strongly'; the question wording is odd, so the stated value 6 is given.
+  q0129 close gold=3446.4 blind=3232.87 (arithmetic_comparison) Asia maximum 3479.06; Europe minimum is at 1950, 246.19. 3479.06 - 246.19 = 3232.87.
+  q0130 miss  gold=2 blind=0 (arithmetic_comparison) Lines are close in 2007 and 2008 but the development points sit slightly below 3.3; no year shows identical va
+  q0174 miss  gold=11.5 blind=21.25 (arithmetic_comparison) Sum 11 + 24 + 21 + 29 = 85; divided by 4 bars = 21.25.
+  q0178 miss  gold=None blind=0.476 (unanswerable) Chart has two unlabelled lines; no single series is specified. Estimating the Costa Rica point at 2013 from gr
+  q0181 miss  gold='senvion' blind=4.4 (visual_reference) Senvion is 4.4% while Bard Engineering is about 1%, so Senvion is higher.
+  q0212 miss  gold=345 blind=35 (arithmetic_comparison) Reading the Total row, Sometimes 52 minus Often 17 = 35. Question wording is ambiguous.
+  q0222 miss  gold=0.168 blind=16.8 (arithmetic_comparison) Three regions exceed 13.8: 20.7 + 15.7 + 14 = 50.4; divided by 3 = 16.8.
+  q0224 miss  gold='red' blind='Golf balls' (arithmetic_comparison) One third of 45.2 is about 15.07. Only Golf balls (12.4) is below it.
+  q0240 miss  gold=3 blind=2 (arithmetic_comparison) Bad values under 56 are 54 and 40 only.
+  q0243 miss  gold='navy blue' blind='Dark blue' (visual_reference) Largest is grey 55.7; second largest is Travel 23.9, shown in dark navy.
+  q0279 miss  gold=0.43 blind=43 (arithmetic_comparison) Labelled segments: median 38, smallest 5. Sum = 43. Two tiny unlabeled slices exist, so slightly ambiguous.
+  q0292 miss  gold=None blind=2036689 (unanswerable) 41.49 x 38.27 = 1587.82; 38.13 x 33.64 = 1282.69; product is about 2,036,689.
+  q0329 miss  gold='industry' blind='Agriculture' (retrieval) Agriculture share falls every year from 39.15% in 2010 to 27.73% in 2020.
+  q0334 miss  gold='connected car (e.g., car with internet connection, gps system or electronic toll collection device)' blind='Employee access card with sensor' (arithmetic_comparison) Question is ambiguous; interpreting as the item whose three shares are closest together, Employee access card 
+  q0335 miss  gold=1249.5 blind=4892.22 (arithmetic_comparison) Nine companies below 20 000: 18427+6197+4902+3481+3329+2619+2576+1286+1213 = 44 030; divided by 9 = 4892.2.
+  q0346 miss  gold=4 blind=5 (arithmetic_comparison) All five lines exceed 5% at some point, Japan only slightly around 2000-2004.
+  q0369 close gold=1.142361111 blind=1.08 (arithmetic_comparison) 27/25=1.08.
+  q0371 miss  gold=0.042361111 blind='1:1' (arithmetic_comparison) Values 37 occur twice, 42 occur twice; ratio 2:2 = 1:1.
+  q0378 miss  gold=0.11 blind=11 (arithmetic_comparison) 61-50=11 point decrease.
+  q0392 miss  gold=None blind='Convenience food and kitchen products' (unanswerable) In 2018 largest segment is convenience food and kitchen products.
+  q0400 miss  gold=0.1356 blind=13.57 (arithmetic_comparison) Sum 40.7 divided by 3 = 13.567.
+  q0413 miss  gold=0.03 blind=3 (arithmetic_comparison) 48 - 45 = 3 (percent points of More likely).
+  q0419 miss  gold=0.3754 blind=37.54 (arithmetic_comparison) Values below 40: 39.58 and 35.5. Average = (39.58 + 35.5) / 2 = 37.54.
+  q0433 miss  gold=6415 blind=5522 (arithmetic_comparison) Chart gives values not percentages; question is ambiguous. Taking difference between highest (ING 8876) and lo
+  q0454 miss  gold='may 21' blind='May 2021' (retrieval) The lowest printed rate is 9.9% at May '21.
+  q0467 miss  gold=0.1 blind=0.17 (arithmetic_comparison) 27.39 - 27.22 = 0.17 (2020 is 0.17 lower than 2019).
+  q0481 miss  gold=None blind=20.45 (unanswerable) (33 + 7.9) / 2 = 20.45.
+  q0499 miss  gold=0.04375 blind=0.33 (arithmetic_comparison) Second smallest is 8, third smallest is 24; ratio 8/24 = 0.33 (1:3).
+  q0500 miss  gold=None blind='No' (unanswerable) The highest is 23.8%, below 50%.
+  q0502 close gold=32 blind=34 (retrieval) The grey Men bar under 'It's overrated' is labelled 34%.
+  q0509 miss  gold='slovak republic' blind='Korea' (visual_reference) Label colours are not visible; the orange line matches Slovak Republic (ends high). The red line ends low near
+  q0524 miss  gold=0.19 blind=19 (arithmetic_comparison) 35.2 - 16.2 = 19.0.
+  q0536 miss  gold=None blind=92 (unanswerable) Question is ambiguous; taking the highest/top bar value, Females mobile phone at 92%.
+  q0557 miss  gold='navy blue' blind='Dark blue' (visual_reference) The tallest bar is the 25% bar, which is the dark navy (Spent less money) colour.
+  q0573 miss  gold='blue' blind='Gray' (visual_reference) The 5-14 years bar is coloured slate gray-blue.
+  q0575 miss  gold=0.047916667 blind=0.11 (arithmetic_comparison) Smallest 10 over largest 90 = 0.111.
+  q0584 miss  gold='green' blind='Mostly good news' (visual_reference) The green Mostly good news line is nearly flat (1 to 7), far less variation than the others.
+  q0602 miss  gold=0.16 blind=16 (arithmetic_comparison) Reading 'not all confident' as 'Not at all confident': 25 minus 9 very confident gives 16.
+  q0611 miss  gold=0.1 blind=9.9 (arithmetic_comparison) Estimated from the purple Malawi line: about 80.1% in 1991 and about 70.2% in 2005; difference about 9.9 point
+  q0616 miss  gold='alkermes' blind=6197 (visual_reference) Ranking bars by length: Shire, Actelion, then Alkermes third at 6,197.
+  q0628 miss  gold=8 blind=6 (arithmetic_comparison) Counting purple Greece points above the 110 gridline: 2004, 2006, 2007, 2008, 2009, 2010. The 2003 and 2005 po
+  q0634 miss  gold=None blind=2016 (unanswerable) Chart has no visible title or country, but among 2012 to 2016 bars the highest is 2016 at 28,327.3 million eur
+  q0659 miss  gold=0.2373 blind=1.24 (arithmetic_comparison) Ratio of 2014 to 2012 value: 73 / 59 = 1.237, about 1.24. Question wording is ambiguous.
+  q0662 miss  gold='mission-based marketing' blind='Performance marketing' (retrieval) Performance marketing has the smallest no-change share (27%), so the most professionals plan changes (73%) the
+  q0672 miss  gold=None blind=2 (unanswerable) The stacked bars use two colours, blue and dark navy.
+  q0684 miss  gold='2/2021' blind=None (visual_reference) The chart shows an overall food price index, not sugar prices, so the question cannot be answered from it.
+  q0694 miss  gold=0.042361111 blind=1 (arithmetic_comparison) Value 70 appears twice and value 26 appears twice, so the ratio is 2:2 = 1.
+  q0720 miss  gold='no' blind='Yes' (arithmetic_comparison) Two lowest bars: 0.2 + 0.39 = 0.59, which is greater than Uruguay's 0.47.
+  q0726 miss  gold=89 blind=123 (arithmetic_comparison) Using the Be distinct bars, the largest is Greece 78 and the smallest country is Poland 45; sum is 123. Series
+  q0737 miss  gold='[1996, 1999]' blind=1998 (retrieval) The pink Greece line peaks at about 19.5 MWh in 1998, then dips in 1999.
+  q0747 miss  gold=27.9 blind=25.1 (arithmetic_comparison) Using the 13 printed values, sorted median is 101. Lowest is 75.9. Difference 101 minus 75.9 equals 25.1. Unla
+  q0761 miss  gold=None blind=76 (unanswerable) The yellowish (olive) segment of the pie is the 76% one.
+  q0763 close gold=0.85 blind=0.8 (arithmetic_comparison) Average = (0.8+0.9+3.4)/3 = 1.7. Median = 0.9. Difference = 0.8.
+  q0777 miss  gold=0.216666667 blind=0.4167 (arithmetic_comparison) Smallest green 30, largest 72. Ratio 30:72 = 5:12 = 0.4167.
+  q0802 miss  gold=9.96 blind=9840.64 (arithmetic_comparison) Sum = 96.7 + 2.5 = 99.2. Square = 99.2 * 99.2 = 9840.64.
+  q0838 miss  gold=0.214583333 blind=0.556 (arithmetic_comparison) Green median is 15; smallest gray is 27. Ratio 15:27 = 0.556.
+  q0842 miss  gold='suriname' blind=1459 (visual_reference) Largest is Puerto Rico 2,362; second largest is Suriname at 1,459 kWh.
+  q0852 miss  gold=2.9 blind=0.9 (arithmetic_comparison) Spain's 2018 bar is labelled 0.9.
+  q0863 miss  gold=0.71 blind=71 (arithmetic_comparison) 59 + 12 = 71.
+  q0869 miss  gold=22.3 blind=5.575 (arithmetic_comparison) Sum = 22.3; divided by 4 countries = 5.575.
+  q0873 miss  gold='gray' blind='Grey' (visual_reference) The Canada slice is light grey.
+  q0876 miss  gold='those who did not learn about the election' blind='Gives people some say about how the govt runs things' (retrieval) Across the groups the 'Gives people some say' option has the larger value (63 max; 49+63 vs 50+36). Question i
+  q0884 miss  gold=6.69 blind=3.345 (arithmetic_comparison) (2.43+4.26)/2 = 3.345.
+  q0893 close gold=158 blind=169.25 (arithmetic_comparison) (169+172+172+164)/4 = 677/4 = 169.25.
+  q0897 miss  gold=1.21875 blind=1.93 (arithmetic_comparison) Median row has 58 and 30; ratio 58:30 = 1.93.
+  q0910 miss  gold=None blind='No' (unanswerable) Every bar is olive green; the largest is also olive green, not blue.
+  q0942 miss  gold=9 blind=8 (arithmetic_comparison) Counting the listed rows gives 8 categories.
+  q0962 miss  gold=None blind=83 (unanswerable) Highest printed value is 83 in 2020 for 'really matters'.
+  q0966 miss  gold=0.06 blind=6 (arithmetic_comparison) Politics row shows good 36 and bad 30; 36-30 = 6.
+  q0995 miss  gold='3rd quartile' blind='4th quartile' (visual_reference) Austria values are 150, 250, 400, 400; the 3rd and 4th quartiles tie, picking the 4th as last.
+  q1018 miss  gold=1 blind=2 (arithmetic_comparison) Values near 2820 are 2811 (2018) and 2761.9 (2019); others are 2610.8 or below. The question is ambiguous, so 
+  q1025 miss  gold='no' blind='Yes' (arithmetic_comparison) Estimated from axis: Denmark about 2.77 plus Switzerland about 1.65 is about 4.4 billion, greater than 4.
+  q1026 miss  gold=None blind=100 (unanswerable) The chart has only two slices; the question's 'other takes' is unclear. Sum of all slices is 18 + 82 = 100.
+  q1044 miss  gold=0.888194444 blind=0.25 (arithmetic_comparison) Ratio fossil fuels to alternative energy is 20/79 = 0.253 (about 1:4). Direction of ratio is ambiguous.
+  q1046 miss  gold=0.42 blind=288 (arithmetic_comparison) 42+18+18+17+64+62+67 = 288.
+  q1060 miss  gold=0.64 blind=64 (arithmetic_comparison) The green Good influence bar for Education is labelled 64%.
+  q1061 miss  gold=0.678472222 blind='48:51' (arithmetic_comparison) The two largest segments are 51% and 48%; smaller first gives 48:51.
+  q1084 miss  gold=1.023809524 blind='1:1' (arithmetic_comparison) Light blue Flemish peaks at 43%; the gray Belgium line also peaks at 43% (2019). Ratio is 43:43 = 1:1. Light g
+  q1087 miss  gold=None blind='No' (unanswerable) There is no gray segment; two smallest are 2+18 = 20, which is not greater than the 20% tan segment nor the 61
+  q1101 miss  gold=43 blind=21 (arithmetic_comparison) Highest Important is 24, lowest Very important is 45; difference 45-24=21.
+  q1105 miss  gold=0.05 blind=5 (arithmetic_comparison) Teal Lithuania line is 20% in 2009 and 15% in 2010; difference 5 points.
+  q1117 miss  gold=3 blind=7 (arithmetic_comparison) Estimated from gridlines: 2004 about -76.0, 2006 about -69.1; change about 7 points. No printed values.
+  q1118 miss  gold=1.700694444 blind=0.82 (arithmetic_comparison) 40 / 49 = 0.816.

@@ -1,0 +1,11 @@
+{"id": "val-multi_col_100304-934", "reason": "blind_answer_disagrees", "gold": 12, "blind": 24, "rationale": "There are 12 horizontal stacked bars, each with 2 segments. Counting segments, 12 x 2 = 24; counting whole bars would be 12."}
+{"id": "val-two_col_63-953", "reason": "blind_answer_disagrees", "gold": "[deloitte, pwc]", "blind": null, "rationale": "Highest revenue shown is 47.6 billion USD; no firm exceeds 90 billion, so the question's premise is not supported by the chart."}
+{"id": "val-96134789000993-424", "reason": "blind_answer_disagrees", "gold": "northwest europe marker price", "blind": "Japan steam coal import cif price", "rationale": "The brown/maroon bar is the second one, labelled Japan steam coal import cif price."}
+{"id": "val-8126-38", "reason": "blind_answer_disagrees", "gold": "support", "blind": "Defense", "rationale": "The green slice is connected to the label Defense 55."}
+{"id": "val-11711749024597-177", "reason": "blind_answer_disagrees", "gold": 4, "blind": 1, "rationale": "Only two data points are marked, 2010 (~5%) and 2017 (~42%). Only 2017 is above 20%. If interpolating the straight line, 2013-2017 would exceed 20%."}
+{"id": "val-OECD_IMPORTS_BY_BUSINESS_SIZE_LVA_NZL_PRT_ROU_000002-373", "reason": "blind_answer_disagrees", "gold": 8.3, "blind": 8300, "rationale": "(3.0 + 8.9 + 13.0) / 3 = 24.9 / 3 = 8.3 thousand million US dollars, i.e. 8300 million."}
+{"id": "val-10578-406", "reason": "blind_answer_disagrees", "gold": 0.71, "blind": 71, "rationale": "Spain's Keep euro bar is labelled 71%."}
+{"id": "val-multi_col_40608-834", "reason": "blind_answer_disagrees", "gold": 1.5, "blind": 1, "rationale": "The dark bar for Denmark is labelled 1%."}
+{"id": "val-4488-315", "reason": "blind_answer_disagrees", "gold": 0.91, "blind": 91, "rationale": "Highest is China 70, lowest is UK 21. Sum = 91."}
+{"id": "val-8500-349", "reason": "blind_answer_disagrees", "gold": 1.993055556, "blind": 0.94, "rationale": "Oppose 47, favor 50. Ratio 47/50 = 0.94."}
+{"id": "val-two_col_21413-620", "reason": "blind_answer_disagrees", "gold": "footwear", "blind": 45.2, "rationale": "Footwear has the highest share at 45.2%."}
