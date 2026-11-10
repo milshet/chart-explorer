@@ -1,3 +1,4 @@
-items 40 | exact 39 | close 0 | miss 1 | key order ok 40/40
-final confidence: high 39, medium 0, low 1
+items 40 | exact 38 | miss 2 | key order ok 40/40
+final confidence: high 38, medium 0, low 2
+  q0007 miss  gold=2020 blind='1st half 2020' (arithmetic_comparison) Europe plus North America sums per period; 2020 first half is the smallest at 4234.
   q0011 miss  gold='[10, 12]' blind=22 (retrieval) 10 + 12 = 22.

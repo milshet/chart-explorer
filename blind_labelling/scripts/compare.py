@@ -1,9 +1,17 @@
 """Compare blind labels with the real answers (run only AFTER labelling).
 
+Strict exact match (v2.0, decided 2026-11-10: only 100% matches are kept).
+  numbers: the same value (commas and a % sign ignored; 46 and 0.46 are NOT the same). When both
+           have decimals, they only need to agree to the shorter one's decimals, since that is the
+           same answer rounded: 3.22 = 3.22222, 33.3 = 33.33, but 7.5 != 7.4 and 6.4 != 6
+  text:    the same after lower-casing and removing punctuation, ignoring list order
+           ("A and B" = "[B, A]") and a qualifier in brackets ("Naomi Osaka (tennis)" = "Naomi Osaka")
+  unanswerable: both answers null
+
 Final confidence:
-  high   = blind answer matches gold (numbers within 5%, text same after normalising)
-  medium = numbers within 5-10%, or match but labeller said low confidence
-  low    = mismatch -> left out of training
+  high   = exact match
+  medium = exact match, but the labeller said its own confidence was low
+  low    = anything else -> left out of training
 """
 import json, sys, re, pathlib, collections
 out = pathlib.Path(sys.argv[1])
@@ -18,7 +26,18 @@ def num(x):
         m = re.fullmatch(r"\s*[-+]?[\d,]*\.?\d+\s*%?\s*", x)
         if m: return float(x.replace(",", "").replace("%", ""))
     return None
-def norm(x): return re.sub(r"[^a-z0-9.]+", " ", re.sub(r"['\u2019]", "", str(x).lower())).strip()
+def decimals(x):
+    t = str(x).replace(",", "").replace("%", "").strip()
+    return len(t.split(".")[1]) if "." in t else 0
+def same_number(g, b, gn, bn):
+    if abs(gn - bn) <= 1e-9 * max(1.0, abs(gn)): return True
+    d = min(decimals(g), decimals(b))
+    return d > 0 and abs(gn - bn) <= 0.5 * 10 ** -d + 1e-9
+def norm(x):
+    s = re.sub(r"\([^)]*\)", " ", str(x).lower())          # drop a qualifier in brackets
+    s = re.sub(r"['\u2019]", "", s).replace("grey", "gray")
+    s = re.sub(r"\.(?=\s|$)", "", s)                       # "U.S." = "u.s"
+    return re.sub(r"[^a-z0-9.]+", " ", s).strip()
 def parts(x):
     """Split list-like answers: "[A, B]", "A and B", "A, B" -> sorted normalised items."""
     s = str(x).strip().strip("[]")
@@ -35,12 +54,10 @@ for l in labs:
     else:
         gn, bn = num(g), num(b)
         if gn is not None and bn is not None:
-            d = abs(gn - bn) / max(abs(gn), 1e-9)
-            m = "exact" if d <= 0.05 else "close" if d <= 0.10 else "miss"
+            m = "exact" if same_number(g, b, gn, bn) else "miss"
         else:
-            ng, nb = norm(g), norm(b)
-            m = "exact" if ng == nb or (ng and nb and (ng in nb or nb in ng)) or parts(g) == parts(b) or (str(g).startswith("[") and all(p in nb for p in parts(g))) else "miss"
-    conf = {"exact": "high", "close": "medium", "miss": "low"}[m]
+            m = "exact" if norm(g) == norm(b) or parts(g) == parts(b) else "miss"
+    conf = {"exact": "high", "miss": "low"}[m]
     if m == "exact" and l.get("confidence") == "low": conf = "medium"
     stats[m] += 1; stats["conf_" + conf] += 1
     rows.append({"pack_id": l["pack_id"], "id": k["id"], "gold": g, "blind": b, "unit": l.get("unit"),
@@ -49,7 +66,7 @@ for l in labs:
 with open(out / "compare.jsonl", "w", encoding="utf-8", newline="\n") as f:
     for r in rows: f.write(json.dumps(r) + "\n")
 n = len(rows)
-print(f"items {n} | exact {stats['exact']} | close {stats['close']} | miss {stats['miss']} | key order ok {stats['key_order_ok']}/{n}")
+print(f"items {n} | exact {stats['exact']} | miss {stats['miss']} | key order ok {stats['key_order_ok']}/{n}")
 print(f"final confidence: high {stats['conf_high']}, medium {stats['conf_medium']}, low {stats['conf_low']}")
 for r in rows:
     if r["match"] != "exact":

@@ -3,7 +3,7 @@ Ask a question about any chart image, get a grounded answer.
 
 ## Dataset
 
-**ChartAudit-Fin v2.0** (`data/v2.0/`): 1,070 train / 126 val / 180 test finance and economics chart questions from ChartQA, selected by written rules and labelled blind (the labeller never saw the correct answers). Method, results and rebuild steps: [`data/v2.0/README.md`](data/v2.0/README.md).
+**ChartAudit-Fin v2.0** (`data/v2.0/`): 1,033 train / 124 val / 180 test finance and economics chart questions from ChartQA, selected by written rules and labelled blind (the labeller never saw the correct answers). Method, results and rebuild steps: [`data/v2.0/README.md`](data/v2.0/README.md).
 
 | Folder | What |
 |---|---|
