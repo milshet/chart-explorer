@@ -1,0 +1,26 @@
+# Ablation (#6): answer-only targets, no 'show working'. Same data items as Runs A/B
+# (data/v2.0/image_only/answer_only/). Set lora.r / lora.alpha to the better of Run A and Run B
+# before submitting; everything else must match that run.
+run_name: ablation_answer_only
+data_dir: data/v2.0
+variant: image_only
+targets: answer_only
+max_pixels: 640000
+lora:
+  r: 16                     # <- the winner of Run A / Run B
+  alpha: 32
+  dropout: 0.05
+train:
+  epochs: 2
+  lr: 2.0e-4
+  grad_accum: 8
+  warmup_ratio: 0.03
+  seed: 42
+eval:
+  every_steps: 50
+save:
+  every_steps: 50
+  keep: 2
+wandb:
+  enabled: true
+  project: chartqa-week2

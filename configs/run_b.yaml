@@ -1,0 +1,24 @@
+# Run B (#5): rank 64, everything else identical to Run A.
+run_name: run_b_r64
+data_dir: data/v2.0
+variant: image_only
+targets: reasoning
+max_pixels: 640000
+lora:
+  r: 64
+  alpha: 128                # alpha = 2 x r, same scaling as Run A
+  dropout: 0.05
+train:
+  epochs: 2
+  lr: 2.0e-4
+  grad_accum: 8
+  warmup_ratio: 0.03
+  seed: 42
+eval:
+  every_steps: 50
+save:
+  every_steps: 50
+  keep: 2
+wandb:
+  enabled: true
+  project: chartqa-week2
