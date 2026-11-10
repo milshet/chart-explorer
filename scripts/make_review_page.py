@@ -3,7 +3,7 @@
 
 The page shows the same 50 items as audit/audit_v2.xlsx (ids in audit/audit_v2_ids.txt),
 the chart large, and three Yes / No / Unsure questions per item. Progress is kept in the
-browser; at the end the reviewer downloads audit_reviewer_<A|B>.json, and
+browser; at the end the reviewer downloads audit_reviewer_<A|B|C>.json, and
 scripts/audit_import.py writes it into the workbook.
 
 Open audit/review.html from inside the repo (it loads the charts from ../data/v2.0/images).
@@ -50,13 +50,13 @@ function save(){ store.set(key(), {i, data}); }
 function start(){
   document.getElementById("app").innerHTML = `<div class="start card"><h2>Human audit of ChartAudit-Fin v2.0 labels</h2>
   <p>You will see ${ITEMS.length} training items, one at a time. For each, look at the chart and answer three questions with Yes, No or Unsure. Add a short note for any No or Unsure.</p>
-  <p>Work on your own. Do not look at the other reviewer's answers.</p>
+  <p>Work on your own. Do not look at the other reviewers' answers.</p>
   <p class="lbl">I am</p>
-  <label><input type="radio" name="r" value="A"> Reviewer A</label><label><input type="radio" name="r" value="B"> Reviewer B</label>
+  <label><input type="radio" name="r" value="A"> Reviewer A</label><label><input type="radio" name="r" value="B"> Reviewer B</label><label><input type="radio" name="r" value="C"> Reviewer C</label>
   <p class="hint">Your progress is saved in this browser, so you can close the page and come back. At the end, click "Download my results".</p>
   <button class="big" id="go">Start</button></div>`;
   document.getElementById("go").onclick = () => {
-    const r = document.querySelector("input[name=r]:checked"); if(!r) return alert("Choose Reviewer A or B");
+    const r = document.querySelector("input[name=r]:checked"); if(!r) return alert("Choose Reviewer A, B or C");
     who = r.value; const s = store.get(key()); if(s){ i = s.i||0; data = s.data||{}; } render(); };
 }
 function render(){

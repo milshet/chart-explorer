@@ -2,10 +2,10 @@
 """Copy the results downloaded from audit/review.html into the audit workbook.
 
 Each JSON file says which reviewer it belongs to; its answers go into that reviewer's sheet
-(matched by item id), then the workbook is saved and the kappa summary is printed.
+(matched by item id), then the workbook is saved and the agreement and kappa summary is printed.
 
 Usage:
-  python scripts/audit_import.py audit/audit_v2.xlsx audit_reviewer_A.json audit_reviewer_B.json
+  python scripts/audit_import.py audit/audit_v2.xlsx audit_reviewer_A.json audit_reviewer_B.json audit_reviewer_C.json
 """
 import json, os, subprocess, sys
 from openpyxl import load_workbook

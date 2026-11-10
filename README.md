@@ -11,6 +11,6 @@ Ask a question about any chart image, get a grounded answer.
 | `scripts/select_clean.py`, `scripts/chartqa_rules.py` | Rule-based selection from raw ChartQA |
 | `blind_labelling/` | Labeller prompt, packs, hidden answer keys, labels and comparisons (incl. a GPT cross-check) |
 | `scripts/build_final.py` | Builds the final files from the selection and the blind labels |
-| `audit/` | 50-item two-reviewer human audit sheet (Cohen's kappa) |
+| `audit/` | 50-item three-reviewer human audit (review page `audit/review.html`, Fleiss' kappa) |
 | `notebooks/01_vlm_baselines.ipynb` | Zero-shot, few-shot and chain-of-thought baselines (Qwen2.5-VL-3B) |
 | `data/v1.0/` | Earlier version, superseded by v2.0 |

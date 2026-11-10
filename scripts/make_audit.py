@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Make a two-reviewer audit workbook for a random sample of v2.0 training items.
+"""Make a three-reviewer audit workbook for a random sample of v2.0 training items.
 
 Each reviewer gets their own sheet with the chart image, the question, the label
 (evidence, rationale, answer, unit) and three Yes/No/Unsure columns to fill in.
-The Summary sheet computes agreement and Cohen's kappa with Excel formulas, and
+The Summary sheet computes agreement and Fleiss' kappa with Excel formulas, and
 scripts/audit_kappa.py computes the same from the filled-in file.
 
 Usage:
@@ -61,11 +61,35 @@ def reviewer_sheet(wb, title, items, root):
     return ws
 
 
+REVIEWERS = ["A", "B", "C"]
+
+
+def calc_sheet(wb, n):
+    """Hidden helper sheet: per item and check, how many reviewers said Yes / No / Unsure."""
+    ws = wb.create_sheet("Calc")
+    last = n + 1
+    for i, (key, _) in enumerate(CHECKS):
+        col = chr(ord("G") + i)
+        base = 1 + i * 5
+        for j, h in enumerate([f"{key} Yes", "No", "Unsure", "rated by", "P_i"]):
+            ws.cell(row=1, column=base + j, value=h)
+        for r in range(2, last + 1):
+            cells = [f"'Reviewer {x}'!{col}{r}" for x in REVIEWERS]
+            for j, o in enumerate(OPTIONS):
+                ws.cell(row=r, column=base + j, value="=" + "+".join(f'({c}="{o}")*1' for c in cells))
+            y, nn, u, k, pi = (ws.cell(row=r, column=base + j).coordinate for j in range(5))
+            ws.cell(row=r, column=base + 3, value=f"={y}+{nn}+{u}")
+            m = len(REVIEWERS)
+            ws.cell(row=r, column=base + 4, value=f'=IF({k}={m},({y}^2+{nn}^2+{u}^2-{m})/({m}*({m}-1)),"")')
+    ws.sheet_state = "hidden"
+    return ws
+
+
 def summary_sheet(wb, n):
     ws = wb.create_sheet("Summary", 0)
-    ws["A1"] = "Audit of ChartAudit-Fin v2.0 training labels"; ws["A1"].font = Font(bold=True, size=14)
+    ws["A1"] = "Audit of ChartAudit-Fin v2.0 training labels (three reviewers)"; ws["A1"].font = Font(bold=True, size=14)
     ws["A3"] = "How to fill in"; ws["A3"].font = Font(bold=True)
-    steps = ["Reviewer A fills sheet 'Reviewer A', Reviewer B fills 'Reviewer B'. Do it separately; don't look at each other's answers.",
+    steps = ["Reviewers A, B and C each fill their own sheet (or use audit/review.html). Work separately; don't look at each other's answers.",
              "For each row look at the chart image, then pick Yes / No / Unsure in the three yellow columns.",
              "answer_correct: read the chart yourself. Is the answer right? (numbers within ~5% count as right)",
              "evidence_matches: are the values quoted in Evidence really on the chart?",
@@ -74,28 +98,33 @@ def summary_sheet(wb, n):
     for i, s in enumerate(steps):
         ws.cell(row=4 + i, column=1, value=f"{i + 1}. {s}")
     r0 = 11
-    hdr = ["Check", "A: % Yes", "B: % Yes", "Agreement %", "Expected agreement", "Cohen's kappa"]
+    hdr = ["Check", "A: % Yes", "B: % Yes", "C: % Yes", "All 3 agree %", "Fleiss' kappa"]
     for j, h in enumerate(hdr):
         c = ws.cell(row=r0, column=1 + j, value=h); c.font = Font(bold=True)
     last = n + 1
+    m = len(REVIEWERS)
     for i, (key, desc) in enumerate(CHECKS):
         col = chr(ord("G") + i)
-        A = f"'Reviewer A'!{col}2:{col}{last}"; B = f"'Reviewer B'!{col}2:{col}{last}"
         row = r0 + 1 + i
         ws.cell(row=row, column=1, value=key)
-        ws.cell(row=row, column=2, value=f'=IFERROR(COUNTIF({A},"Yes")/COUNTA({A}),"")')
-        ws.cell(row=row, column=3, value=f'=IFERROR(COUNTIF({B},"Yes")/COUNTA({B}),"")')
-        agree = "+".join(f'SUMPRODUCT(({A}="{o}")*({B}="{o}"))' for o in OPTIONS)
-        both = f'SUMPRODUCT(({A}<>"")*({B}<>""))'
-        ws.cell(row=row, column=4, value=f"=IFERROR(({agree})/{both},\"\")")
-        exp = "+".join(f'(COUNTIF({A},"{o}")/{both})*(COUNTIF({B},"{o}")/{both})' for o in OPTIONS)
-        ws.cell(row=row, column=5, value=f"=IFERROR({exp},\"\")")
-        ws.cell(row=row, column=6, value=f'=IFERROR((D{row}-E{row})/(1-E{row}),"")')
+        for j, x in enumerate(REVIEWERS):
+            R = f"'Reviewer {x}'!{col}2:{col}{last}"
+            ws.cell(row=row, column=2 + j, value=f'=IFERROR(COUNTIF({R},"Yes")/COUNTA({R}),"")')
+        base = 1 + i * 5
+        L = lambda j: chr(64 + base + j)
+        Y, N_, U, K, P = (f"Calc!{L(j)}2:{L(j)}{last}" for j in range(5))
+        full = f"COUNTIF({K},{m})"
+        allagree = f'SUMPRODUCT(({K}={m})*(({Y}={m})+({N_}={m})+({U}={m})))'
+        ws.cell(row=row, column=5, value=f'=IFERROR({allagree}/{full},"")')
+        pj = lambda R: f"(SUMPRODUCT(({K}={m})*{R})/({m}*{full}))"
+        pe = "+".join(f"{pj(R)}^2" for R in (Y, N_, U))
+        ws.cell(row=row, column=6, value=f'=IFERROR((AVERAGE({P})-({pe}))/(1-({pe})),"")')
         for c in "BCDE":
             ws[f"{c}{row}"].number_format = "0.0%"
         ws[f"F{row}"].number_format = "0.00"
-    ws.cell(row=r0 + 5, column=1, value="Kappa guide: above 0.8 almost perfect, 0.6-0.8 substantial, 0.4-0.6 moderate. "
-            "If agreement is very high and almost everything is 'Yes', kappa can look low; report agreement % too.")
+    ws.cell(row=r0 + 5, column=1, value="Fleiss' kappa = agreement among all three reviewers beyond chance. Above 0.8 almost perfect, "
+            "0.6-0.8 substantial, 0.4-0.6 moderate. If almost everything is 'Yes', kappa can look low even when agreement "
+            "is high; report agreement % too. scripts/audit_kappa.py also prints Cohen's kappa for each pair.")
     ws.column_dimensions["A"].width = 22
     for c in "BCDEF":
         ws.column_dimensions[c].width = 18
@@ -112,9 +141,10 @@ def main():
     rows = [r for r in rows if r["answer_type"] != "unanswerable"]
     items = random.Random(a.seed).sample(rows, a.n)
     wb = Workbook(); wb.remove(wb.active)
-    for name in ("Reviewer A", "Reviewer B"):
-        reviewer_sheet(wb, name, items, a.data)
+    for x in REVIEWERS:
+        reviewer_sheet(wb, f"Reviewer {x}", items, a.data)
     summary_sheet(wb, a.n)
+    calc_sheet(wb, a.n)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     wb.save(a.out)
     with open(os.path.splitext(a.out)[0] + "_ids.txt", "w", encoding="utf-8", newline="\n") as f:
