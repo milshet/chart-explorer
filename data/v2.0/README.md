@@ -4,8 +4,8 @@ Finance and economics chart questions from ChartQA for fine-tuning a vision-lang
 
 | Split | Selected | Kept | Dropped (blind answer disagreed) |
 |---|---|---|---|
-| train | 1,155 | **1,070** | 85 |
-| val | 137 | **126** | 11 |
+| train | 1,155 | **1,033** | 122 |
+| val | 137 | **124** | 13 |
 | test | 180 | **180** | not labelled (human answers only) |
 
 The splits share 0 charts.
@@ -22,13 +22,15 @@ The splits share 0 charts.
    Counts for every exclusion reason are in `selection/stats.json`.
 3. **Question packs.** `blind_labelling/scripts/make_packs.py` copies each chart PNG under a neutral name (`q0001.png`) next to its question. The answers go to a separate `key/` folder. `leak_check.py` fails if a pack holds anything other than `pack_id`, `image` and `question`.
 4. **Blind labelling.** A fresh model instance per batch of 50 (Claude Sonnet) read only the pack and `blind_labelling/LABELLER_PROMPT.md`. It returned, in this key order: `evidence`, `rationale`, `answer_type`, `unit`, `answer`, `confidence`.
-5. **Compare.** `blind_labelling/scripts/compare.py` opens the key only after labelling. The final confidence comes from agreement with the human answer:
-    - numbers within 5%, or the same text: **high**;
-    - numbers within 10%, or a match the labeller itself marked low: **medium**;
-    - anything else: **low**, and the item is dropped.
+5. **Compare (strict exact match).** `blind_labelling/scripts/compare.py` opens the key only after labelling. An item is kept only if the blind answer is **the same answer** as the human one:
+    - numbers: the same value (commas and `%` ignored). When both have decimals they must agree to the shorter one's decimals, since that is the same answer rounded (3.22 = 3.22222; 7.5 ≠ 7.4; 2010 ≠ 2020);
+    - text: the same after lower-casing and removing punctuation, ignoring list order ("A and B" = "[B, A]") and a qualifier in brackets ("Naomi Osaka (tennis)" = "Naomi Osaka");
+    - unanswerable: both answers null.
+
+   An exact match is **high**, or **medium** if the labeller itself marked its confidence low. Anything else is **low**, and the item is dropped. (An earlier version also kept numbers within 5–10%. It was tightened on 2026-11-10 because a percentage tolerance also accepted wrong years, e.g. 2010 for 2020.)
 6. **Final files.** `scripts/build_final.py` keeps high and medium items. The training target uses the blind label's evidence and rationale with the **human ChartQA answer**. Test is never labelled.
 
-All packs, keys, labels and comparisons are in `blind_labelling/runs/`. The 40-item pilot (`pilot40`, from an earlier selection) matched on 39 of 40.
+All packs, keys, labels and comparisons are in `blind_labelling/runs/`. The 40-item pilot (`pilot40`, from an earlier selection) matched on 38 of 40 under the strict rule.
 
 ## All domains (counts only, not labelled)
 
@@ -58,24 +60,25 @@ Tags overlap (a chart can be both finance and economy), so the per-tag counts ar
 
 Each record has:
 - `domain` (`finance_economy`) and `domain_tags` (all keyword topics, e.g. `["business", "finance"]`);
-- `confidence` (`high` or `medium`; `null` on test);
+- `confidence` (`high`, or `medium` when the labeller marked itself unsure; `null` on test);
 - `evidence_in_table_share`, the share of numbers in the evidence found in the chart's data table. The labeller never saw that table. Computed values such as sums lower the share, so it is a flag, not a filter.
 
 ## Results of the blind check
 
 | | train | val |
 |---|---|---|
-| Blind answer matches human answer (high) | 1,042 (90.2%) | 123 (89.8%) |
-| Close (medium) | 28 | 3 |
-| Disagrees (dropped) | 85 (7.4%) | 11 (8.0%) |
-| Kept items whose evidence cites numbers | 1,001 | 114 |
-| …all of those numbers in the data table | 820 | 89 |
-| …at least half in the data table | 901 | 99 |
+| Exact match, labeller confident (high) | 1,018 (88.1%) | 121 (88.3%) |
+| Exact match, labeller unsure (medium) | 15 | 3 |
+| Not an exact match (dropped) | 122 (10.6%) | 13 (9.5%) |
+| Kept items whose evidence cites numbers | 964 | 112 |
+| …all of those numbers in the data table | 795 | 88 |
+| …at least half in the data table | 872 | 97 |
 
-Disagreements are mostly arithmetic questions (53 of 85 in train). Common causes:
+Dropped items are mostly arithmetic questions (75 of 122 in train). Common causes:
 - ChartQA answers that store a percentage as a fraction (0.46 for 46%);
 - ambiguous questions;
-- colour names (navy versus dark blue);
+- colour names (navy versus dark blue, light blue versus blue);
+- small rounding differences in computed values (40.66 versus 40.67);
 - mistakes by either side.
 
 ### Second model (GPT) cross-check
@@ -86,7 +89,7 @@ On a random sample of 30 train items, GPT (free ChatGPT and Microsoft Copilot we
 
 - The labeller ran in a shared workspace, so isolation rests on the packs, the leak check and the saved prompt, not a sandbox. The packs and outputs are kept so anyone can rerun the labelling with another model.
 - ChartQA is public, so a large model may have seen it in training. Agreement checks and number grounding reduce, but don't remove, that risk.
-- Dropping disagreements removes some hard questions from training. The test set is not filtered.
+- Dropping every item that is not an exact match removes some hard questions from training, especially charts without printed values. The test set is not filtered.
 
 ## Rebuild
 

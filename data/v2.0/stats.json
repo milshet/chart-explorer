@@ -3,46 +3,46 @@
   "splits": {
     "train": {
       "selected": 1155,
-      "kept": 1070,
-      "dropped": 85,
-      "conf_high": 1042,
-      "evidence_items_with_numbers": 1001,
-      "evidence_all_numbers_in_table": 820,
-      "evidence_most_numbers_in_table": 901,
-      "conf_low": 85,
-      "conf_medium": 28,
+      "kept": 1033,
+      "dropped": 122,
+      "conf_high": 1018,
+      "evidence_items_with_numbers": 964,
+      "evidence_all_numbers_in_table": 795,
+      "evidence_most_numbers_in_table": 872,
+      "conf_low": 122,
+      "conf_medium": 15,
       "by_answer_type": {
         "yes_no": 69,
-        "number": 739,
-        "text": 221,
+        "number": 715,
+        "text": 208,
         "unanswerable": 41
       },
       "by_question_type": {
-        "visual_reference": 282,
-        "retrieval": 188,
-        "arithmetic_comparison": 559,
+        "visual_reference": 272,
+        "retrieval": 183,
+        "arithmetic_comparison": 537,
         "unanswerable": 41
       }
     },
     "val": {
       "selected": 137,
-      "kept": 126,
-      "dropped": 11,
-      "conf_high": 123,
-      "evidence_items_with_numbers": 114,
-      "evidence_all_numbers_in_table": 89,
-      "evidence_most_numbers_in_table": 99,
-      "conf_low": 11,
+      "kept": 124,
+      "dropped": 13,
+      "conf_high": 121,
+      "evidence_items_with_numbers": 112,
+      "evidence_all_numbers_in_table": 88,
+      "evidence_most_numbers_in_table": 97,
+      "conf_low": 13,
       "conf_medium": 3,
       "by_answer_type": {
-        "number": 83,
+        "number": 81,
         "text": 33,
         "unanswerable": 7,
         "yes_no": 3
       },
       "by_question_type": {
-        "arithmetic_comparison": 64,
-        "retrieval": 21,
+        "arithmetic_comparison": 63,
+        "retrieval": 20,
         "visual_reference": 34,
         "unanswerable": 7
       }

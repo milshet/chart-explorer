@@ -1,74 +1,110 @@
 {"id": "train-38656412008715-1372", "reason": "blind_answer_disagrees", "gold": 12, "blind": 4, "rationale": "Four distinct education levels appear (below upper secondary, upper secondary and post-secondary non-tertiary, all levels, tertiary), each with total, active, employed."}
+{"id": "train-two_col_42732-5241", "reason": "blind_answer_disagrees", "gold": 0.642, "blind": 0.61, "rationale": "Sum 374.28, mean 74.856. Sorted 73.02,73.6,74.25,76.17,77.24, median 74.25. Difference 0.606."}
+{"id": "train-two_col_23041-4957", "reason": "blind_answer_disagrees", "gold": "[32.21, 2014]", "blind": "32.21% in 2014", "rationale": "The peak of the line is 32.21% in 2014."}
 {"id": "train-two_col_43304-5320", "reason": "blind_answer_disagrees", "gold": 6, "blind": null, "rationale": "Denmark is not labelled in the pie; it could only be inside Other (8%), which is not separable."}
+{"id": "train-multi_col_1507-5972", "reason": "blind_answer_disagrees", "gold": "light blue", "blind": "Blue", "rationale": "Highest bar is 725, the blue Male bar for age 40 to 49."}
 {"id": "train-two_col_60692-3632-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 1994, "rationale": "The shortest bar is 26 at 1994 Lillehammer."}
+{"id": "train-multi_col_80344-7239", "reason": "blind_answer_disagrees", "gold": 0.833333333, "blind": 0.858, "rationale": "Ratio services to products in 2022 = 1410 / 1643 = 0.858."}
 {"id": "train-two_col_22793-4949", "reason": "blind_answer_disagrees", "gold": 0.44, "blind": 44, "rationale": "Maximum growth 45.4 and minimum 1.4; difference = 44."}
 {"id": "train-4566-2437", "reason": "blind_answer_disagrees", "gold": 2.185416667, "blind": 1.93, "rationale": "Politics good 52 versus bad 27; ratio = 52 / 27 = 1.93."}
+{"id": "train-multi_col_80653-7281", "reason": "blind_answer_disagrees", "gold": "ireland", "blind": "Italy, Ireland", "rationale": "UK is 28, not divisible by 9. The blue values divisible by 9 are Italy 27 and Ireland 36. The question premise mentioning UK does not match; best reading is Italy and Ireland."}
 {"id": "train-4349-2574", "reason": "blind_answer_disagrees", "gold": 0.46, "blind": 46, "rationale": "The Total row shows Too much = 46."}
+{"id": "train-multi_col_995-5941", "reason": "blind_answer_disagrees", "gold": 2020, "blind": 2010, "rationale": "Computed Industry minus Agriculture for each year: 6.22, 6.51, 7.01, 7.24, 7.69, 7.72, 7.20, 6.96, 6.88, 6.70, 6.65. Minimum is 2010."}
+{"id": "train-5254-2392", "reason": "blind_answer_disagrees", "gold": 51, "blind": 48, "rationale": "The top leftmost bar is the green bar for White, labelled 48."}
 {"id": "train-12358-602", "reason": "blind_answer_disagrees", "gold": "recovering strongly", "blind": 6, "rationale": "The 6% slice is 'Recovering strongly'; the question wording is odd, so the stated value 6 is given."}
+{"id": "train-multi_col_1365-5863", "reason": "blind_answer_disagrees", "gold": 3446.4, "blind": 3232.87, "rationale": "Asia maximum 3479.06; Europe minimum is at 1950, 246.19. 3479.06 - 246.19 = 3232.87."}
 {"id": "train-multi_col_100312-7212", "reason": "blind_answer_disagrees", "gold": 2, "blind": 0, "rationale": "Lines are close in 2007 and 2008 but the development points sit slightly below 3.3; no year shows identical values."}
+{"id": "train-two_col_285-3608", "reason": "blind_answer_disagrees", "gold": 2020, "blind": 2021, "rationale": "Largest year-over-year jump in GDP change is 2020 (2.27%) to 2021 (8.44%), about 6.2 points, bigger than the 2019-2020 drop of 3.6."}
 {"id": "train-3612-2345", "reason": "blind_answer_disagrees", "gold": 11.5, "blind": 21.25, "rationale": "Sum 11 + 24 + 21 + 29 = 85; divided by 4 bars = 21.25."}
 {"id": "train-two_col_23713-4996-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 0.476, "rationale": "Chart has two unlabelled lines; no single series is specified. Estimating the Costa Rica point at 2013 from gridlines gives about 0.476."}
 {"id": "train-two_col_20088-4845", "reason": "blind_answer_disagrees", "gold": "senvion", "blind": 4.4, "rationale": "Senvion is 4.4% while Bard Engineering is about 1%, so Senvion is higher."}
 {"id": "train-959-2173", "reason": "blind_answer_disagrees", "gold": 345, "blind": 35, "rationale": "Reading the Total row, Sometimes 52 minus Often 17 = 35. Question wording is ambiguous."}
+{"id": "train-6772-165", "reason": "blind_answer_disagrees", "gold": 40.66, "blind": 40.67, "rationale": "Last three points of the red China line are 41, 35, 46; sum 122, divided by 3 = 40.67."}
 {"id": "train-09847806002036-1125", "reason": "blind_answer_disagrees", "gold": 0.168, "blind": 16.8, "rationale": "Three regions exceed 13.8: 20.7 + 15.7 + 14 = 50.4; divided by 3 = 16.8."}
 {"id": "train-two_col_62366-3726", "reason": "blind_answer_disagrees", "gold": "red", "blind": "Golf balls", "rationale": "One third of 45.2 is about 15.07. Only Golf balls (12.4) is below it."}
 {"id": "train-7342-189", "reason": "blind_answer_disagrees", "gold": 3, "blind": 2, "rationale": "Bad values under 56 are 54 and 40 only."}
 {"id": "train-two_col_41999-5216", "reason": "blind_answer_disagrees", "gold": "navy blue", "blind": "Dark blue", "rationale": "Largest is grey 55.7; second largest is Travel 23.9, shown in dark navy."}
+{"id": "train-two_col_42171-5227", "reason": "blind_answer_disagrees", "gold": 18.31, "blind": 18.32, "rationale": "86.1 / 4.7 = 18.32."}
 {"id": "train-16361-875", "reason": "blind_answer_disagrees", "gold": 0.43, "blind": 43, "rationale": "Labelled segments: median 38, smallest 5. Sum = 43. Two tiny unlabeled slices exist, so slightly ambiguous."}
 {"id": "train-two_col_40260-5142-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 2036689, "rationale": "41.49 x 38.27 = 1587.82; 38.13 x 33.64 = 1282.69; product is about 2,036,689."}
 {"id": "train-multi_col_393-5440", "reason": "blind_answer_disagrees", "gold": "industry", "blind": "Agriculture", "rationale": "Agriculture share falls every year from 39.15% in 2010 to 27.73% in 2020."}
+{"id": "train-36077678002616-1771", "reason": "blind_answer_disagrees", "gold": 9, "blind": 9.1, "rationale": "Estimated from gridlines: 5.7 - (-3.4) = about 9.1 percentage points."}
 {"id": "train-multi_col_100581-5553", "reason": "blind_answer_disagrees", "gold": "connected car (e.g., car with internet connection, gps system or electronic toll collection device)", "blind": "Employee access card with sensor", "rationale": "Question is ambiguous; interpreting as the item whose three shares are closest together, Employee access card with sensor has the smallest spread (14)."}
 {"id": "train-two_col_82082-3945", "reason": "blind_answer_disagrees", "gold": 1249.5, "blind": 4892.22, "rationale": "Nine companies below 20 000: 18427+6197+4902+3481+3329+2619+2576+1286+1213 = 44 030; divided by 9 = 4892.2."}
 {"id": "train-OECD_UNEMPLOYMENT_RATE_FORECAST_BEL_FRA_JPN_SVN_ZAF_000081-3565", "reason": "blind_answer_disagrees", "gold": 4, "blind": 5, "rationale": "All five lines exceed 5% at some point, Japan only slightly around 2000-2004."}
+{"id": "train-multi_col_524-5455", "reason": "blind_answer_disagrees", "gold": 2643.54, "blind": 2688.61, "rationale": "3105.13 - 416.52 = 2688.61."}
+{"id": "train-OECD_LONG-TERM_INTEREST_RATES_FORECAST_BEL_DEU_IND_POL_000066-3509", "reason": "blind_answer_disagrees", "gold": 7.4, "blind": 7.5, "rationale": "Belgium (purple) max ~12.25 in 1984, min ~4.75 in 1998; no printed values, read from gridlines. Difference ~7.5."}
+{"id": "train-two_col_23591-4992", "reason": "blind_answer_disagrees", "gold": "[2, black sea]", "blind": 2, "rationale": "Smallest labelled slice is Black Sea with value 2."}
+{"id": "train-4579-2425", "reason": "blind_answer_disagrees", "gold": 1.142361111, "blind": 1.08, "rationale": "27/25=1.08."}
 {"id": "train-9576-2967", "reason": "blind_answer_disagrees", "gold": 0.042361111, "blind": "1:1", "rationale": "Values 37 occur twice, 42 occur twice; ratio 2:2 = 1:1."}
 {"id": "train-9172-2931", "reason": "blind_answer_disagrees", "gold": 0.11, "blind": 11, "rationale": "61-50=11 point decrease."}
 {"id": "train-multi_col_20373-6084-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": "Convenience food and kitchen products", "rationale": "In 2018 largest segment is convenience food and kitchen products."}
 {"id": "train-OECD_SHARE_PRICES_DNK_ESP_HUN_ISL_000027-3153", "reason": "blind_answer_disagrees", "gold": 0.1356, "blind": 13.57, "rationale": "Sum 40.7 divided by 3 = 13.567."}
 {"id": "train-9875-3005", "reason": "blind_answer_disagrees", "gold": 0.03, "blind": 3, "rationale": "48 - 45 = 3 (percent points of More likely)."}
 {"id": "train-22081073006996-1251", "reason": "blind_answer_disagrees", "gold": 0.3754, "blind": 37.54, "rationale": "Values below 40: 39.58 and 35.5. Average = (39.58 + 35.5) / 2 = 37.54."}
+{"id": "train-two_col_5989-4924", "reason": "blind_answer_disagrees", "gold": "feminine accessories, intimate apparel, shoes and cosmetics", "blind": "Feminine accessories, intimate apparel, shoes", "rationale": "The blue slice is the largest (about 40%); its label is truncated beyond 'Feminine accessories, intimate apparel, sho...'."}
 {"id": "train-multi_col_20095-6005", "reason": "blind_answer_disagrees", "gold": 6415, "blind": 5522, "rationale": "Chart gives values not percentages; question is ambiguous. Taking difference between highest (ING 8876) and lowest (ABN AMRO 3354) in 2015: 5522."}
+{"id": "train-2185-2217", "reason": "blind_answer_disagrees", "gold": 99, "blind": 98, "rationale": "Lighter sorted 45,53,63,72,79,82 median 67.5. Darker sorted 17,20,26,35,46,54 median 30.5. Sum = 98."}
 {"id": "train-two_col_557-4588", "reason": "blind_answer_disagrees", "gold": "may 21", "blind": "May 2021", "rationale": "The lowest printed rate is 9.9% at May '21."}
 {"id": "train-multi_col_1311-5839", "reason": "blind_answer_disagrees", "gold": 0.1, "blind": 0.17, "rationale": "27.39 - 27.22 = 0.17 (2020 is 0.17 lower than 2019)."}
+{"id": "train-10265-3244", "reason": "blind_answer_disagrees", "gold": "[44, 41]", "blind": 44, "rationale": "The question is ambiguous about which bar; the first (Democratic Party) bar for Economy reads 44, Republican 41."}
+{"id": "train-two_col_62101-3687", "reason": "blind_answer_disagrees", "gold": 1691805, "blind": 1691805.33, "rationale": "Sum = 5,075,416; divided by 3 = 1,691,805.33."}
 {"id": "train-two_col_24469-5105-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 20.45, "rationale": "(33 + 7.9) / 2 = 20.45."}
 {"id": "train-11989-585", "reason": "blind_answer_disagrees", "gold": 0.04375, "blind": 0.33, "rationale": "Second smallest is 8, third smallest is 24; ratio 8/24 = 0.33 (1:3)."}
 {"id": "train-two_col_40212-5086-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": "No", "rationale": "The highest is 23.8%, below 50%."}
+{"id": "train-multi_col_100470-5530", "reason": "blind_answer_disagrees", "gold": 32, "blind": 34, "rationale": "The grey Men bar under 'It's overrated' is labelled 34%."}
 {"id": "train-OECD_INVESTMENT_FORECAST_FRA_ITA_KOR_NLD_SVK_000143-3500", "reason": "blind_answer_disagrees", "gold": "slovak republic", "blind": "Korea", "rationale": "Label colours are not visible; the orange line matches Slovak Republic (ends high). The red line ends low near Korea's label. This is a guess."}
 {"id": "train-15239782005012-1173", "reason": "blind_answer_disagrees", "gold": 0.19, "blind": 19, "rationale": "35.2 - 16.2 = 19.0."}
+{"id": "train-multi_col_20502-6145", "reason": "blind_answer_disagrees", "gold": 35538, "blind": 35568, "rationale": "23156 + 12382 + 30 = 35568."}
 {"id": "train-1595-2082-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 92, "rationale": "Question is ambiguous; taking the highest/top bar value, Females mobile phone at 92%."}
 {"id": "train-multi_col_80253-7098", "reason": "blind_answer_disagrees", "gold": "navy blue", "blind": "Dark blue", "rationale": "The tallest bar is the 25% bar, which is the dark navy (Spent less money) colour."}
+{"id": "train-16883-411", "reason": "blind_answer_disagrees", "gold": 20.5, "blind": 20.67, "rationale": "Republican low 24, Democrat low 17, independent (olive) low estimated ~21 from the line. Average (24+17+21)/3 = 20.67."}
 {"id": "train-15239782005012-1172", "reason": "blind_answer_disagrees", "gold": "blue", "blind": "Gray", "rationale": "The 5-14 years bar is coloured slate gray-blue."}
 {"id": "train-1475-369", "reason": "blind_answer_disagrees", "gold": 0.047916667, "blind": 0.11, "rationale": "Smallest 10 over largest 90 = 0.111."}
 {"id": "train-16882-408", "reason": "blind_answer_disagrees", "gold": "green", "blind": "Mostly good news", "rationale": "The green Mostly good news line is nearly flat (1 to 7), far less variation than the others."}
 {"id": "train-9324-2945", "reason": "blind_answer_disagrees", "gold": 0.16, "blind": 16, "rationale": "Reading 'not all confident' as 'Not at all confident': 25 minus 9 very confident gives 16."}
 {"id": "train-15775224002939-1679", "reason": "blind_answer_disagrees", "gold": 0.1, "blind": 9.9, "rationale": "Estimated from the purple Malawi line: about 80.1% in 1991 and about 70.2% in 2005; difference about 9.9 points."}
+{"id": "train-10249312005004-1651", "reason": "blind_answer_disagrees", "gold": "child labor uk (boys, historic)", "blind": "Boys", "rationale": "The boys line is above the girls line at every year shown."}
 {"id": "train-two_col_82082-3944", "reason": "blind_answer_disagrees", "gold": "alkermes", "blind": 6197, "rationale": "Ranking bars by length: Shire, Actelion, then Alkermes third at 6,197."}
 {"id": "train-OECD_GDP_PER_HOUR_WORKED_GBR_GRC_NOR_USA_000068-3479", "reason": "blind_answer_disagrees", "gold": 8, "blind": 6, "rationale": "Counting purple Greece points above the 110 gridline: 2004, 2006, 2007, 2008, 2009, 2010. The 2003 and 2005 points appear marginally below 110."}
 {"id": "train-two_col_101168-4310-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 2016, "rationale": "Chart has no visible title or country, but among 2012 to 2016 bars the highest is 2016 at 28,327.3 million euros."}
+{"id": "train-two_col_104687-4496", "reason": "blind_answer_disagrees", "gold": "light blue", "blind": "Blue", "rationale": "The Italy slice is bright blue."}
 {"id": "train-11759-295", "reason": "blind_answer_disagrees", "gold": 0.2373, "blind": 1.24, "rationale": "Ratio of 2014 to 2012 value: 73 / 59 = 1.237, about 1.24. Question wording is ambiguous."}
+{"id": "train-multi_col_1348-5857", "reason": "blind_answer_disagrees", "gold": 12.5, "blind": 13, "rationale": "No year specified; using the latest season 2015/16: 7 + 6 = 13."}
 {"id": "train-multi_col_100568-5546", "reason": "blind_answer_disagrees", "gold": "mission-based marketing", "blind": "Performance marketing", "rationale": "Performance marketing has the smallest no-change share (27%), so the most professionals plan changes (73%) there."}
 {"id": "train-39408949022043-1382-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 2, "rationale": "The stacked bars use two colours, blue and dark navy."}
+{"id": "train-multi_col_100179-7167", "reason": "blind_answer_disagrees", "gold": 1.111111111, "blind": 1.07, "rationale": "No year specified; using latest year 2019: 37.85 / 35.22 = 1.075."}
 {"id": "train-two_col_62228-3702", "reason": "blind_answer_disagrees", "gold": "2/2021", "blind": null, "rationale": "The chart shows an overall food price index, not sugar prices, so the question cannot be answered from it."}
 {"id": "train-8566-2865", "reason": "blind_answer_disagrees", "gold": 0.042361111, "blind": 1, "rationale": "Value 70 appears twice and value 26 appears twice, so the ratio is 2:2 = 1."}
+{"id": "train-two_col_42171-5226", "reason": "blind_answer_disagrees", "gold": "light purple", "blind": "Purple", "rationale": "The Others slice at 86.1% is purple and dominates the pie."}
 {"id": "train-67420315000433-1515", "reason": "blind_answer_disagrees", "gold": "no", "blind": "Yes", "rationale": "Two lowest bars: 0.2 + 0.39 = 0.59, which is greater than Uruguay's 0.47."}
+{"id": "train-83565479005471-1919", "reason": "blind_answer_disagrees", "gold": 2000, "blind": 2001, "rationale": "The red Costa Rica line jumps from about 0.456 in 2000 to about 0.496 in 2001, the steepest rise."}
 {"id": "train-8711-2870", "reason": "blind_answer_disagrees", "gold": 89, "blind": 123, "rationale": "Using the Be distinct bars, the largest is Greece 78 and the smallest country is Poland 45; sum is 123. Series choice is assumed."}
 {"id": "train-04784450006294-1616", "reason": "blind_answer_disagrees", "gold": "[1996, 1999]", "blind": 1998, "rationale": "The pink Greece line peaks at about 19.5 MWh in 1998, then dips in 1999."}
 {"id": "train-two_col_83134-4013", "reason": "blind_answer_disagrees", "gold": 27.9, "blind": 25.1, "rationale": "Using the 13 printed values, sorted median is 101. Lowest is 75.9. Difference 101 minus 75.9 equals 25.1. Unlabelled points are ignored."}
 {"id": "train-10974-3322-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 76, "rationale": "The yellowish (olive) segment of the pie is the 76% one."}
+{"id": "train-two_col_83196-4017", "reason": "blind_answer_disagrees", "gold": 2406, "blind": 2402, "rationale": "1668 + 734 = 2402 million U.S. dollars."}
 {"id": "train-4297-2563", "reason": "blind_answer_disagrees", "gold": 0.216666667, "blind": 0.4167, "rationale": "Smallest green 30, largest 72. Ratio 30:72 = 5:12 = 0.4167."}
+{"id": "train-two_col_348-3621", "reason": "blind_answer_disagrees", "gold": "[2014, 2015]", "blind": "2014 to 2015", "rationale": "The largest year-to-year change is the drop from 2014 (2048.84) to 2015 (1356.7), about 692."}
 {"id": "train-two_col_82090-3947", "reason": "blind_answer_disagrees", "gold": 9.96, "blind": 9840.64, "rationale": "Sum = 96.7 + 2.5 = 99.2. Square = 99.2 * 99.2 = 9840.64."}
+{"id": "train-multi_col_60989-7011", "reason": "blind_answer_disagrees", "gold": 0.333333333, "blind": 0.3287, "rationale": "Polished combined = 24 + 23 = 47. Retail combined = 71 + 72 = 143. Ratio 47/143 = 0.3287."}
 {"id": "train-6876-2733", "reason": "blind_answer_disagrees", "gold": 0.214583333, "blind": 0.556, "rationale": "Green median is 15; smallest gray is 27. Ratio 15:27 = 0.556."}
 {"id": "train-15890399002800-1176", "reason": "blind_answer_disagrees", "gold": "suriname", "blind": 1459, "rationale": "Largest is Puerto Rico 2,362; second largest is Suriname at 1,459 kWh."}
 {"id": "train-multi_col_1388-5877", "reason": "blind_answer_disagrees", "gold": 2.9, "blind": 0.9, "rationale": "Spain's 2018 bar is labelled 0.9."}
 {"id": "train-20337-925", "reason": "blind_answer_disagrees", "gold": 0.71, "blind": 71, "rationale": "59 + 12 = 71."}
 {"id": "train-OECD_HOSPITAL_BEDS_AUT_CRI_ITA_LVA_NZL_000018-3071", "reason": "blind_answer_disagrees", "gold": 22.3, "blind": 5.575, "rationale": "Sum = 22.3; divided by 4 countries = 5.575."}
-{"id": "train-two_col_40368-5066", "reason": "blind_answer_disagrees", "gold": "gray", "blind": "Grey", "rationale": "The Canada slice is light grey."}
 {"id": "train-9255-2939", "reason": "blind_answer_disagrees", "gold": "those who did not learn about the election", "blind": "Gives people some say about how the govt runs things", "rationale": "Across the groups the 'Gives people some say' option has the larger value (63 max; 49+63 vs 50+36). Question is ambiguous between groups."}
+{"id": "train-two_col_83495-4086", "reason": "blind_answer_disagrees", "gold": "india", "blind": "Germany and India", "rationale": "Lowest shares are Germany and India, tied at 5%."}
 {"id": "train-two_col_62106-3689", "reason": "blind_answer_disagrees", "gold": 6.69, "blind": 3.345, "rationale": "(2.43+4.26)/2 = 3.345."}
+{"id": "train-multi_col_20613-6193", "reason": "blind_answer_disagrees", "gold": 158, "blind": 169.25, "rationale": "(169+172+172+164)/4 = 677/4 = 169.25."}
 {"id": "train-3768-2369", "reason": "blind_answer_disagrees", "gold": 1.21875, "blind": 1.93, "rationale": "Median row has 58 and 30; ratio 58:30 = 1.93."}
+{"id": "train-14113772021882-1675", "reason": "blind_answer_disagrees", "gold": "total non market work (men)", "blind": "Total Market Work (Women) and Total Non Market Work (Men)", "rationale": "From 1965 to 1985 two lines rise: Total Market Work (Women) (teal) and Total Non Market Work (Men) (dark). Others fall."}
 {"id": "train-5115-670-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": "No", "rationale": "Every bar is olive green; the largest is also olive green, not blue."}
+{"id": "train-multi_col_40152-6394", "reason": "blind_answer_disagrees", "gold": 2015, "blind": 2016, "rationale": "Highest total full time employees is 5305 in 2016."}
 {"id": "train-9181-2934", "reason": "blind_answer_disagrees", "gold": 9, "blind": 8, "rationale": "Counting the listed rows gives 8 categories."}
 {"id": "train-multi_col_40978-6608-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": 83, "rationale": "Highest printed value is 83 in 2020 for 'really matters'."}
 {"id": "train-10976-3325", "reason": "blind_answer_disagrees", "gold": 0.06, "blind": 6, "rationale": "Politics row shows good 36 and bad 30; 36-30 = 6."}
+{"id": "train-two_col_1663-4529", "reason": "blind_answer_disagrees", "gold": "jun 20", "blind": "May '20 to Jun '20", "rationale": "Biggest rise is 0.7 points from May '20 to Jun '20; other rises are 0.3 or less."}
 {"id": "train-multi_col_80818-7296", "reason": "blind_answer_disagrees", "gold": "3rd quartile", "blind": "4th quartile", "rationale": "Austria values are 150, 250, 400, 400; the 3rd and 4th quartiles tie, picking the 4th as last."}
 {"id": "train-two_col_83527-4282", "reason": "blind_answer_disagrees", "gold": 1, "blind": 2, "rationale": "Values near 2820 are 2811 (2018) and 2761.9 (2019); others are 2610.8 or below. The question is ambiguous, so I count two."}
 {"id": "train-04769019006554-1615", "reason": "blind_answer_disagrees", "gold": "no", "blind": "Yes", "rationale": "Estimated from axis: Denmark about 2.77 plus Switzerland about 1.65 is about 4.4 billion, greater than 4."}
@@ -79,6 +115,7 @@
 {"id": "train-5115-671", "reason": "blind_answer_disagrees", "gold": 0.678472222, "blind": "48:51", "rationale": "The two largest segments are 51% and 48%; smaller first gives 48:51."}
 {"id": "train-multi_col_100653-5559", "reason": "blind_answer_disagrees", "gold": 1.023809524, "blind": "1:1", "rationale": "Light blue Flemish peaks at 43%; the gray Belgium line also peaks at 43% (2019). Ratio is 43:43 = 1:1. Light gray Walloon would be 32 instead."}
 {"id": "train-two_col_63529-3759-unans", "reason": "blind_answer_disagrees", "gold": null, "blind": "No", "rationale": "There is no gray segment; two smallest are 2+18 = 20, which is not greater than the 20% tan segment nor the 61% segment. Either reading gives No."}
+{"id": "train-two_col_104450-4478", "reason": "blind_answer_disagrees", "gold": "light purple", "blind": "Purple", "rationale": "Smallest segment is China at 4.2%, drawn in light purple/violet."}
 {"id": "train-multi_col_1428-5949", "reason": "blind_answer_disagrees", "gold": 43, "blind": 21, "rationale": "Highest Important is 24, lowest Very important is 45; difference 45-24=21."}
 {"id": "train-25404558003027-1733", "reason": "blind_answer_disagrees", "gold": 0.05, "blind": 5, "rationale": "Teal Lithuania line is 20% in 2009 and 15% in 2010; difference 5 points."}
 {"id": "train-00989191017734-1599", "reason": "blind_answer_disagrees", "gold": 3, "blind": 7, "rationale": "Estimated from gridlines: 2004 about -76.0, 2006 about -69.1; change about 7 points. No printed values."}
