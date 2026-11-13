@@ -28,6 +28,7 @@ import math
 import os
 import platform
 import random
+import secrets
 import shutil
 import sys
 import time
@@ -282,7 +283,9 @@ def main():
         try:
             import wandb
             id_file = out / "wandb_id.txt"
-            run_id = id_file.read_text().strip() if id_file.is_file() else wandb.util.generate_id()
+            # own ID (wandb.util.generate_id was removed in wandb 0.31); kept in the run folder so --resume
+            # continues the same W&B run
+            run_id = id_file.read_text().strip() if id_file.is_file() else secrets.token_hex(8)
             id_file.write_text(run_id)
             wandb_run = wandb.init(project=cfg["wandb"]["project"], entity=cfg["wandb"]["entity"],
                                    name=cfg["run_name"], id=run_id, resume="allow", config=cfg, dir=str(out))
