@@ -96,3 +96,18 @@ Written when the job ends, whatever the outcome. Fields later steps may use:
    (`data/v2.1`, new tag) and is never compared with runs on the old one.
 3. **Report only clean runs** (`"clean": true`, `"status": "completed"`).
 4. **Model selection uses the validation split only.** The test split is used once, for the final model (#8).
+
+## Evaluations
+
+`scripts/evaluate.py` (submit with `slurm/eval.sbatch`) applies rules 1-4: it reads `variant`, `targets` and
+`max_pixels` from the adapter's run, refuses a conflicting `--targets`, and scores an adapter on test only with
+`--final-test`. It uses the same reproducibility gate as training. One folder per evaluation,
+`~/evals/<model>_<split>_<variant>_<style>_<shots>shot_<precision>/`, never overwritten:
+
+| File | What it is |
+|---|---|
+| `predictions.jsonl` | Per item: `raw` output, `parsed` JSON, `pred`, `gold`, `correct`, `json_valid`, `schema_valid`, `question_type`, `answer_type`, `new_tokens`, `truncated` (hit `max_new_tokens`), `seconds`, `evidence_n`/`evidence_ok` |
+| `summary.json` | `overall` (relaxed accuracy, schema validity, refusal and answerable accuracy, evidence grounding, truncated, tokens/s), `by` question type, answer type, source and chart type, `settings`, `provenance` (incl. `adapter_sha256` and the run's training data), `reportable` |
+
+"Correct" is defined once, in `scripts/scoring.py`, which the Week 1 notebook also imports. Reported
+evaluations are copied into `results/evals/`.

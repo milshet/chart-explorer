@@ -1,0 +1,141 @@
+{
+  "name": "base_test_image_only_answer_only_0shot_4bit",
+  "settings": {
+    "data_dir": "data/v2.0",
+    "variant": "image_only",
+    "targets": "answer_only",
+    "adapter": null,
+    "run_name": null,
+    "source": "base",
+    "style": "answer_only",
+    "name": "base_test_image_only_answer_only_0shot_4bit",
+    "split": "test",
+    "shots": 0,
+    "shot_ids": [],
+    "precision": "4bit",
+    "batch_size": 4,
+    "max_new_tokens": 384,
+    "limit": null,
+    "decoding": "greedy"
+  },
+  "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "model_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "gpu": "NVIDIA L40S",
+  "slurm_job_id": "36",
+  "provenance": {
+    "git_commit": "5eeceb1e1b3c762e30207d7f0999139882ec682d",
+    "git_dirty": [],
+    "versions": {
+      "python": "3.12.3",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "bitsandbytes": "0.50.2",
+      "accelerate": "1.15.0",
+      "safetensors": "0.8.0",
+      "pillow": "13.0.0",
+      "qwen-vl-utils": "0.0.14",
+      "wandb": "0.31.0"
+    },
+    "env_drift": {},
+    "data": {
+      "data_dir": "data/v2.0",
+      "test_file": "data/v2.0/image_only/answer_only/test.jsonl",
+      "test_sha256": "5ec9b879b3a502aa648c88462cf278244d47d01d22f030f4bc28aa2a9da43c25",
+      "images": 143,
+      "images_sha256": "b2fa02aef686d32dcd227ab80822a4e8516dadcf9b6c3377db3f5ebcabb1fe41"
+    },
+    "clean": true
+  },
+  "reportable": true,
+  "overall": {
+    "n": 180,
+    "relaxed_accuracy": 0.5278,
+    "json_valid": 0.9944,
+    "schema_valid": 0.9889,
+    "evidence_grounded": 0.0,
+    "refusal_accuracy": 0.4444,
+    "answerable_accuracy": 0.5322,
+    "truncated": 0,
+    "mean_new_tokens": 22.0,
+    "tokens_per_second": 74.0,
+    "seconds_per_item": 0.297
+  },
+  "by": {
+    "question_type": {
+      "arithmetic_comparison": {
+        "mean": 0.438,
+        "count": 96
+      },
+      "retrieval": {
+        "mean": 0.743,
+        "count": 35
+      },
+      "unanswerable": {
+        "mean": 0.444,
+        "count": 9
+      },
+      "visual_reference": {
+        "mean": 0.575,
+        "count": 40
+      }
+    },
+    "answer_type": {
+      "number": {
+        "mean": 0.631,
+        "count": 122
+      },
+      "text": {
+        "mean": 0.359,
+        "count": 39
+      },
+      "unanswerable": {
+        "mean": 0.444,
+        "count": 9
+      },
+      "yes_no": {
+        "mean": 0.0,
+        "count": 10
+      }
+    },
+    "source": {
+      "oecd": {
+        "mean": 0.538,
+        "count": 13
+      },
+      "owid": {
+        "mean": 0.457,
+        "count": 35
+      },
+      "pew": {
+        "mean": 0.375,
+        "count": 16
+      },
+      "statista": {
+        "mean": 0.569,
+        "count": 116
+      }
+    },
+    "chart_type": {
+      "h_bar": {
+        "mean": 0.569,
+        "count": 51
+      },
+      "line": {
+        "mean": 0.381,
+        "count": 42
+      },
+      "pie": {
+        "mean": 0.727,
+        "count": 22
+      },
+      "v_bar": {
+        "mean": 0.523,
+        "count": 65
+      }
+    }
+  },
+  "load_seconds": 2.9,
+  "minutes": 1.0,
+  "peak_gpu_memory_mib": 2828
+}
