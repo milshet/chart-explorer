@@ -16,7 +16,8 @@ same code the smoke test checks.
   sbatch slurm/train.sbatch configs/run_a.yaml --set train.lr=1e-4 --set run_name=run_a_lr1e-4
 
 Writes to --out (default ~/runs/<run_name>): metrics.jsonl (one line per step and per validation),
-checkpoints/step-NNNNN (resumable, newest `save.keep` kept), adapter/ (final adapter, processor and
+checkpoints/step-NNNNN (resumable, newest `save.keep` kept), checkpoints/epoch-N (one per epoch, never
+deleted, so epochs can be compared), adapter/ (final adapter, processor and
 train_config.json) and run_summary.json. Logs to Weights & Biases when `wandb.enabled` is true and
 the wandb package is installed; otherwise metrics.jsonl is the record.
 """
@@ -144,8 +145,10 @@ def checkpoints(out):
     return sorted(p for p in d.glob("step-*") if p.is_dir() and not p.name.endswith(".tmp")) if d.is_dir() else []
 
 
-def save_checkpoint(torch, out, model, optimizer, scheduler, state, keep):
-    final = out / "checkpoints" / f"step-{state['step']:05d}"
+def save_checkpoint(torch, out, model, optimizer, scheduler, state, keep, name=None):
+    """Save to checkpoints/step-NNNNN (rotated, newest `keep` kept) or, with a name, to checkpoints/<name>,
+    which the rotation never touches (only step-* directories are counted)."""
+    final = out / "checkpoints" / (name or f"step-{state['step']:05d}")
     tmp = final.with_name(final.name + ".tmp")
     shutil.rmtree(tmp, ignore_errors=True)
     model.save_pretrained(tmp, safe_serialization=True)
@@ -154,8 +157,9 @@ def save_checkpoint(torch, out, model, optimizer, scheduler, state, keep):
                         "cuda": torch.cuda.get_rng_state_all()}}, tmp / "trainer_state.pt")
     shutil.rmtree(final, ignore_errors=True)
     tmp.rename(final)  # a checkpoint only appears once it is complete
-    for old in checkpoints(out)[:-keep]:
-        shutil.rmtree(old, ignore_errors=True)
+    if name is None:
+        for old in checkpoints(out)[:-keep]:
+            shutil.rmtree(old, ignore_errors=True)
     print(f"    saved {final}", flush=True)
 
 
@@ -390,6 +394,10 @@ def main():
 
         state.update(epoch=epoch + 1, next_index=0)
         validate(f"end of epoch {epoch + 1}")
+        # Kept for good so #7 can compare epochs. Written before the rotating checkpoint: if the job dies in
+        # between, --resume starts from the previous step-* checkpoint and writes epoch-N again.
+        save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"],
+                        name=f"epoch-{epoch + 1}")
         save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
 
     # final adapter --------------------------------------------------------------------------------
@@ -402,6 +410,7 @@ def main():
     if state["val_history"]:
         summary["final_val_loss"] = state["val_history"][-1]["val_loss"]
         summary["best_val_loss"] = min(v["val_loss"] for v in state["val_history"])
+    summary["epoch_checkpoints"] = sorted(str(p) for p in (out / "checkpoints").glob("epoch-*") if p.is_dir())
     finish("completed")
 
 
