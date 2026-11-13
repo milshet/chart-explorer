@@ -15,21 +15,29 @@ same code the smoke test checks.
   sbatch slurm/train.sbatch configs/run_a.yaml --resume                              # continue a run
   sbatch slurm/train.sbatch configs/run_a.yaml --set train.lr=1e-4 --set run_name=run_a_lr1e-4
 
-Writes to --out (default ~/runs/<run_name>): metrics.jsonl (one line per step and per validation),
-checkpoints/step-NNNNN (resumable, newest `save.keep` kept), checkpoints/epoch-N (one per epoch, never
-deleted, so epochs can be compared), adapter/ (final adapter, processor and
-train_config.json) and run_summary.json. Logs to Weights & Biases when `wandb.enabled` is true and
-the wandb package is installed; otherwise metrics.jsonl is the record.
+Writes to --out (default ~/runs/<run_name>): provenance.json, metrics.jsonl (one line per step and per
+validation), checkpoints/step-NNNNN (resumable, newest `save.keep` kept), checkpoints/epoch-N (one per
+epoch, never deleted, so epochs can be compared), adapter/ (final adapter, processor and
+train_config.json) and run_summary.json. docs/RUNS.md describes the layout. Logs to Weights & Biases when
+`wandb.enabled` is true and the wandb package is installed; otherwise metrics.jsonl is the record.
+
+Before touching the GPU, a run checks that it is reproducible and refuses to start otherwise: the data
+files must match data/<version>/MANIFEST.txt, the code must have no uncommitted changes, and the installed
+packages must match requirements-vm03.lock. --allow-unclean overrides the last two for throwaway tests and
+is recorded as clean=false.
 """
 import argparse
 import copy
+import hashlib
 import json
 import math
 import os
 import platform
 import random
+import re
 import secrets
 import shutil
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -38,6 +46,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import smoke_test as st  # noqa: E402  shared helpers: load_base, encode, training_batch, load_image
 
 REPO = Path(__file__).resolve().parents[1]
+LOCK_FILE = REPO / "requirements-vm03.lock"
+RECORDED_PACKAGES = ("torch", "transformers", "peft", "bitsandbytes", "accelerate", "safetensors", "pillow",
+                     "qwen-vl-utils", "wandb")
 
 DEFAULTS = {
     "run_name": None,
@@ -81,7 +92,7 @@ def load_config(path, overrides):
                     sys.exit(f"{path}: '{prefix}{k}' must be a mapping")
                 merge(dst[k], v, f"{prefix}{k}.")
             else:
-                dst[k] = v
+                dst[k] = coerce(dst[k], v, f"{prefix}{k}", path)
 
     merge(cfg, raw)
     if not cfg["run_name"]:
@@ -91,6 +102,24 @@ def load_config(path, overrides):
     if cfg["train"]["grad_accum"] < 1 or cfg["train"]["epochs"] < 1:
         sys.exit(f"{path}: train.grad_accum and train.epochs must be at least 1")
     return cfg
+
+
+def coerce(default, value, key, path):
+    """Give a numeric setting the type of its default. PyYAML reads `1e-4` (no decimal point) as a string,
+    which would otherwise reach the optimizer as text; anything that is not a number is rejected."""
+    if isinstance(default, bool) or default is None or not isinstance(default, (int, float)):
+        return value
+    if isinstance(value, bool):
+        sys.exit(f"{path}: '{key}' must be a number, got {value!r}")
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        sys.exit(f"{path}: '{key}' must be a number, got {value!r}")
+    if isinstance(default, int):
+        if not number.is_integer():
+            sys.exit(f"{path}: '{key}' must be a whole number, got {value!r}")
+        return int(number)
+    return number
 
 
 def split_path(cfg, split):
@@ -103,6 +132,127 @@ def read_split(cfg, split):
     if not path.is_file():
         sys.exit(f"missing {path}")
     return st.read_jsonl(path, None)
+
+
+# --- provenance: which code, environment and data produced a run ---------------------------------
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def read_manifest(data_dir):
+    """{relative path: sha256} from <data_dir>/MANIFEST.txt (`sha256sum` output format)."""
+    path = Path(data_dir) / "MANIFEST.txt"
+    if not path.is_file():
+        sys.exit(f"missing {path}: without a manifest the dataset version cannot be checked")
+    entries = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            digest, name = line.split(maxsplit=1)
+            entries[name.lstrip("*")] = digest
+    return entries
+
+
+def data_fingerprint(cfg, rows):
+    """Check the split files against MANIFEST.txt and fingerprint the images they use.
+
+    rows maps split name to its full list of rows. Exits if a split file is missing from the manifest or
+    differs from it, so a run can never train on data other than the frozen version.
+    """
+    data_dir = REPO / cfg["data_dir"]
+    manifest = read_manifest(data_dir)
+    fp = {"data_dir": cfg["data_dir"]}
+    for split in sorted(rows):
+        path = split_path(cfg, split)
+        rel = path.relative_to(data_dir).as_posix()
+        if rel not in manifest:
+            sys.exit(f"{rel} is not listed in {cfg['data_dir']}/MANIFEST.txt")
+        digest = sha256_file(path)
+        if digest != manifest[rel]:
+            sys.exit(f"{cfg['data_dir']}/{rel} does not match MANIFEST.txt "
+                     "(the file was changed, or was checked out with CRLF line endings)")
+        fp[f"{split}_file"] = f"{cfg['data_dir']}/{rel}"
+        fp[f"{split}_sha256"] = digest
+    images = sorted({r["image"] for split_rows in rows.values() for r in split_rows})
+    h = hashlib.sha256()
+    for rel in images:
+        h.update(f"{rel} {sha256_file(data_dir / rel)}\n".encode())
+    fp["images"] = len(images)
+    fp["images_sha256"] = h.hexdigest()
+    return fp
+
+
+def canonical(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def read_lock(path=LOCK_FILE):
+    """{package: version} pinned in requirements-vm03.lock ({} if the file does not exist)."""
+    pins = {}
+    if Path(path).is_file():
+        for line in Path(path).read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "==" in line:
+                name, version = line.split("==", 1)
+                pins[canonical(name)] = version.strip()
+    return pins
+
+
+def installed_versions():
+    """{package: version} as Python would import them (the first copy on sys.path wins)."""
+    from importlib import metadata
+    found = {}
+    for dist in metadata.distributions():
+        name = dist.metadata["Name"]
+        if name:
+            found.setdefault(canonical(name), dist.version)
+    return found
+
+
+def env_drift(pins, installed):
+    """Locked packages whose installed version differs: {name: (locked, installed or None)}."""
+    return {n: (v, installed.get(n)) for n, v in sorted(pins.items()) if installed.get(n) != v}
+
+
+def git_state():
+    """(full commit hash, [tracked files with uncommitted changes]); (None, []) outside a git checkout."""
+    try:
+        run = dict(cwd=REPO, text=True, stderr=subprocess.DEVNULL)
+        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], **run).strip()
+        status = subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"], **run)
+    except (OSError, subprocess.CalledProcessError):
+        return None, []
+    return commit, [line[3:] for line in status.splitlines() if line.strip()]
+
+
+def preflight(cfg, rows):
+    """Provenance of a run plus the reasons it would not be reproducible (empty list = clean)."""
+    commit, dirty = git_state()
+    installed = installed_versions()
+    pins = read_lock()
+    drift = env_drift(pins, installed)
+    problems = []
+    if commit is None:
+        problems.append("not a git checkout, so results cannot be tied to a code version")
+    if dirty:
+        problems.append(f"uncommitted changes in {len(dirty)} tracked file(s): {', '.join(dirty[:5])}")
+    if not pins:
+        problems.append(f"{LOCK_FILE.name} is missing, so the environment cannot be checked")
+    elif drift:
+        shown = ", ".join(f"{n} {a} -> {b}" for n, (a, b) in list(drift.items())[:5])
+        problems.append(f"{len(drift)} package(s) differ from {LOCK_FILE.name}: {shown}")
+    prov = {
+        "git_commit": commit, "git_dirty": dirty,
+        "versions": {"python": platform.python_version(), **{p: installed.get(p) for p in RECORDED_PACKAGES}},
+        "env_drift": {n: {"locked": a, "installed": b} for n, (a, b) in drift.items()},
+        "data": data_fingerprint(cfg, rows),
+        "clean": not problems,
+    }
+    return prov, problems
 
 
 # --- data ----------------------------------------------------------------------------------------
@@ -118,9 +268,9 @@ def make_batch(processor, cfg, row):
 def dry_run(cfg):
     from transformers import AutoProcessor
     processor = AutoProcessor.from_pretrained(st.MODEL_ID, local_files_only=True)
-    report = {}
+    report, all_rows = {}, {}
     for split in ("train", "val"):
-        rows = read_split(cfg, split)
+        rows = all_rows[split] = read_split(cfg, split)
         lengths, answers, too_long = [], [], 0
         t0 = time.monotonic()
         for row in rows:
@@ -134,9 +284,12 @@ def dry_run(cfg):
                          "seconds": round(time.monotonic() - t0, 1)}
     n_train = report["train"]["examples"] - report["train"]["too_long"]
     steps = math.ceil(report["train"]["examples"] / cfg["train"]["grad_accum"]) * cfg["train"]["epochs"]
+    prov, problems = preflight(cfg, all_rows)  # exits if the data does not match MANIFEST.txt
     print(json.dumps({"config": cfg, "data": report, "trainable_examples": n_train,
-                      "optimizer_steps": steps}, indent=2))
-    print("DRY_RUN_OK (every example tokenised and the prompt mask checked)")
+                      "optimizer_steps": steps, "provenance": prov}, indent=2))
+    for p in problems:
+        print(f"WARNING: a GPU run would refuse to start: {p}")
+    print("DRY_RUN_OK (every example tokenised, the prompt mask checked, data matches MANIFEST.txt)")
 
 
 # --- checkpoints ---------------------------------------------------------------------------------
@@ -159,9 +312,14 @@ def save_checkpoint(torch, out, model, optimizer, scheduler, state, keep, name=N
     shutil.rmtree(final, ignore_errors=True)
     tmp.rename(final)  # a checkpoint only appears once it is complete
     if name is None:
-        for old in checkpoints(out)[:-keep]:
-            shutil.rmtree(old, ignore_errors=True)
+        rotate(out, keep)
     print(f"    saved {final}", flush=True)
+
+
+def rotate(out, keep):
+    """Delete all but the newest `keep` step-* checkpoints; epoch-* and other names are never touched."""
+    for old in checkpoints(out)[:-keep]:
+        shutil.rmtree(old, ignore_errors=True)
 
 
 def load_checkpoint(torch, ckpt, model, optimizer, scheduler):
@@ -192,6 +350,9 @@ def parse_args():
     p.add_argument("--max-minutes", type=float, help="save a checkpoint and stop after this long (job time limit)")
     p.add_argument("--dry-run", action="store_true", help="check config and data on the CPU, no training")
     p.add_argument("--limit-train", type=int, help="use only the first N training examples (testing the script)")
+    p.add_argument("--allow-unclean", action="store_true",
+                   help="start even with uncommitted code changes or packages that differ from "
+                        "requirements-vm03.lock (throwaway tests only; recorded as clean=false)")
     return p.parse_args()
 
 
@@ -213,11 +374,29 @@ def main():
         sys.exit(f"{out} already exists: pass --resume to continue it, or choose another --out / run_name")
     if args.resume and (out / "adapter" / "adapter_model.safetensors").is_file():
         sys.exit(f"{out} has already finished (adapter/ exists)")
+
+    # provenance, checked before anything is written or the GPU is touched
+    all_train_rows, val_rows = read_split(cfg, "train"), read_split(cfg, "val")
+    prov, problems = preflight(cfg, {"train": all_train_rows, "val": val_rows})
+    if problems and not args.allow_unclean:
+        sys.exit("Not starting: this run would not be reproducible.\n  - " + "\n  - ".join(problems) +
+                 "\nCommit or revert the changes, or regenerate and commit requirements-vm03.lock after an "
+                 "intentional upgrade. For a throwaway test, pass --allow-unclean (recorded as clean=false).")
+    for p in problems:
+        print(f"WARNING (--allow-unclean): {p}", flush=True)
     out.mkdir(parents=True, exist_ok=True)
+    prov_file = out / "provenance.json"
+    if args.resume and prov_file.is_file():
+        first = json.loads(prov_file.read_text(encoding="utf-8"))
+        if first["data"] != prov["data"]:
+            sys.exit(f"--resume: the data differs from what {out.name} started with; runs never mix data versions")
+        if first["git_commit"] != prov["git_commit"]:
+            print(f"WARNING: resuming with code {prov['git_commit']}, the run started with {first['git_commit']}",
+                  flush=True)
+    else:
+        prov_file.write_text(json.dumps(prov, indent=2) + "\n", encoding="utf-8")
 
     import torch
-    import transformers
-    import peft
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoProcessor, get_cosine_schedule_with_warmup
 
@@ -227,9 +406,7 @@ def main():
     random.seed(tc["seed"])
     torch.manual_seed(tc["seed"])
 
-    train_rows, val_rows = read_split(cfg, "train"), read_split(cfg, "val")
-    if args.limit_train:
-        train_rows = train_rows[:args.limit_train]
+    train_rows = all_train_rows[:args.limit_train] if args.limit_train else all_train_rows
     steps_per_epoch = math.ceil(len(train_rows) / tc["grad_accum"])
     planned_steps = steps_per_epoch * tc["epochs"]
     stop_at = min(planned_steps, args.max_steps) if args.max_steps else planned_steps
@@ -263,12 +440,10 @@ def main():
 
     summary = {
         "run_name": cfg["run_name"], "status": "running", "model": st.MODEL_ID,
-        "model_revision": st.model_revision(), "git_commit": st.git_commit(),
-        "gpu": torch.cuda.get_device_name(0),
-        "versions": {"python": platform.python_version(), "torch": torch.__version__,
-                     "transformers": transformers.__version__, "peft": peft.__version__},
-        "config": cfg, "data": {"train_file": str(split_path(cfg, "train").relative_to(REPO)),
-                                "train_examples": len(train_rows), "val_examples": len(val_rows),
+        "model_revision": st.model_revision(), "gpu": torch.cuda.get_device_name(0),
+        "git_commit": prov["git_commit"], "git_dirty": prov["git_dirty"], "clean": prov["clean"],
+        "versions": prov["versions"], "env_drift": prov["env_drift"],
+        "config": cfg, "data": {**prov["data"], "train_examples": len(train_rows), "val_examples": len(val_rows),
                                 "limit_train": args.limit_train},
         "lora": {"wrapped_modules": len(lora_modules), "trainable_parameters": sum(p.numel() for p in trainable)},
         "planned_steps": planned_steps, "steps_per_epoch": steps_per_epoch,
@@ -287,8 +462,10 @@ def main():
             # continues the same W&B run
             run_id = id_file.read_text().strip() if id_file.is_file() else secrets.token_hex(8)
             id_file.write_text(run_id)
+            wb_config = {**cfg, "provenance": {"git_commit": prov["git_commit"], "clean": prov["clean"],
+                                               **{k: v for k, v in prov["data"].items() if k.endswith("sha256")}}}
             wandb_run = wandb.init(project=cfg["wandb"]["project"], entity=cfg["wandb"]["entity"],
-                                   name=cfg["run_name"], id=run_id, resume="allow", config=cfg, dir=str(out))
+                                   name=cfg["run_name"], id=run_id, resume="allow", config=wb_config, dir=str(out))
             summary["wandb_url"] = getattr(wandb_run, "url", None)
         except Exception as e:  # never lose a GPU slot over logging
             print(f"W&B disabled ({type(e).__name__}: {e}); metrics.jsonl is the record", flush=True)
@@ -306,6 +483,8 @@ def main():
             val_batches.append(b)
 
     def validate(reason):
+        if state["val_history"] and state["val_history"][-1]["step"] == state["step"]:
+            return  # already validated at this step (e.g. --max-steps 50 with eval.every_steps 50)
         model.eval()
         total = 0.0
         with torch.no_grad():
@@ -339,6 +518,16 @@ def main():
         print(f"TRAIN_{status.upper()}", flush=True)
         sys.exit(code)
 
+    saved_at = {"step": None}
+
+    def checkpoint(name=None):
+        """Save a resumable checkpoint; a rotating step-* save is skipped if this step was already saved."""
+        if name is None and saved_at["step"] == state["step"]:
+            return
+        save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"], name=name)
+        if name is None:
+            saved_at["step"] = state["step"]
+
     # training -------------------------------------------------------------------------------------
     step_secs = []
     deadline = started + args.max_minutes * 60 if args.max_minutes else None
@@ -352,17 +541,19 @@ def main():
             torch.cuda.synchronize()
             t0 = time.monotonic()
             optimizer.zero_grad(set_to_none=True)
-            losses, answer_tokens = [], 0
+            losses, answer_tokens, batches = [], 0, []
             for idx in chunk:
                 b, n_answer, _ = make_batch(processor, cfg, train_rows[idx])
                 if b is None:
                     state["skipped_too_long"] += 1
-                    continue
+                else:
+                    batches.append((b, n_answer))
+            for b, n_answer in batches:
                 loss = model(**{k: v.to(model.device) for k, v in b.items()}).loss
                 if not torch.isfinite(loss):
-                    save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
+                    checkpoint()
                     finish(f"failed_nonfinite_loss_at_step_{state['step'] + 1}", 1)
-                (loss / len(chunk)).backward()
+                (loss / len(batches)).backward()  # mean over the examples actually used
                 losses.append(loss.item())
                 answer_tokens += n_answer
             i += len(chunk)
@@ -385,13 +576,13 @@ def main():
             if cfg["eval"]["every_steps"] and state["step"] % cfg["eval"]["every_steps"] == 0:
                 validate(f"step {state['step']}")
             if cfg["save"]["every_steps"] and state["step"] % cfg["save"]["every_steps"] == 0:
-                save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
+                checkpoint()
             if state["step"] >= stop_at and stop_at < planned_steps:
                 validate("max_steps")
-                save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
+                checkpoint()
                 finish("stopped_at_max_steps")
             if deadline and time.monotonic() > deadline:
-                save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
+                checkpoint()
                 print("Time budget reached; resubmit with --resume to continue.", flush=True)
                 finish("paused_time_limit", 75)
 
@@ -399,9 +590,9 @@ def main():
         validate(f"end of epoch {epoch + 1}")
         # Kept for good so #7 can compare epochs. Written before the rotating checkpoint: if the job dies in
         # between, --resume starts from the previous step-* checkpoint and writes epoch-N again.
-        save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"],
-                        name=f"epoch-{epoch + 1}")
-        save_checkpoint(torch, out, model, optimizer, scheduler, state, cfg["save"]["keep"])
+        checkpoint(name=f"epoch-{epoch + 1}")
+        saved_at["step"] = None  # the epoch state (next_index 0) differs from a mid-epoch save at this step
+        checkpoint()
 
     # final adapter --------------------------------------------------------------------------------
     adapter_dir = out / "adapter"

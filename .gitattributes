@@ -1,2 +1,8 @@
 *.sh text eol=lf
 *.sbatch text eol=lf
+# Data and manifests are checksummed (data/*/MANIFEST.txt, run_summary.json): keep them byte-identical on
+# every machine. Without this, Windows checkouts get CRLF and no longer match the manifest.
+*.jsonl text eol=lf
+*.json text eol=lf
+MANIFEST.txt text eol=lf
+*.lock text eol=lf
