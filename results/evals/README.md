@@ -32,3 +32,17 @@ bf16 base + adapter, greedy, `max_new_tokens` 512, 124 items (7 unanswerable). N
 Paired on the same items (exact McNemar): A final vs B final, 4 items only A gets right and 8 only B,
 p = 0.39. Epoch 1 vs final: A p = 0.63, B p = 0.55. None of the differences is significant at n = 124
 (about +/-7 to 9 points for one score). Base-model reference on test: 52.2% (CoT) to 57.2% (few-shot).
+
+## Ablation: answer-only targets, r16 (#6)
+
+Same items, rank and settings as Run A; the targets omit evidence and rationale. Val, bf16, greedy.
+
+| Adapter | Relaxed acc. | Schema valid | Refusals | Arith./comp. (63) | Retrieval (20) | Visual ref. (34) | Tokens out | s / item |
+|---|---|---|---|---|---|---|---|---|
+| Run A r16 (show working) | 81.5% | 99.2% | 7/7 | 81.0% | 95.0% | 70.6% | 71.0 | 1.14 |
+| Ablation r16 (answer only) | 82.3% | 97.6% | 6/7 | 73.0% | 95.0% | 91.2% | 20.8 | 0.39 |
+
+Paired: overall 9 items only Run A gets right, 10 only the ablation (p = 1.0, a tie). By question type,
+arithmetic/comparison 8 vs 3 in favour of showing working (p = 0.23), visual reference 0 vs 7 in favour of
+answer-only (p = 0.016, one of four per-type tests, so treat as a lead to check on test, not a result).
+Answer-only is about 3x faster per answer (batch 4).
