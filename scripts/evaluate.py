@@ -51,7 +51,7 @@ def parse_args(argv=None):
     p.add_argument("--max-new-tokens", type=int, default=512)
     p.add_argument("--limit", type=int, help="first N items only (smoke tests; not a reportable result)")
     p.add_argument("--final-test", action="store_true",
-                   help="required to score an adapter on test: the test split is used once, for the chosen model (#8)")
+                   help="required to score an adapter on test: only after the final model is chosen on val, once per compared model (docs/RUNS.md rule 4)")
     p.add_argument("--out", type=Path)
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--allow-unclean", action="store_true")
@@ -84,7 +84,7 @@ def resolve(args):
         s.update(data_dir=cfg["data_dir"], variant=cfg["variant"], targets=cfg["targets"], adapter=str(adapter),
                  run_name=cfg["run_name"], source=f"{cfg['run_name']}-{adapter.name}")
         if args.split == "test" and not args.final_test:
-            sys.exit("adapters are scored on test once, for the chosen model (#8): add --final-test if this is that run")
+            sys.exit("adapters are scored on test only after the final model is chosen on val, once each (docs/RUNS.md rule 4): add --final-test")
     elif not args.targets:
         sys.exit("--targets is required for the base model (answer_only for zero/few-shot, reasoning for CoT)")
     s["style"] = STYLE[s["targets"]]
