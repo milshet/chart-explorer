@@ -1,0 +1,152 @@
+{
+  "name": "run_b_r64-adapter_test_image_only_cot_0shot_bf16",
+  "settings": {
+    "data_dir": "data/v2.0",
+    "variant": "image_only",
+    "targets": "reasoning",
+    "adapter": "/storage/tracka/users/learner01/runs/run_b_r64/adapter",
+    "run_name": "run_b_r64",
+    "source": "run_b_r64-adapter",
+    "style": "cot",
+    "name": "run_b_r64-adapter_test_image_only_cot_0shot_bf16",
+    "split": "test",
+    "shots": 0,
+    "shot_ids": [],
+    "precision": "bf16",
+    "batch_size": 4,
+    "max_new_tokens": 512,
+    "limit": null,
+    "decoding": "greedy"
+  },
+  "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "model_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "gpu": "NVIDIA L40S",
+  "slurm_job_id": "46",
+  "provenance": {
+    "git_commit": "42133c1b6354276e76b94c5869cfb6bafad9cc4b",
+    "git_dirty": [],
+    "versions": {
+      "python": "3.12.3",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "bitsandbytes": "0.50.2",
+      "accelerate": "1.15.0",
+      "safetensors": "0.8.0",
+      "pillow": "13.0.0",
+      "qwen-vl-utils": "0.0.14",
+      "wandb": "0.31.0"
+    },
+    "env_drift": {},
+    "data": {
+      "data_dir": "data/v2.0",
+      "test_file": "data/v2.0/image_only/test.jsonl",
+      "test_sha256": "9158b1c1d39f3e727826a35c8aaf0b5dfc7d3084a2176089ed348b8e0f8db331",
+      "images": 143,
+      "images_sha256": "b2fa02aef686d32dcd227ab80822a4e8516dadcf9b6c3377db3f5ebcabb1fe41"
+    },
+    "clean": true,
+    "adapter_sha256": "45465e991a924e20831426dc1fc972f2dd65e3bdf282424cee55d557d8713e4f",
+    "trained_at_commit": "4cc71496ab38d4f209ad07fb83930a8f19296851",
+    "trained_data": {
+      "data_dir": "data/v2.0",
+      "train_file": "data/v2.0/image_only/train.jsonl",
+      "train_sha256": "c0df429f4a5c833f3f208b323e414e12c2237687cb563c7bdc0006d698e3489b",
+      "val_file": "data/v2.0/image_only/val.jsonl",
+      "val_sha256": "f82e12663d7f1abbc0e4ce04ef4a2637e5b27820d7050cb69471378424372df4",
+      "images": 941,
+      "images_sha256": "3c0743290e2e718287c6481a891935e49e935adc67845dcb61e5c2df48d18d63"
+    }
+  },
+  "reportable": true,
+  "overall": {
+    "n": 180,
+    "relaxed_accuracy": 0.8333,
+    "json_valid": 1.0,
+    "schema_valid": 0.9944,
+    "evidence_grounded": 0.8487,
+    "refusal_accuracy": 1.0,
+    "answerable_accuracy": 0.8246,
+    "truncated": 0,
+    "mean_new_tokens": 74.0,
+    "tokens_per_second": 62.4,
+    "seconds_per_item": 1.185
+  },
+  "by": {
+    "question_type": {
+      "arithmetic_comparison": {
+        "mean": 0.792,
+        "count": 96
+      },
+      "retrieval": {
+        "mean": 0.914,
+        "count": 35
+      },
+      "unanswerable": {
+        "mean": 1.0,
+        "count": 9
+      },
+      "visual_reference": {
+        "mean": 0.825,
+        "count": 40
+      }
+    },
+    "answer_type": {
+      "number": {
+        "mean": 0.844,
+        "count": 122
+      },
+      "text": {
+        "mean": 0.769,
+        "count": 39
+      },
+      "unanswerable": {
+        "mean": 1.0,
+        "count": 9
+      },
+      "yes_no": {
+        "mean": 0.8,
+        "count": 10
+      }
+    },
+    "source": {
+      "oecd": {
+        "mean": 0.923,
+        "count": 13
+      },
+      "owid": {
+        "mean": 0.886,
+        "count": 35
+      },
+      "pew": {
+        "mean": 0.75,
+        "count": 16
+      },
+      "statista": {
+        "mean": 0.819,
+        "count": 116
+      }
+    },
+    "chart_type": {
+      "h_bar": {
+        "mean": 0.863,
+        "count": 51
+      },
+      "line": {
+        "mean": 0.81,
+        "count": 42
+      },
+      "pie": {
+        "mean": 0.727,
+        "count": 22
+      },
+      "v_bar": {
+        "mean": 0.862,
+        "count": 65
+      }
+    }
+  },
+  "load_seconds": 4.8,
+  "minutes": 3.7,
+  "peak_gpu_memory_mib": 8448
+}

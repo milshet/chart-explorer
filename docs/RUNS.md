@@ -95,7 +95,10 @@ Written when the job ends, whatever the outcome. Fields later steps may use:
 2. **Compare only runs with the same data fingerprint** (`data.*_sha256`). A data change is a new version
    (`data/v2.1`, new tag) and is never compared with runs on the old one.
 3. **Report only clean runs** (`"clean": true`, `"status": "completed"`).
-4. **Model selection uses the validation split only.** The test split is used once, for the final model (#8).
+4. **Model selection uses the validation split only; test is never used to choose or tune.** Every
+   configuration is fixed and the final model named on val first. Then each compared model (the planned
+   runs and the ablation, #8) is scored on test once, and nothing is changed afterwards. The course brief asks
+   for a held-out test set "the team never trains on" and a comparison of runs, not a single run.
 
 ## Evaluations
 

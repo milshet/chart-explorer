@@ -140,3 +140,24 @@ def test_pinned_shots_exist_in_both_train_files():
 def test_answer_length_and_truncation():
     assert evaluate.answer_length([5, 6, 2, 0, 0], {2, 0}) == (2, False)
     assert evaluate.answer_length([5, 6, 7], {2}) == (3, True)
+
+
+# --- compare.py ------------------------------------------------------------------------------------
+
+def test_mcnemar_exact():
+    import compare
+    a = {i: i < 8 for i in range(20)}             # right on 0-7
+    b = {i: 4 <= i < 16 for i in range(20)}       # right on 4-15
+    x, y, p = compare.mcnemar(a, b)
+    assert (x, y) == (4, 8) and p == pytest.approx(0.3877, abs=1e-4)
+    assert compare.mcnemar(a, a)[2] == 1.0
+    with pytest.raises(ValueError):
+        compare.mcnemar(a, {0: True})
+
+
+def test_compare_table_from_committed_results():
+    import compare
+    evals = compare.load(REPO / "results" / "evals", "val")
+    out = compare.table(evals, "run_a_r16-adapter_val_image_only_cot_0shot_bf16")
+    assert "81.5%" in out and "reference" in out and "4 / 8" not in out
+    assert "8 / 4 (p = 0.388)" in out              # Run B vs Run A, as in results/evals/README.md
