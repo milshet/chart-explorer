@@ -2,14 +2,13 @@
 """Serving-stack smoke test (task 3.0f): does vLLM, in its own venv, load a merged Qwen2.5-VL checkpoint and
 answer one multimodal request with a contract-valid object?
 
-Runs in ~/venv-serve, never in ~/venv: vLLM pins torch, and the training stack (torch 2.14.1+cu126,
-transformers 5.22.1) must not move under three weeks of measured numbers. docs/SERVING.md is the runbook.
+Decided 2026-11-19 (docs/SERVING.md): --engine transformers, run from ~/venv, the locked training stack, so the
+served model runs on exactly the stack every reported number was measured on. vLLM did not fit the per-user quota;
+the vllm engine stays for a separate venv (SERVE_VENV unset activates ~/venv-serve), never ~/venv.
 
-  # 1. merge Run A into bf16 weights (a smoke merge; task 4.1 does the verified one)
-  sbatch slurm/serve_smoke.sbatch --merge ~/runs/run_a_r16/adapter --merged ~/merged/run_a_r16_smoke
-  # 2. one request through vLLM, scored with scripts/scoring.py
-  sbatch slurm/serve_smoke.sbatch --model ~/merged/run_a_r16_smoke
-  # --engine transformers: the named fallback (serve through transformers.generate, drop the vLLM claim)
+  M=/storage/tracka/users/learner01/merged/run_a_r16_smoke
+  SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --merge ~/runs/run_a_r16/adapter --merged $M --engine transformers
+  SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --model $M --engine transformers     # request only
 
 Writes a JSON log (--log, default logs/serve_smoke.json): engine, package versions, the request, the raw
 output, the scorer's verdict, load and generation seconds. Exit status 0 only when the output is json_valid,
