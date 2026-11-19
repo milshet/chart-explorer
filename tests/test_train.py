@@ -55,7 +55,7 @@ def test_config_rejects_mistakes(tmp_path, yaml_text, overrides):
         train.load_config(write(tmp_path / "c.yaml", yaml_text), overrides)
 
 
-@pytest.mark.parametrize("name", ["run_a", "run_b", "ablation_answer_only"])
+@pytest.mark.parametrize("name", ["run_a", "run_b", "ablation_answer_only", "run_a_vision"])
 def test_committed_configs_load(name):
     cfg = train.load_config(REPO / "configs" / f"{name}.yaml", [])
     assert cfg["run_name"]
@@ -156,3 +156,66 @@ def test_git_state_reports_a_commit():
     if commit is None:
         pytest.skip("not a git checkout")
     assert len(commit) == 40 and isinstance(dirty, list)
+
+
+# --- LoRA scope and the vision arm (task 3.0j) ----------------------------------------------
+
+def flat(d, prefix=""):
+    return {k2: v2 for k, v in d.items()
+            for k2, v2 in (flat(v, f"{prefix}{k}.").items() if isinstance(v, dict) else {f"{prefix}{k}": v}.items())}
+
+
+@pytest.mark.parametrize("name, differs", [
+    ("run_a_vision", {"run_name", "lora.scope", "lora.target_modules"}),
+])
+def test_week3_arms_differ_from_run_a_in_one_thing(name, differs):
+    a = flat(train.load_config(REPO / "configs/run_a.yaml", []))
+    b = flat(train.load_config(REPO / f"configs/{name}.yaml", []))
+    assert {k for k in a if a[k] != b[k]} == differs
+
+
+def test_decoder_scope_is_exactly_the_week2_pattern():
+    cfg = train.load_config(REPO / "configs/run_a.yaml", [])
+    assert cfg["lora"]["scope"] == "decoder" and cfg["lora"]["target_modules"] == train.st.LORA_TARGETS
+
+
+# Module paths as Qwen2.5-VL names them; the vision MLP shares its leaf names with the decoder MLP.
+DECODER = ["base_model.model.model.language_model.layers.0.self_attn.q_proj",
+           "base_model.model.model.language_model.layers.0.mlp.gate_proj"]
+TOWER = ["base_model.model.model.visual.blocks.0.attn.qkv", "base_model.model.model.visual.blocks.0.mlp.gate_proj"]
+MERGER = ["base_model.model.model.visual.merger.mlp.0", "base_model.model.model.visual.merger.mlp.2"]
+
+
+def test_scope_patterns_select_by_path_not_leaf():
+    import re
+    dec, both = re.compile(train.LORA_SCOPES["decoder"]), re.compile(train.LORA_SCOPES["decoder+vision"])
+    assert all(dec.fullmatch(n) for n in DECODER) and not any(dec.fullmatch(n) for n in TOWER + MERGER)
+    assert all(both.fullmatch(n) for n in DECODER + TOWER + MERGER)
+    assert not both.fullmatch("base_model.model.model.visual.patch_embed.proj")   # Conv3d: not a LoRA target
+    assert [train.module_part(n) for n in DECODER + TOWER + MERGER] == ["decoder"] * 2 + ["vision_tower"] * 2 + ["merger"] * 2
+
+
+@pytest.mark.parametrize("scope, adapted", [
+    ("decoder", []),                              # selects nothing
+    ("decoder", DECODER + TOWER),                 # reached the vision tower
+    ("decoder+vision", DECODER),                  # a "vision" run that adapted only the decoder
+    ("decoder+vision", DECODER + TOWER),          # no merger
+    ("decoder+vision", TOWER + MERGER),           # no decoder
+])
+def test_check_scope_raises_on_a_run_that_would_measure_nothing(scope, adapted):
+    with pytest.raises(SystemExit):
+        train.check_scope(scope, adapted)
+
+
+def test_check_scope_counts_parts():
+    assert train.check_scope("decoder+vision", DECODER + TOWER + MERGER) == {"decoder": 2, "vision_tower": 2, "merger": 2}
+    assert train.check_scope("decoder", DECODER) == {"decoder": 2, "vision_tower": 0, "merger": 0}
+
+
+@pytest.mark.parametrize("yaml_text", [
+    "run_name: x\nlora:\n  scope: vision\n",                       # unknown scope
+    "run_name: x\nlora:\n  target_modules: '.*gate_proj'\n",       # a hand-written pattern
+])
+def test_scope_config_rejects_mistakes(tmp_path, yaml_text):
+    with pytest.raises(SystemExit):
+        train.load_config(write(tmp_path / "c.yaml", yaml_text), [])

@@ -1,0 +1,29 @@
+# Task 3.0j: the vision encoder + merger ablation. Run A in every respect except lora.scope, so the one
+# difference is which modules are adapted. Do NOT retune max_pixels or the batch for memory: an arm that
+# differs in two things is evidence about neither. Read against run_a_r16 on val, then once on test.
+# Run A (#4): rank 16. Reasoning targets (evidence + rationale, then the answer).
+# Unset values come from DEFAULTS in scripts/train.py; settings here are the ones the comparison varies or pins.
+run_name: run_a_r16_vision
+data_dir: data/v2.0
+variant: image_only
+targets: reasoning
+max_pixels: 640000          # 800 x 800, frozen; same as the Week 1 baselines
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  scope: decoder+vision     # path-matched; train.py exits if no vision-tower or merger module is adapted
+train:
+  epochs: 2                 # revisit after the pilot (#3)
+  lr: 2.0e-4
+  grad_accum: 8             # batch 1 x 8 = 8 examples per optimizer step
+  warmup_ratio: 0.03
+  seed: 42
+eval:
+  every_steps: 50
+save:
+  every_steps: 50
+  keep: 2
+wandb:
+  enabled: true
+  project: chartqa-week2
