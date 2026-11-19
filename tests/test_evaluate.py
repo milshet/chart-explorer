@@ -290,3 +290,57 @@ def test_adapter_on_eval_c_needs_final_test(tmp_path):
         evaluate.resolve(evaluate.parse_args(["--split", "eval_c", "--adapter", str(d)]))
     s = evaluate.resolve(evaluate.parse_args(["--split", "eval_c", "--adapter", str(d), "--final-test"]))
     assert s["items_dir"] == "data/eval_c" and s["name"].endswith("_eval_c_image_only_cot_0shot_bf16")
+
+
+# --- error taxonomy (task 3.0e) --------------------------------------------------------------------
+
+def tax_item(answer, answer_type, qtype="retrieval", table="| a | 40 | 60 |"):
+    gold = {"evidence": [], "rationale": "r", "answer": answer, "answer_type": answer_type, "unit": None}
+    return {"id": "x", "answer_type": answer_type, "question_type": qtype, "input_text": table,
+            "messages": [{}, {}, {"role": "assistant", "content": json.dumps(gold)}]}
+
+
+def out(answer, answer_type="number", evidence=("40", "60")):
+    return json.dumps({"evidence": list(evidence), "rationale": "r", "answer_type": answer_type, "unit": None,
+                       "answer": answer})
+
+
+@pytest.mark.parametrize("item_args, raw, category", [
+    ((100, "number"), out(100), "ok"),
+    ((100, "number"), "no json", "schema_invalid"),
+    ((None, "unanswerable", "unanswerable"), out(5), "failed_to_abstain"),
+    ((100, "number"), out(None, "unanswerable"), "false_abstention"),
+    (("yes", "yes_no"), out(100), "answer_type_mismatch"),
+    ((64, "number"), out(0.64), "scale_error"),
+    ((100, "number"), out(110), "near_miss"),
+    ((100, "number", "arithmetic_comparison"), out(20), "reasoning_error"),        # read 40 and 60 right
+    ((100, "number", "arithmetic_comparison"), out(20, evidence=("7",)), "extraction_error"),
+    (("france", "text"), out("Spain", "text"), "text_mismatch"),
+])
+def test_taxonomy_categories(item_args, raw, category):
+    import taxonomy
+    assert taxonomy.classify({"raw": raw}, tax_item(*item_args), "cot")[0] == category
+
+
+def test_schema_invalid_says_which_rule_broke():
+    import taxonomy
+    raw = '{"answer": 1, "answer_type": "count", "evidence": "40"}'
+    assert taxonomy.classify({"raw": raw}, tax_item(1, "number"), "cot")[1] == \
+        ["missing:rationale", "missing:unit", "bad_answer_type", "evidence_not_list"]
+
+
+def test_flags_are_not_categories():
+    import taxonomy
+    cat, _, flags = taxonomy.classify({"raw": out(100, evidence=("999",))}, tax_item(100, "number"), "cot")
+    assert cat == "ok" and flags == ["ungrounded_evidence"]
+    probe = {**tax_item(None, "unanswerable", "unanswerable"), "absent_entities": ["Germany"]}
+    assert taxonomy.classify({"raw": out(None, "unanswerable", ())}, probe, "cot")[2] == ["refusal_reason_unstated"]
+
+
+def test_taxonomy_reconciles_with_every_committed_evaluation():
+    import taxonomy
+    for folder in sorted((REPO / "results/evals").glob("*/summary.json")):
+        t = taxonomy.taxonomy(folder.parent)            # exits if share(ok) != relaxed accuracy
+        assert sum(t["categories"].values()) == t["n"]
+        committed = folder.parent / "taxonomy.json"
+        assert committed.is_file() and json.loads(committed.read_text(encoding="utf-8")) == t
