@@ -1,0 +1,166 @@
+{
+ "corpus_sha256": "e66ab9661092f09865cac333dd1c5321db8d55ea7beda7392173de3b2c98094c",
+ "selection": {
+  "n": 120,
+  "seed": 41003,
+  "from": "train",
+  "results": [
+   {
+    "chunking": "whole_table",
+    "plan": "question_only",
+    "retriever": "tfidf",
+    "metrics": {
+     "recall@1": 0.175,
+     "recall@3": 0.2833,
+     "recall@5": 0.3417,
+     "mrr": 0.2522,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "whole_table",
+    "plan": "question_only",
+    "retriever": "bm25",
+    "metrics": {
+     "recall@1": 0.2,
+     "recall@3": 0.3,
+     "recall@5": 0.3417,
+     "mrr": 0.2686,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "whole_table",
+    "plan": "chart_metadata",
+    "retriever": "tfidf",
+    "metrics": {
+     "recall@1": 0.9,
+     "recall@3": 0.9667,
+     "recall@5": 0.9667,
+     "mrr": 0.9313,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "whole_table",
+    "plan": "chart_metadata",
+    "retriever": "bm25",
+    "metrics": {
+     "recall@1": 0.9333,
+     "recall@3": 0.9667,
+     "recall@5": 0.9667,
+     "mrr": 0.9522,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
+    "plan": "question_only",
+    "retriever": "tfidf",
+    "metrics": {
+     "recall@1": 0.1917,
+     "recall@3": 0.275,
+     "recall@5": 0.3167,
+     "mrr": 0.254,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
+    "plan": "question_only",
+    "retriever": "bm25",
+    "metrics": {
+     "recall@1": 0.1917,
+     "recall@3": 0.3083,
+     "recall@5": 0.3417,
+     "mrr": 0.2638,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
+    "plan": "chart_metadata",
+    "retriever": "tfidf",
+    "metrics": {
+     "recall@1": 0.9167,
+     "recall@3": 0.9583,
+     "recall@5": 0.975,
+     "mrr": 0.9442,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
+    "plan": "chart_metadata",
+    "retriever": "bm25",
+    "metrics": {
+     "recall@1": 0.9,
+     "recall@3": 0.9583,
+     "recall@5": 0.9667,
+     "mrr": 0.9331,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   }
+  ]
+ },
+ "chosen": {
+  "chunking": "whole_table",
+  "plan": "chart_metadata",
+  "retriever": "bm25"
+ },
+ "chosen_basis": "recall@1, then mrr",
+ "headline": {
+  "val/question_only": {
+   "recall@1": 0.2735,
+   "recall@3": 0.3846,
+   "recall@5": 0.453,
+   "mrr": 0.3583,
+   "n_scorable": 117,
+   "n_unscorable": 7,
+   "question_value_leaks": 4
+  },
+  "val/chart_metadata": {
+   "recall@1": 0.9231,
+   "recall@3": 0.9658,
+   "recall@5": 0.9829,
+   "mrr": 0.9467,
+   "n_scorable": 117,
+   "n_unscorable": 7,
+   "question_value_leaks": 4
+  },
+  "test/question_only": {
+   "recall@1": 0.2398,
+   "recall@3": 0.3509,
+   "recall@5": 0.4211,
+   "mrr": 0.3271,
+   "n_scorable": 171,
+   "n_unscorable": 9,
+   "question_value_leaks": 8
+  },
+  "test/chart_metadata": {
+   "recall@1": 0.9006,
+   "recall@3": 0.9708,
+   "recall@5": 0.9825,
+   "mrr": 0.9338,
+   "n_scorable": 171,
+   "n_unscorable": 9,
+   "question_value_leaks": 8
+  }
+ }
+}

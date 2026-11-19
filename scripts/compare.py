@@ -14,7 +14,7 @@ import math
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-QTYPES = ("arithmetic_comparison", "retrieval", "visual_reference")  # unanswerable = the Refusals column
+QTYPES = ("arithmetic_comparison", "retrieval", "visual_reference")  # unanswerable = the abstention pair
 
 
 def mcnemar(a, b):
@@ -43,18 +43,27 @@ def pct(v):
     return "" if v is None else f"{100 * v:.1f}%"
 
 
+def pair(o):
+    """The abstention pair as counts, true then false: "9/9 true · 1/171 false". Never one half alone (task 3.0b)."""
+    a = o.get("abstention")
+    if a is None:
+        raise SystemExit("summary has no abstention pair: run scripts/rescore.py --write first")
+    def frac(rate, n):
+        return "n/a" if rate is None else f"{round(rate * n)}/{n}"
+    return f"{frac(a['true_abstention'], a['n_unanswerable'])} true · {frac(a['false_abstention'], a['n_answerable'])} false"
+
+
 def table(evals, reference):
     ref = evals[reference][1]
-    head = ["Evaluation", "Relaxed acc.", "Schema valid", "Refusals", *[q.split("_")[0].capitalize() for q in QTYPES],
+    head = ["Evaluation", "Relaxed acc.", "Schema valid", "Abstention (true · false)", *[q.split("_")[0].capitalize() for q in QTYPES],
             "Tokens out", "s / item", "vs reference: only this / only ref (p)"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for name, (s, correct) in evals.items():
         o, by = s["overall"], s["by"]["question_type"]
-        refusals = by.get("unanswerable", {})
         x, y, p = mcnemar(correct, ref) if name != reference else (None, None, None)
         lines.append("| " + " | ".join([
             name, pct(o["relaxed_accuracy"]), pct(o["schema_valid"]),
-            f"{round(refusals['mean'] * refusals['count'])}/{refusals['count']}" if refusals else "",
+            pair(o),
             *[pct(by[q]["mean"]) if q in by else "" for q in QTYPES],
             f"{o['mean_new_tokens']}", f"{o['seconds_per_item']}",
             "reference" if p is None else f"{x} / {y} (p = {p:.3g})",
@@ -64,7 +73,7 @@ def table(evals, reference):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--split", choices=("val", "test"), required=True)
+    p.add_argument("--split", required=True, help="val, test, eval_c, rag_val, rag_test, rag_test_qo or rag_test_withheld")
     p.add_argument("--reference", required=True, help="folder name of the evaluation to test against")
     p.add_argument("--root", default=str(REPO / "results" / "evals"))
     args = p.parse_args()

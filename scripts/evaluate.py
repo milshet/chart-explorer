@@ -36,12 +36,20 @@ import train  # noqa: E402  provenance helpers: data fingerprint, git state, env
 # The two train examples behind the reported Week 1 few-shot baseline (notebooks/01_vlm_baselines.ipynb, cell 5).
 FEW_SHOT_IDS = ["train-multi_col_20389-6093", "train-87453827004907-3340"]
 STYLE = {"reasoning": "cot", "answer_only": "answer_only"}  # targets -> scorer style
+# Held-out sets frozen outside the training dataset, each with its own MANIFEST.txt and the same variant/target
+# layout. Scored like test: an adapter needs --final-test, once per compared model.
+EVAL_SETS = {"eval_c": "data/eval_c",                       # task 3.0c: abstention probes
+             **{n: "data/rag" for n in ("rag_val", "rag_test", "rag_test_qo", "rag_test_withheld")}}  # 3.5, 3.6
+# RAG sets exist only in the image_table format. An adapter trained on image_only may be scored on them on
+# purpose (task 3.5 reports run_a_r16 there); the settings then record prompt_format_new_to_model = true.
+RAG_SETS = {n for n, d in EVAL_SETS.items() if d == "data/rag"}
+REPORTED = ("test", *(n for n in EVAL_SETS if n != "rag_val"))  # scored once per model, after selection
 
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--adapter", type=Path, help="adapter/ or checkpoints/epoch-N of a run; omit for the base model")
-    p.add_argument("--split", choices=("val", "test"), required=True)
+    p.add_argument("--split", choices=("val", "test", *EVAL_SETS), required=True)
     p.add_argument("--variant", choices=("image_only", "image_table"))
     p.add_argument("--targets", choices=tuple(STYLE), help="required for the base model; read from the run otherwise")
     p.add_argument("--shots", type=int, choices=(0, len(FEW_SHOT_IDS)), default=0)
@@ -77,17 +85,23 @@ def resolve(args):
         adapter, cfg, cfg_file = adapter_config(args.adapter)
         for key in ("variant", "targets"):
             given = getattr(args, key)
+            if key == "variant" and args.split in RAG_SETS:
+                continue
             if given and given != cfg[key]:
                 sys.exit(f"--{key} {given} differs from the run's {key} {cfg[key]} ({cfg_file}); prompts must match training")
         if cfg["max_pixels"] != st.MAX_PIXELS:
             sys.exit(f"the run used max_pixels={cfg['max_pixels']}, but images are loaded at {st.MAX_PIXELS}")
         s.update(data_dir=cfg["data_dir"], variant=cfg["variant"], targets=cfg["targets"], adapter=str(adapter),
                  run_name=cfg["run_name"], source=f"{cfg['run_name']}-{adapter.name}")
-        if args.split == "test" and not args.final_test:
-            sys.exit("adapters are scored on test only after the final model is chosen on val, once each (docs/RUNS.md rule 4): add --final-test")
+        if args.split in REPORTED and not args.final_test:
+            sys.exit(f"adapters are scored on {args.split} only after the final model is chosen on val, once each (docs/RUNS.md rule 4): add --final-test")
     elif not args.targets:
         sys.exit("--targets is required for the base model (answer_only for zero/few-shot, reasoning for CoT)")
     s["style"] = STYLE[s["targets"]]
+    s["items_dir"] = EVAL_SETS.get(args.split, s["data_dir"])  # where the scored items live
+    if args.split in RAG_SETS:
+        s["prompt_format_new_to_model"] = bool(args.adapter) and s["variant"] != "image_table"
+        s["variant"] = "image_table"
     s["name"] = f"{s['source']}_{args.split}_{s['variant']}_{s['style']}_{args.shots}shot_{args.precision}" + \
         (f"_limit{args.limit}" if args.limit else "")
     return s
@@ -95,7 +109,8 @@ def resolve(args):
 
 def load_rows(s, split, args):
     cfg = {k: s[k] for k in ("data_dir", "variant", "targets")}
-    items = train.read_split(cfg, split)
+    item_cfg = {**cfg, "data_dir": s["items_dir"]}
+    items = train.read_split(item_cfg, split)
     rows = {split: items}
     shots = []
     if args.shots:
@@ -105,18 +120,26 @@ def load_rows(s, split, args):
             sys.exit(f"pinned few-shot examples not in the train split: {missing}")
         shots = [by_id[i] for i in FEW_SHOT_IDS[:args.shots]]
         rows["train"] = shots
-    fingerprint = train.data_fingerprint(cfg, rows)  # exits if the split files differ from MANIFEST.txt
+    if item_cfg == cfg:
+        fingerprint = train.data_fingerprint(cfg, rows)  # exits if the split files differ from MANIFEST.txt
+    else:  # a separate held-out set: checked against its own manifest; any few-shot rows against the dataset's
+        fingerprint = train.data_fingerprint(item_cfg, {split: items})
+        if shots:
+            fingerprint["shots"] = train.data_fingerprint(cfg, {"train": shots})
     return (items[:args.limit] if args.limit else items), shots, fingerprint
 
 
-def build(item, shots, data_dir):
-    """(messages, images): the eval item's system and user turns, after any solved train conversations."""
+def build(item, shots, data_dir, items_dir=None):
+    """(messages, images): the eval item's system and user turns, after any solved train conversations.
+
+    Shot images resolve against data_dir (the training dataset), the item's against items_dir (default the same).
+    """
     msgs, images = [item["messages"][0]], []
     for s in shots:
         msgs += s["messages"][1:3]
         images.append(st.load_image(data_dir, s["image"]))
     msgs.append(item["messages"][1])
-    images.append(st.load_image(data_dir, item["image"]))
+    images.append(st.load_image(items_dir or data_dir, item["image"]))
     return msgs, images
 
 
@@ -124,7 +147,8 @@ def prompt_text(processor, msgs):
     return processor.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
 
 
-def provenance(fingerprint, adapter):
+def provenance(fingerprint, adapter, data_dir=None):
+    data_dir = data_dir or fingerprint["data_dir"]  # the dataset whose prompts the adapter must have been trained on
     commit, dirty = train.git_state()
     pins, installed = train.read_lock(), train.installed_versions()
     drift = train.env_drift(pins, installed)
@@ -150,8 +174,8 @@ def provenance(fingerprint, adapter):
             trained = json.loads(run_prov.read_text(encoding="utf-8"))
             prov["trained_at_commit"] = trained.get("git_commit")
             prov["trained_data"] = trained.get("data")
-            if trained.get("data", {}).get("data_dir") != fingerprint["data_dir"]:
-                problems.append(f"adapter was trained on {trained['data'].get('data_dir')}, evaluated on {fingerprint['data_dir']}")
+            if trained.get("data", {}).get("data_dir") != data_dir:
+                problems.append(f"adapter was trained on {trained['data'].get('data_dir')}, evaluated against {data_dir}")
                 prov["clean"] = False
     return prov, problems
 
@@ -163,7 +187,7 @@ def dry_run(args, s, items, shots, prov, problems):
     data_dir = train.REPO / s["data_dir"]
     lengths, bad_gold = [], []
     for item in items:
-        msgs, images = build(item, shots, data_dir)
+        msgs, images = build(item, shots, data_dir, train.REPO / s["items_dir"])
         text = prompt_text(processor, msgs)
         lengths.append(int(processor(text=[text], images=images, return_tensors="pt")["input_ids"].shape[1]))
         gold = scoring.score(item, item["messages"][2]["content"], s["style"])
@@ -212,7 +236,7 @@ def main(argv=None):
     args = parse_args(argv)
     s = resolve(args)
     items, shots, fingerprint = load_rows(s, args.split, args)
-    prov, problems = provenance(fingerprint, s["adapter"])
+    prov, problems = provenance(fingerprint, s["adapter"], s["data_dir"])
     if args.dry_run:
         return dry_run(args, s, items, shots, prov, problems)
     if not os.getenv("SLURM_JOB_ID"):
@@ -240,7 +264,7 @@ def main(argv=None):
     with open(out / "predictions.jsonl", "w", encoding="utf-8") as pf:
         for i in range(0, len(items), args.batch_size):
             chunk = items[i:i + args.batch_size]
-            built = [build(it, shots, data_dir) for it in chunk]
+            built = [build(it, shots, data_dir, train.REPO / s["items_dir"]) for it in chunk]
             batch = processor(text=[prompt_text(processor, m) for m, _ in built], images=[im for _, im in built],
                               padding=True, return_tensors="pt").to(model.device)
             torch.cuda.synchronize()

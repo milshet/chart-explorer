@@ -1,0 +1,1501 @@
+{
+ "name": "base_test_image_only_answer_only_0shot_4bit",
+ "n": 180,
+ "relaxed_accuracy": 0.5278,
+ "error_rate": 0.4722,
+ "categories": {
+  "ok": 95,
+  "schema_invalid": 2,
+  "failed_to_abstain": 5,
+  "false_abstention": 2,
+  "answer_type_mismatch": 28,
+  "scale_error": 1,
+  "near_miss": 11,
+  "reasoning_error": 0,
+  "extraction_error": 29,
+  "text_mismatch": 7
+ },
+ "schema_rules": {
+  "bad_answer_type": 1,
+  "missing:answer_type": 1,
+  "missing:unit": 1,
+  "no_json": 1
+ },
+ "flags": {},
+ "by_question_type": {
+  "arithmetic_comparison": {
+   "ok": 42,
+   "schema_invalid": 2,
+   "false_abstention": 2,
+   "answer_type_mismatch": 15,
+   "scale_error": 1,
+   "near_miss": 10,
+   "extraction_error": 24
+  },
+  "retrieval": {
+   "ok": 26,
+   "answer_type_mismatch": 6,
+   "extraction_error": 1,
+   "text_mismatch": 2
+  },
+  "unanswerable": {
+   "ok": 4,
+   "failed_to_abstain": 5
+  },
+  "visual_reference": {
+   "ok": 23,
+   "answer_type_mismatch": 7,
+   "near_miss": 1,
+   "extraction_error": 4,
+   "text_mismatch": 5
+  }
+ },
+ "items": [
+  {
+   "id": "test-OECD_INVESTMENT_BY_SECTOR_AUS_CHL_CRI_ITA_ZAF_000130-581",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_20396-927",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_61646-624",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_60664-836",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_41814-812",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_898-729",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_970-905",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_100855-1223",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-multi_col_40407-959",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_81937-651",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60820-1033",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60911-1037",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_FINANCIAL_DISINCENTIVE_TO_RETURN_TO_WORK_AUS_DNK_LUX_NOR_SVN_000002-521",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_80405-1083",
+   "category": "false_abstention",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_100876-1212",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-5480-79-unans",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-two_col_82105-1130",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_83219-1211-unans",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-multi_col_100839-851",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_60946-1042",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_40232-798",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_24502-1126",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_60316-1003",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_PUBLIC_UNEMPLOYMENT_SPENDING_KOR_TUR_000098-594",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-05810070001466-217",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-97331592016092-574",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40183-950",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_40160-811",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_805-896",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60799-1030",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_60299-828",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_4148-742",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-5831-25",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-OECD_DEATHS_FROM_CANCER_COL_CRI_SVN_000015-68",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_62027-1145",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_TAX_REVENUE_GBR_NLD_000037-543",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-14155246005645-364",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_852-898",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_22179-770",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-8124-197",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-6021-493",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-11128-62",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-4027-474",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_1088-879",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60102-988",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_100839-850",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-29008706007362-270",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_20741-943",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_61269-622",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-12275-157",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_24274-793",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_100291-1077",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_PRICE_LEVEL_INDICES_AUT_CHL_000024-588",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_100960-856",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-24441478018800-255",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_158-607",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_100993-1166",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-4842-136",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_101027-1121",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_5319-754",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-20374873014871-19",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-multi_col_60240-999",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_60414-832",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_22205-773",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-20374873014871-18",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-302-443",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_80177-1061",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-13543-182",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-24441478018800-254",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_20436-930",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_40213-791",
+   "category": "scale_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_1716-717",
+   "category": "schema_invalid",
+   "schema_rules": [
+    "no_json"
+   ],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_41814-813",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40334-1119",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_60276-827",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_2138-726",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-53962594007840-316",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_82105-1131",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40258-1102",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60502-1124",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_1716-716",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-1201-88",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40183-951",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-26767847002300-382",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60681-1023",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_62141-630-unans",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-two_col_102898-696",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_101067-1129",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_959-901",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-94483094006737-571",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_101935-691",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-44409110004673-305",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-98173121004315-577-unans",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-two_col_82108-652",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_959-900-unans",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-OECD_BENEFITS_IN_UNEMPLOYMENT,_SHARE_OF_PREVIOUS_INCOME_BGR_IRL_ISR_LUX_MLT_000003-516-unans",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-multi_col_60916-1245",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_61188-618",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_82496-654",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-12097783003404-230",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-5417-32",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_24416-1204",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40184-1148",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_60928-1041",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_100718-670",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_40232-799",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-67940673002511-413",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_83566-677",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60476-1009",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_62141-631",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-77342851005157-21",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-29008706007362-271",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-two_col_100855-1222",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-97331592016092-575",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40871-1195",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_20801-1170",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_102898-697",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-05705464003774-215",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-5417-33",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-multi_col_60562-1014-unans",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-two_col_3582-739",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_101261-870",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_60974-1046",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_1303-884",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-939-47",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_20953-1162",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_HOUSING_PRICES_JPN_RUS_000007-529",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-26767847002300-383",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-33156208005328-282",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-26535003011580-264",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_61269-623",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-11832048004655-229",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_20213-916",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_80102-1233",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-36773128002975-293",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-two_col_81937-650",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_20065-912",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_DEATHS_FROM_CANCER_COL_CRI_SVN_000015-69",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-50392747010463-310",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_101141-868",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_788-840",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_3582-738",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-OECD_FDI_INCOME_PAYMENTS_BY_INDUSTRY_HUN_LTU_000042-30",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-44409110004673-304",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_24416-1205",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_4228-744",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_80177-1060",
+   "category": "schema_invalid",
+   "schema_rules": [
+    "missing:answer_type",
+    "missing:unit",
+    "bad_answer_type"
+   ],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_4148-743",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_5327-756-unans",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-52159158000443-314",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_803-894",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_4524-1221-unans",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "test-OECD_HOUSING_PRICES_JPN_RUS_000007-528",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_60824-616",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-35432405007230-288",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-64970172000121-329",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "yes_no"
+  },
+  {
+   "id": "test-30922516017795-274",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_80405-1082",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_22179-771",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-two_col_4925-751",
+   "category": "near_miss",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_60299-829",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_5319-755",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_24548-795",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-15979830001410-366",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-OECD_PUBLIC_UNEMPLOYMENT_SPENDING_KOR_TUR_000098-595",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-4300-481",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_100237-1070",
+   "category": "answer_type_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_40617-965",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_40617-964",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_20719-761",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_1009-876",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-46913441006782-399",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-80807271000019-420",
+   "category": "false_abstention",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-OECD_TRADE_IN_GOODS_AND_SERVICES_FORECAST_AUT_CHE_ISL_ITA_LVA_000024-544",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-two_col_20322-758",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60240-998",
+   "category": "text_mismatch",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "visual_reference",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-multi_col_20213-917",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-6021-492",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "number"
+  },
+  {
+   "id": "test-multi_col_60284-1114",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "retrieval",
+   "answer_type": "text"
+  },
+  {
+   "id": "test-53962594007840-317",
+   "category": "extraction_error",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "arithmetic_comparison",
+   "answer_type": "number"
+  }
+ ]
+}

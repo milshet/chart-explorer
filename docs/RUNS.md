@@ -114,3 +114,51 @@ Written when the job ends, whatever the outcome. Fields later steps may use:
 
 "Correct" is defined once, in `scripts/scoring.py`, which the Week 1 notebook also imports. Reported
 evaluations are copied into `results/evals/`.
+
+## Week 3 GPU jobs (tasks 3.0h, 3.0j, 3.0c)
+
+Queue these together early in the week: same data fingerprint, so they are comparable to Run A. Each member
+who has not yet trained submits one of them, which satisfies the template's "every member runs a job" rule.
+
+| Job | Command | Who |
+|---|---|---|
+| `run_a_r16_table` (3.0h, §9 decision 6) | `sbatch slurm/train.sbatch configs/run_a_table.yaml` | member 1 |
+| `run_a_r16_vision` (3.0j) | `sbatch slurm/train.sbatch configs/run_a_vision.yaml` | member 2 |
+| seed rerun (3.0h) | `sbatch slurm/train.sbatch configs/run_a.yaml --set run_name=run_a_seed1_<name> --set train.seed=1` | member 3 |
+| seed rerun (3.0h) | same, `train.seed=2`, `run_a_seed2_<name>` | member 4 |
+
+`configs/run_a_table.yaml` and `configs/run_a_vision.yaml` differ from `configs/run_a.yaml` in exactly one
+setting each (`variant`, `lora.scope`); `tests/test_train.py` fails if that ever stops being true.
+
+**Vision run (3.0j).** `lora.scope: decoder+vision` adapts the vision blocks' attention and MLP and the merger,
+selected by module *path*. `train.py` exits if a scope adapts nothing, if `decoder` reaches the vision encoder,
+or if `decoder+vision` misses the tower or the merger. Every run writes `targets.json` (in the run folder and
+in `adapter/`) listing the modules actually adapted, with counts per part: check it before reading the result.
+Expect more memory and slower steps; do **not** change `max_pixels` or the batch.
+
+**Then evaluate** each new adapter on val, and only after selection on test and Eval-C, once each:
+
+```bash
+sbatch slurm/eval.sbatch --adapter ~/runs/<run>/adapter --split val
+sbatch slurm/eval.sbatch --adapter ~/runs/<run>/adapter --split test --final-test
+sbatch slurm/eval.sbatch --adapter ~/runs/<run>/adapter --split eval_c --final-test
+```
+
+Eval-C also needs the existing models scored once each (`run_a_r16`, `run_b_r64`, `ablation_answer_only`, and
+the few-shot base: `--split eval_c --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384`).
+Copy every `~/evals/<name>/` into `results/evals/` and run `python scripts/taxonomy.py --all --write`.
+
+**RAG conditions (tasks 3.5, 3.6).** The prompt sets are frozen in `data/rag/` (retrieved tables, ids identical
+to test). Score each once, then run `python scripts/threeway.py --write` and `python scripts/report_week3.py --write`:
+
+```bash
+# base + RAG (few-shot, the Week 1 reference regime), bracket floor, and retrieval failure
+sbatch slurm/eval.sbatch --split rag_test --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384
+sbatch slurm/eval.sbatch --split rag_test_withheld --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384
+# fine-tuned + RAG: Run A (prompt format new to it) and the image_table adapter (trained on it)
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16/adapter --split rag_test --final-test
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_val
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_test --final-test
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_test_withheld --final-test
+# optional, the floor end of the bracket: --split rag_test_qo
+```

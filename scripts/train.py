@@ -57,7 +57,8 @@ DEFAULTS = {
     "targets": "reasoning",           # reasoning (evidence + rationale + answer) | answer_only
     "max_pixels": 800 * 800,          # same limit as notebooks/01_vlm_baselines.ipynb
     "max_seq_len": 2048,              # longer examples are skipped and counted
-    "lora": {"r": 16, "alpha": 32, "dropout": 0.05, "target_modules": st.LORA_TARGETS},
+    # scope picks the modules (task 3.0j); target_modules is derived from it and recorded, never set by hand
+    "lora": {"r": 16, "alpha": 32, "dropout": 0.05, "scope": "decoder", "target_modules": st.LORA_TARGETS},
     "train": {"epochs": 2, "lr": 2.0e-4, "grad_accum": 8, "warmup_ratio": 0.03,
               "weight_decay": 0.0, "max_grad_norm": 1.0, "seed": 42},
     "eval": {"every_steps": 50},      # validation loss every N optimizer steps (0 = end of epoch only)
@@ -101,7 +102,52 @@ def load_config(path, overrides):
         sys.exit(f"{path}: targets must be 'reasoning' or 'answer_only'")
     if cfg["train"]["grad_accum"] < 1 or cfg["train"]["epochs"] < 1:
         sys.exit(f"{path}: train.grad_accum and train.epochs must be at least 1")
+    scope = cfg["lora"]["scope"]
+    if scope not in LORA_SCOPES:
+        sys.exit(f"{path}: lora.scope must be one of {sorted(LORA_SCOPES)}, not {scope!r}")
+    if cfg["lora"]["target_modules"] not in (DEFAULTS["lora"]["target_modules"], LORA_SCOPES[scope]):
+        sys.exit(f"{path}: set lora.scope, not lora.target_modules (a hand-written pattern is how a vision run "
+                 "ends up adapting no vision module)")
+    cfg["lora"]["target_modules"] = LORA_SCOPES[scope]
     return cfg
+
+
+# --- LoRA scope (task 3.0j) ----------------------------------------------------------------------
+# Qwen2.5-VL's vision MLP and the decoder MLP share leaf names (gate_proj, up_proj, down_proj), so modules are
+# selected and classified by their full PATH, never by leaf. "decoder" is exactly the Week 2 pattern.
+VISION_TARGETS = (r"^.*\.visual\.(blocks\.\d+\.(attn\.(qkv|proj)|mlp\.(gate_proj|up_proj|down_proj))"
+                  r"|merger\.mlp\.(0|2))$")
+LORA_SCOPES = {"decoder": st.LORA_TARGETS, "decoder+vision": f"(?:{st.LORA_TARGETS})|(?:{VISION_TARGETS})"}
+
+
+def module_part(name):
+    """Which part of the model a module path belongs to: decoder, vision_tower or merger."""
+    if ".visual.merger." in f".{name}":
+        return "merger"
+    if ".visual." in f".{name}":
+        return "vision_tower"
+    return "decoder"
+
+
+def check_scope(scope, adapted):
+    """{part: count} for the adapted module paths; exits if they do not match the scope.
+
+    The failure this exists for looks like a clean result: a vision run whose pattern matched no vision module
+    trains and logs normally and reports "vision adaptation does not help" having adapted none.
+    """
+    counts = {"decoder": 0, "vision_tower": 0, "merger": 0}
+    for n in adapted:
+        counts[module_part(n)] += 1
+    if not adapted:
+        sys.exit(f"lora.scope {scope}: LoRA wrapped no module at all")
+    if not counts["decoder"]:
+        sys.exit(f"lora.scope {scope}: no decoder module adapted")
+    if scope == "decoder" and (counts["vision_tower"] or counts["merger"]):
+        sys.exit("lora.scope decoder: LoRA reached the vision encoder, which this scope keeps frozen")
+    if scope == "decoder+vision" and not (counts["vision_tower"] and counts["merger"]):
+        sys.exit(f"lora.scope decoder+vision selected only {counts}: the vision tower and the merger must both "
+                 "be adapted, or the run measures nothing about vision adaptation")
+    return counts
 
 
 def coerce(default, value, key, path):
@@ -421,8 +467,9 @@ def main():
     model = get_peft_model(model, LoraConfig(r=lc["r"], lora_alpha=lc["alpha"], lora_dropout=lc["dropout"],
                                              target_modules=lc["target_modules"], task_type="CAUSAL_LM"))
     lora_modules = [n for n, m in model.named_modules() if hasattr(m, "lora_A") and len(getattr(m, "lora_A", {})) > 0]
-    if not lora_modules or any("visual" in n for n in lora_modules):
-        sys.exit("LoRA must wrap language-model layers only (vision encoder frozen)")
+    counts = check_scope(lc["scope"], lora_modules)
+    targets = {"scope": lc["scope"], "pattern": lc["target_modules"], "counts": counts, "modules": sorted(lora_modules)}
+    (out / "targets.json").write_text(json.dumps(targets, indent=1) + "\n")  # what was adapted, checkable later
     trainable = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(trainable, lr=tc["lr"], weight_decay=tc["weight_decay"])
     scheduler = get_cosine_schedule_with_warmup(optimizer, max(1, round(tc["warmup_ratio"] * planned_steps)),
@@ -445,7 +492,8 @@ def main():
         "versions": prov["versions"], "env_drift": prov["env_drift"],
         "config": cfg, "data": {**prov["data"], "train_examples": len(train_rows), "val_examples": len(val_rows),
                                 "limit_train": args.limit_train},
-        "lora": {"wrapped_modules": len(lora_modules), "trainable_parameters": sum(p.numel() for p in trainable)},
+        "lora": {"wrapped_modules": len(lora_modules), "by_part": counts,
+                 "trainable_parameters": sum(p.numel() for p in trainable)},
         "planned_steps": planned_steps, "steps_per_epoch": steps_per_epoch,
     }
     (out / "config.json").write_text(json.dumps(cfg, indent=2) + "\n")
@@ -599,6 +647,7 @@ def main():
     model.save_pretrained(adapter_dir, safe_serialization=True)
     processor.save_pretrained(adapter_dir)
     (adapter_dir / "train_config.json").write_text(json.dumps(cfg, indent=2) + "\n")
+    shutil.copy2(out / "targets.json", adapter_dir / "targets.json")
     summary["adapter_dir"] = str(adapter_dir)
     summary["adapter_mib"] = round((adapter_dir / "adapter_model.safetensors").stat().st_size / 2**20, 1)
     if state["val_history"]:

@@ -1,0 +1,468 @@
+# Capstone Project Plan — Track A (Model-Side)
+
+**Programme:** Executive Post Graduate Programme in Generative AI and Agentic AI
+**Track:** A — "Model-Side" Capstone (direct model access, GPU required)
+**Base model:** Qwen2.5-VL-3B-Instruct (vision-language; within the template's 8B cap)
+**Primary dataset:** **ChartAudit-Fin v2.0** — built from the original ChartQA release ([`ahmed-masry/ChartQA`](https://huggingface.co/datasets/ahmed-masry/ChartQA), rev `af8b6f5`), human-written questions only, finance and economics, blind-labelled (§4)
+**Implementation:** `chart-explorer-main/` — `scripts/`, `configs/`, `slurm/`, `blind_labelling/`, `data/v2.0/`, `results/evals/`, `tests/`, `docs/`
+**Duration:** 4 weeks · **Team:** 6 members · ~8–10 focused hours per person per week
+**Plan drafted:** 2026-11-05 · **Amended 2026-11-17:** Weeks 1 and 2 rewritten to record what was actually built and measured; Week 3 extended with the carry-forward tasks Weeks 3 and 4 cannot start without
+
+> **How to read an amended section.** Weeks 1 and 2 are past. Their tables are a record, not a forecast: the Status column says what each task produced, and where the implementation chose differently from the draft the row says so and gives the reason. §4.6 lists what was dropped and what it costs. Weeks 3 and 4 are still a plan. Nothing in Weeks 1–2 is outstanding work unless it reappears as a Week 3 carry-forward task (3.0a–3.0i).
+
+---
+
+## 1. Project Title
+
+**Chart-Grounded Analytics Assistant: QLoRA Fine-Tuning and Serving Qwen2.5-VL-3B for Auditable Chart Question Answering in Financial & Business Reporting**
+
+*Short form (title slide / repo description):*
+**Auditable Chart QA: Adapting and Serving a 3B Vision-Language Model for Regulated Business Reporting**
+
+---
+
+## 2. Project Domain
+
+**Enterprise business intelligence / regulated financial & statistical reporting — visual analytics question answering.**
+
+The workflow being automated: an analyst or auditor is handed a deck, filing, or market-research report and must extract specific figures and comparisons from the **charts** — not the prose, not an attached spreadsheet — and restate them in a document someone will be held accountable for.
+
+The regulated character comes from the consequence of a wrong number. A figure read off a chart and typed into an investor update, a regulatory filing, or a board pack is a compliance exposure, not a typo. That makes **abstention a first-class requirement**: the assistant must decline when the chart does not support an answer, rather than guessing a plausible value.
+
+This framing is what gives the model card's refusal section and the 20-prompt red-team log something real to measure.
+
+---
+
+## 3. Project Description
+
+A general-purpose instruct model — and even a general vision-language model — handles chart reading badly in a specific, documentable way. Qwen2.5-VL-3B-Instruct out of the box will:
+
+- read the wrong bar when legend ordering is non-obvious;
+- interpolate between gridlines instead of reporting the plotted value;
+- answer in prose when the workflow needs a typed scalar;
+- silently invent a value for a series that is not in the chart;
+- fail compositional questions ("how much more did X gain than Y between 2015 and 2019") that require two extractions plus arithmetic.
+
+These are not generic weaknesses. They are the failure taxonomy this project exists to shrink.
+
+The team adapts the model along three axes and proves each one separately.
+
+### 3.1 Supervised adaptation (QLoRA)
+
+A training set of **1,033 instruction–response pairs** (§4), stratified across ChartQA's source, chart type, answer type and question type, teaching the model a fixed output contract rather than free prose. Only ChartQA's **human-written** questions are used; the machine-generated split is excluded, which is what makes the single remaining question-origin unambiguous and the reported splits chart-level rather than origin-level.
+
+Two LoRA configurations plus one ablation, all three trained and reported (§6, Week 2).
+
+> **Amended 2026-11-17 — the ablation changed.** The draft made the ablation VLM-specific: *does adapting the vision encoder and the vision–language merger help, or is the language decoder enough?* That is not what was run. `scripts/smoke_test.py` restricts LoRA to language-model projections by regex (`^(?!.*visual).*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)$`) and `scripts/train.py` **exits** if any adapted module name contains `visual`, so the vision tower was frozen in every run by construction. The ablation that was run instead is the **supervision-format** one: identical data, rank and hyperparameters, targets with `evidence` + `rationale` versus targets carrying the answer alone — the draft's task 2.5 arms C and D, run as the headline ablation rather than as a side arm.
+>
+> The ablation that *was* run answers a question the project actually depends on — whether the auditable `evidence`/`rationale` contract earns its token cost — and it answered it with a significant result (§6, Week 2, task 2.4). But it does not answer the vision-tower question, and the two are not interchangeable.
+>
+> **The vision arm is therefore revived and scheduled** (§9 decision 7) as Week 3 task **3.0j**: Run A's data, rank, hyperparameters and seed, with adapters extended to the vision encoder and the merger, read against `run_a_r16`. It unblocks nothing downstream, which is exactly why it has to be protected in the schedule rather than left to spare time — Week 3's cut rule names what it gives way to and what it does not.
+
+### 3.2 Structured, auditable output
+
+Every answer is emitted as a JSON object — `answer`, `answer_type`, `unit`, `evidence` (the chart elements the number was read from) and a short `rationale`, with `answer_type: "unanswerable"` and `answer: null` as the explicit abstain path — so that **schema validity becomes a measurable metric** alongside accuracy, and so a downstream reviewer can trace a number back to a chart element. Validation is part of the serving stack, not an afterthought.
+
+> **Amended 2026-11-17 — the contract lives in the scorer, and a `schema.json` will not be written.** Weeks 1 and 2 measured `schema_valid` as a field-presence check inside `scripts/scoring.py` (the required keys for the target style, plus an allowed `answer_type`), not against a published JSON Schema. Writing one was considered as a Week 3 carry-forward and **dropped on 2026-11-17**: `scoring.py` is already the single definition the notebook, the evaluation script and the write-up share, it is covered by tests, and a second definition of the same contract in a different formalism is one more thing that can disagree with it — and the disagreement would move `schema_valid` for every number already reported.
+>
+> The cost is paid in Week 4, once, and is named there: task 4.3 planned to hand a ref-inlined schema to a guided decoder, and now has nothing to hand it. Serving therefore enforces the contract by **validate-and-retry against `scoring.py`'s own check** rather than by constrained decoding — two layers instead of three. That is a weaker guarantee on malformed output and a defensible one at this scale: Run A already emits 100% schema-valid output on the test split without any decoding constraint, so the layer being given up is the one with the least to do. The report should say so in those words rather than describing a constrained decoder that was never built.
+>
+> The dataset's own `confidence` field is a **label-quality flag from the blind-labelling step, not a model output** (§4.2): it records whether the labeller marked itself unsure, is used only to decide what to keep, and is absent from the model's target. The decision below stands unchanged.
+
+> **Design decision: no `confidence` field.** An earlier draft of the output contract carried a self-reported confidence score. It was dropped before the Week 1 freeze, for three reasons.
+>
+> 1. **It is not verifiable.** There is no gold label for confidence, so the field could never be scored. Every other field in the §4.5 record can be checked against something — the benchmark label, the data table, the schema. Confidence could only be checked against itself.
+> 2. **Small models are badly calibrated, and fine-tuning makes it worse.** A 3B model's verbalised confidence tracks fluency rather than correctness, and SFT on a fixed output format pushes it further toward whatever confidence string dominated the training targets. The field would have looked most trustworthy exactly where it was least informative.
+> 3. **It would have competed with the mechanism that actually does the job.** The auditability argument in §2 rests on `evidence` (trace the number to a chart element) and `abstain` (decline when the chart does not support an answer). Both are binary-checkable and both are trained on verifiable labels. A confidence score sitting next to them invites a reviewer to read a soft number instead of the hard ones — and in a regulated reporting workflow, that is the wrong habit to design in.
+>
+> If calibration is wanted later, the honest version is a post-hoc measure computed outside the model — sequence log-probability of the answer span, or agreement across sampled generations — reported as a diagnostic rather than emitted as a field the model authors about itself.
+
+### 3.3 Retrieval grounding (RAG)
+
+ChartQA ships the **underlying data table for every chart**, and Week 1 resolved the dependency in the strongest possible way: the dataset was built from the original `ahmed-masry/ChartQA` release rather than the `HuggingFaceM4` mirror, so the table is not merely reachable — it is already **inside every frozen record**, serialised as `input_text` (source, chart type, title, category axis, series with colours, and the table itself as Markdown). The §4.4 ladder is therefore resolved at **rung 1**, and the headline three-way comparison can legitimately run on Eval-A.
+
+Two consequences the draft did not have to think about:
+
+- **The corpus is free but not built.** No `table_index.json`, no extracted corpus, no record→table join artefact exists yet; the tables live inline in the JSONL and nothing has pulled them out, deduplicated them by chart, or hashed them. Week 3 task **3.0d** does that, and until it does, task 3.4's recall@k has no gold-table ground truth to score against.
+- **The RAG prompt format already exists, and the fine-tuned model has never seen it.** `data/v2.0/image_table/` is the same items with the table in the prompt, frozen alongside `image_only/`. That is exactly the shape a retrieved table takes at inference — but every Week 2 adapter was trained on `image_only`, so "fine-tuned + RAG" would score a model on a prompt format it was never trained for and attribute the result to retrieval. Task 3.5 names the fix: measure the RAG conditions with the `image_table` prompt *and* train one short `run_a_r16_table` adapter on the frozen `image_table/train.jsonl` at identical hyperparameters, so the comparison separates the prompt change from the retrieval.
+
+Chunking strategy, embedding choice and reranking remain genuine documented decisions (chart title and axis/legend text as the query; table rows vs. whole-table chunks; a reranker over top-k candidate tables), all of them made on a selection set drawn from the training freeze and never on the reported split. Retrieval failure is itself a studied condition (task 3.6), since in production the source table often will not exist.
+
+### 3.4 Label quality by blind labelling — what replaced synthetic generation
+
+> **Amended 2026-11-17.** The draft filled three gaps with programmatically generated charts: unanswerable questions, stylistic stressors, and harder compositional questions. **No chart generator was built.** The implementation spent its Week 1 effort on a different axis — not more data, but *verified* data — and the three gaps are now in three different states. This section records that honestly rather than describing a generator that does not exist; §4.6 states what it costs.
+
+**Gap 1 — unanswerable questions: filled, thinly.** ChartQA has none, and the project's compliance argument rests on abstention, so `scripts/chartqa_rules.make_unanswerable` manufactures them: a real human-written question is paired with an **unrelated chart** at ~5% of each split (41 train / 7 val / 9 test). Absence is verifiable, so the label carries no noise. Two things the draft asked for are missing. The pairs are **not drawn from the same charts as the answerable records**, so the training signal still permits the shortcut the draft warned about — chart appearance correlating with refusal — and the dataset has **no `abstain_reason` vocabulary**, so every refusal is one undifferentiated kind. Nine items is also too thin to carry the model card's refusal section; `refusal_accuracy` already reads 9/9 on test, which is a saturated metric wearing a perfect score. Week 3 task **3.0c** builds a proper abstention probe set.
+
+**Gap 2 — stylistic breadth: not filled.** No truncated axes, dual-axis plots, log scales, waterfalls, missing data labels or mismatched legends beyond what ChartQA happens to contain. **Eval-B does not exist**, which removes the project's designed answer to benchmark memorisation; §3.7 states the weaker claim that remains. A minimal generator is still needed in Week 4 — the red-team log (task 4.5) is defined in terms of charts whose ground truth is known by construction — so task **3.0g** builds the smallest one that serves that purpose, with Eval-B as an explicit stretch.
+
+**Gap 3 — compositional depth: traded for verification.** No teacher generates new questions. Instead, **every training and validation label was re-derived blind**: a fresh model instance saw only the chart image and the question — never the gold answer, enforced by `blind_labelling/scripts/leak_check.py` on the packs — and wrote `evidence`, `rationale`, `answer_type`, `unit`, `answer` and its own `confidence`. The key was opened afterwards and `compare.py` kept an item only on a **strict exact match** with the human ChartQA answer. 10.6% of train and 9.5% of val failed and were dropped. A 30-item cross-check with a second model family (GPT, via two web apps) agreed with the human answer on 29 of 30, the same 29 the primary labeller matched.
+
+That is a weaker claim than the draft's table-validated teacher pairs on one axis — no new compositional questions were created, and dropping every non-exact match removes some of the hardest items from training, which the report must say — and a stronger one on another: the surviving supervision has been independently reproduced from the image alone, and the acceptance rate (89.4% train) is a measured statement about label quality rather than about a teacher's fluency.
+
+### 3.5 Evaluation
+
+Implemented in `scripts/scoring.py`, one definition of "correct" shared by the Week 1 notebook, `scripts/evaluate.py` and the write-up, with 25 tests in `tests/`:
+
+- **Primary task metric:** ChartQA **relaxed accuracy** (5% numeric tolerance), reported **by question type** — `arithmetic_comparison`, `retrieval`, `visual_reference` — and by answer type, source and chart type. *The draft's human-vs-machine split is not reportable: the machine-generated questions were excluded from the dataset entirely (§3.1), so there is no gap between them to measure.* The question-type breakdown carries the diagnostic weight instead, and it earns it — the Week 2 ablation's effect is concentrated almost entirely in arithmetic and comparison.
+- JSON validity and **schema validity rate** — field presence per target style plus an allowed `answer_type`, as defined in `scoring.py`. This is the contract; no separate schema file exists, by decision (§3.2).
+- **Evidence grounding** — the share of numbers cited as evidence that appear in the chart's own data table, which the model never sees in `image_only`. This is the auditability claim made measurable, and it is one metric the draft did not specify.
+- **Abstention, reported as a pair — never alone:**
+  - **True-abstention rate** — of questions the chart genuinely cannot answer, how many did the model decline? Implemented as `refusal_accuracy`.
+  - **False-abstention rate** — of questions the chart *can* answer, how many did the model decline anyway? **Implemented 2026-11-19 (task 3.0b)**: `scoring.summarise` returns both rates as one `abstention` object with their denominators, and the committed Week 1–2 evaluations are backfilled. *Before that:* `answerable_accuracy` is not a substitute: a wrong number and a refusal both score zero, so nothing currently distinguishes a model that is wrong from one that is silent. Every abstention number reported in Weeks 1 and 2 is therefore half a measurement, and the fix is Week 3 task **3.0b**, which also re-scores the committed predictions so the Week 1 and Week 2 tables gain the missing half without a GPU.
+- **Paired comparison, not two accuracies.** `scripts/compare.py` runs an exact two-sided McNemar test on the items where exactly one model is correct. At n = 180 a single score carries about ±7 points, which is wider than most of the differences worth arguing about; every model answers the same items, so the paired test is the one that can tell a real difference from the margin.
+- **LLM-as-judge rubric** on the held-out set: correctness, grounding, appropriate abstention (Week 3, task 3.7).
+- **Latency and tokens-per-second** measured on the team's own stack (`seconds_per_item` and `tokens_per_second` are already recorded in every evaluation summary).
+
+### 3.6 Delivery
+
+The merged-and-quantised adapter served through vLLM behind a containerised FastAPI endpoint, with a model card covering intended use, data provenance (ChartQA's Statista / Pew / OWID / OECD lineage, the finance-and-economics selection rules, and the blind-labelling procedure with its acceptance rate), measured failure modes, and refusal behaviour — plus an adversarial log whose prompts are genuinely multimodal: charts with truncated axes, dual-axis charts, questions about series that do not exist, and questions whose answer is legible in the chart's caption but not its plot. Those charts do not exist in the dataset and must be generated for the purpose (task 3.0g), which is what lets an attempt be scored `misled` rather than logged as "looks wrong to me".
+
+### 3.7 Stated caveat
+
+ChartQA is a public benchmark, not an enterprise corpus; the "regulated workflow" framing is a wrapper around public data. This is permitted by the template, which explicitly allows public datasets, and the abstention and auditability requirements make the wrapper do real work.
+
+> **Amended 2026-11-17 — the mitigation is weaker than the draft's.** The draft's answer to benchmark memorisation was Eval-B, an out-of-distribution set in a house style the model had never seen. It was not built, so the project cannot claim to have tested generalisation to unseen chart styles. What remains is real but narrower: splits that **share no chart** (0 overlap, enforced in selection), a test split that was **never labelled by any model** and keeps ChartQA's original human answers, and labels on train and val that a second model reproduced from the image alone. Those bound label leakage and annotation drift; they say nothing about style transfer. The report must state the limitation in those words, and the honest supporting sentence is the one already in `data/v2.0/README.md`: ChartQA is public, so a large model may have seen it in training, and agreement checks reduce but do not remove that risk.
+
+---
+
+## 4. Dataset Composition
+
+> **Amended 2026-11-17.** The draft specified 2,000 records — 1,000 real, 600 synthetic, 250 abstention, 150 teacher-generated — across three frozen eval sets. That dataset was not built. What was built is **ChartAudit-Fin v2.0**, and every Week 1 and Week 2 number in this plan comes from it. The sections below describe it as frozen; §4.6 lists what was dropped and what the loss costs.
+
+**Source.** `ChartQA Dataset.zip` from [`ahmed-masry/ChartQA`](https://huggingface.co/datasets/ahmed-masry/ChartQA), revision `af8b6f5c08c95085271561c2a3f9d15f2b5a9031`, zip sha256 `1bf310e5…c160` — the **original release**, which ships `png/`, `tables/` and the annotation JSONs together, not the `HuggingFaceM4` mirror. Taking the original as the primary source rather than as a fallback is what resolves §4.4 at rung 1 and puts a data table inside every record (§3.3). Only the **human-written** questions (`*_human.json`) are used, on ChartQA's official splits. ChartQA is GPL-3.0, including its chart images; the derived dataset carries the same licence.
+
+**Domain.** Questions whose keyword domain tags include `finance` or `economy`, which narrows the project from "business reporting in general" to the regulated-reporting framing of §2 and makes the domain claim in the report checkable rather than asserted. `data/v2.0/selection/all_domains_catalogue.jsonl` records how ChartQA splits by topic across **all** domains (train: finance_economy 2,306 · health 433 · business 248 · other 3,608) so the choice is visible and reversible; it carries no labels and is not trained or tested on.
+
+### 4.1 Training and validation sets (frozen end of Week 1)
+
+| Split | Selected by rule | **Kept** | Dropped (blind answer disagreed) |
+|---|---:|---:|---:|
+| `train` | 1,155 | **1,033** | 122 (10.6%) |
+| `val` | 137 | **124** | 13 (9.5%) |
+| `test` | 180 | **180** | not labelled — human answers only |
+
+**The splits share zero charts**, and `val` is used for checkpoint selection only. 1,168 chart PNGs are committed under `data/v2.0/images/` (910 train / 115 val / 143 test).
+
+| Composition | train / val / test |
+|---|---|
+| `question_type` | arithmetic_comparison 537 / 63 / 96 · retrieval 183 / 20 / 35 · visual_reference 272 / 34 / 40 · unanswerable 41 / 7 / 9 |
+| `answer_type` | number 715 / 81 / 122 · text 208 / 33 / 39 · yes_no 69 / 3 / 10 · unanswerable 41 / 7 / 9 |
+
+**On the template's 2,000-example cap:** at 1,033 training records the cap is not binding, and that is a deliberate trade rather than an oversight. The draft would have spent the remaining slots on generated data; the implementation spent the same effort on verifying the records it has (§3.4). The report should say which of the two it chose and why, because a reader who knows the cap will ask why half of it is unused.
+
+### 4.2 Held-out sets
+
+| Set | Count | Status |
+|---|---:|---|
+| **Eval-A** — `data/v2.0/image_only/test.jsonl` | **180** | Built and frozen. ChartQA's original human answers, never labelled by any model, never trained or tuned on. Scored once per compared model, after selection on `val` |
+| **Eval-B** — out-of-distribution "house style" | — | **Does not exist.** No chart generator was built (§3.4, Gap 2). See §3.7 for the weakened generalisation claim and task 3.0g for the minimal generator Week 4 still needs |
+| **Eval-C** — abstention probes | **9** | The unanswerable slice of Eval-A, not a set of its own. Too thin to carry §3.5's abstention pair or the model card's refusal section — `refusal_accuracy` reads 9/9 on every fine-tuned run. Task **3.0c** builds a real one |
+
+**Margin of error matters at this size.** One score on 180 items carries roughly ±7 points, which is wider than most differences the report will want to discuss. This is why §3.5 reports paired McNemar tests rather than two accuracies with overlapping intervals, and why any Week 3 or Week 4 claim resting on a 2–3 point move must say `n` beside it.
+
+### 4.3 Methodological rules (must not be broken)
+
+The draft's rule here governed a synthetic style bank that does not exist. The rules that do govern this dataset, all of them executable rather than documentary:
+
+1. **No chart appears in more than one split.** Enforced in `scripts/select_clean.py` at selection time; the reported figure is 0 overlap. A question's chart is the unit of leakage, not the question.
+2. **The test split is never labelled, never enriched, never re-scored against a new gold.** It keeps ChartQA's original answers exactly as shipped, which is what keeps Eval-A comparable to published ChartQA numbers.
+3. **The blind-labelling isolation is enforced on the artefact, not on trust.** `blind_labelling/scripts/leak_check.py` fails if a question pack contains anything but `pack_id`, `image` and `question`; the answer key lives in a separate `key/` folder opened only by `compare.py`, after labelling.
+4. **The freeze is hashed and checked by the code that uses it.** `data/v2.0/MANIFEST.txt` carries the sha256 of all twelve JSONL files; `scripts/train.py` recomputes them plus a fingerprint over every image the run touches and **refuses to start** on any mismatch, with no override. `tests/test_train.py::test_committed_v2_data_matches_its_manifest` checks the same thing on the laptop.
+5. **`val` selects; `test` reports.** Every configuration was fixed and the final model named on `val` first; each compared model was then scored on `test` **once**, and nothing was changed afterwards (`scripts/evaluate.py` requires `--final-test` to touch it). This rule extends in Week 3 to every retrieval choice — chunking, embedding, reranker, query plan — which are selections too.
+6. **Seed ranges are partitioned by purpose.** Selection used seed 2026. Any chart generated later for the Week 4 red-team (task 3.0g) must use a seed range disjoint from anything in the dataset, because a red-team chart carrying training data tests memorisation and logs as a pass.
+
+### 4.4 Fallback ladder if the data tables are unavailable — **resolved, rung 1**
+
+The ladder is settled and does not need to be read again: the `HuggingFaceM4` mirror was bypassed entirely and the **original ChartQA release used outright**, so every record carries its chart's data table inline as `input_text`. The RAG corpus can therefore be built over real ChartQA tables and the Week 3 headline comparison runs on **Eval-A**, comparable to published ChartQA numbers. Rungs 2 (synthetic-only corpus) and 3 (teacher-extracted tables) are not in play, and no Week 3 notebook needs to branch on a rung.
+
+One residual the rung does not cover: the ~5% unanswerable items pair a question with an *unrelated* chart, so "the gold table for this question" is undefined for them. They are excluded from retrieval scoring's denominator and reported as `n_unscorable` (task 3.4), not counted as misses.
+
+### 4.5 The record and the output contract
+
+Each record carries the chart image, the question, the gold answer, a full `messages` conversation in Qwen2-VL / TRL multimodal chat format, and the chart's serialised data table (`input_text` — source, chart type, title, axes, series with colours, and the table as Markdown). The assistant turn **is** the training target and **is** the output contract:
+
+```json
+{"evidence": ["Row1 values 3,11,38,47", "Row2 13,24,41,22"],
+ "rationale": "Listed all printed segment values; none equals 40 (closest are 38 and 41).",
+ "answer_type": "yes_no", "unit": null, "answer": "No"}
+```
+
+Controlled vocabularies, as frozen:
+
+- `answer_type` — number / text / yes_no / **unanswerable** (the abstain path: `answer` is `null`)
+- `question_type` — arithmetic_comparison / retrieval / visual_reference / unanswerable
+- `chart_type`, `source` — carried for the reported breakdowns, not emitted by the model
+- `confidence` — **a label-quality flag, not a model output**: `high`, or `medium` where the blind labeller marked itself unsure, `null` on test. It never appears in the target, so §3.2's no-self-reported-confidence decision holds.
+
+Four frozen variants, twelve files, all hashed:
+
+| Variant | What the model sees | Used for |
+|---|---|---|
+| `image_only/` | chart image + question | **The main setting.** Every Week 1 baseline and Week 2 run |
+| `image_only/answer_only/` | same, target is `answer_type` / `unit` / `answer` only | The Week 2 supervision-format ablation; the Week 1 zero/few-shot baselines |
+| `image_table/` | image + question + the chart's table as text | Unused so far. The prompt format the Week 3 RAG conditions need (§3.3) |
+| `image_table/answer_only/` | both of the above | Available; not used |
+
+**How the targets were produced** — this replaces the draft's five enrichment stages:
+
+| Step | What happens | Label noise |
+|---|---|---|
+| 1 — Selection | `scripts/select_clean.py` + `chartqa_rules.py`, seed 2026: drop structural problems (no data table, duplicate or malformed question, empty answer, a train/val table identical to one in a later split, a looked-up number absent from the chart's own table, unresolvable colour questions); keep finance/economy tags; sample proportionally over source × chart type × answer type × question type; add ~5% unanswerable (RULE 7). Every exclusion reason is counted in `selection/stats.json` | None |
+| 2 — Packs | `make_packs.py` copies each chart under a neutral name beside its question; `leak_check.py` fails the pack if it holds anything else | — |
+| 3 — Blind labelling | A fresh model instance per batch of 50 (Claude Sonnet) sees only the pack and `LABELLER_PROMPT.md`, returns `evidence`, `rationale`, `answer_type`, `unit`, `answer`, `confidence`. **The gold answer is never shown** | — |
+| 4 — Compare | `compare.py` opens the key afterwards and keeps an item only on a **strict exact match** with the human answer: numbers equal to the shorter one's decimals (3.22 = 3.22222; 7.5 ≠ 7.4; 2010 ≠ 2020), text equal after lower-casing, punctuation stripping and list-order normalisation, unanswerable where both are null. A percentage tolerance was tried and **removed on 2026-11-10** because it also accepted wrong years | The acceptance rate *is* the measurement |
+| 5 — Build | `build_final.py` keeps `high` and `medium` items. The target uses the **blind label's `evidence` and `rationale` with the human ChartQA answer** — so the reasoning is independently derived and the answer is still the benchmark's | None in the answer |
+
+**Never rewrite held-out gold.** Test is never labelled; Eval-A is scored against the original ChartQA labels under relaxed accuracy. Enrichment adds fields around the answer; it never changes the answer.
+
+A reported diagnostic rather than a filter: `evidence_in_table_share`, the share of numbers in the evidence that appear in the chart's data table — which the labeller never saw. Of the kept train items citing numbers (964), **795 have every cited number in the table** and 872 have at least half. Computed values such as sums lower the share legitimately, which is why it flags rather than filters.
+
+### 4.6 What was dropped from the draft, and what it costs
+
+| Dropped | Cost | Where it is handled |
+|---|---|---|
+| Synthetic chart generator and the partitioned style bank | No Eval-B; the project cannot claim generalisation to unseen chart styles (§3.7). The Week 4 red-team has no charts whose ground truth is known by construction | Minimal generator for the red-team: task **3.0g**. Eval-B: stretch only |
+| Teacher-generated compositional QA with table validation | No new hard questions; training breadth is ChartQA's, and dropping non-exact matches removes some of the hardest items. Compensated on the quality axis, not the difficulty axis | Stated as a limitation in the report; not revived |
+| 250 purpose-built abstention pairs, balanced across reasons, on shared charts | 9 test items carry the entire refusal story; no `abstain_reason` vocabulary; the appearance-correlates-with-refusal shortcut is not closed | Task **3.0c** |
+| `schema.json` as a separate published contract | Week 4 guided decoding has no schema to inline, so serving enforces the contract by validate-and-retry instead — two layers rather than three | **Dropped by decision, 2026-11-17** (§3.2). `scoring.py` remains the single definition |
+| False-abstention metric | Every abstention number so far is half a measurement (§3.5) | Task **3.0b** |
+
+#### Acceptance gates (end of Week 1) — status
+
+- [x] Every frozen file hashed in `MANIFEST.txt`, re-checked by `train.py`, `evaluate.py` and a laptop test before any GPU run
+- [x] Blind-labelling acceptance rate reported per split, with drops kept in `dropped_{train,val}.jsonl` rather than discarded silently, and the common causes enumerated
+- [x] Evidence grounding reported as a coverage statistic, with computed-value cases explained rather than dropped
+- [x] A second model family cross-checked a random sample (29/30 agreement, same item missed)
+- [x] **Every frozen record satisfies the output contract, wired as a test** — `tests/test_evaluate.py::test_every_gold_answer_scores_full_marks` scores every gold target across both variants, both target styles and all three splits through the same scorer the reported numbers use. A separate `schema.json` was considered and **dropped** (§3.2); this is the check that replaces it
+- [ ] **Manual audit of ≥50 stratified records by two or more people, with an agreement rate quoted** — the instrument is built and the sample drawn (`scripts/make_audit.py`, `audit/audit_v2.xlsx`, 50 ids, three reviewer sheets, Fleiss' κ and pairwise Cohen's κ in `scripts/audit_kappa.py`), but **the workbook is still an empty template and no κ has been reported** (task 3.0i)
+
+---
+
+## 5. Role Split (6 members)
+
+| Role | Code | Responsibility |
+|---|---|---|
+| Data & blind labelling | **DS** | ChartQA sourcing, selection rules and stratification, blind-labelling packs and comparison, abstention pairs, the red-team chart generator (task 3.0g) |
+| Fine-tuning & tracking | **FT** | QLoRA runs, hyperparameter sweeps, the supervision-format ablation, the vision-tower ablation (task 3.0j), the member runs and the `image_table` adapter (task 3.0h), experiment logging |
+| RAG pipeline | **RAG** | Table corpus, chunking, embeddings, vector store, reranking, retrieval metrics |
+| Evaluation & red-teaming | **EV** | Relaxed-accuracy harness, schema scorer, LLM-as-judge rubric, failure taxonomy, adversarial prompts |
+| Serving, quantisation & infra | **SV** | Adapter merge, quantisation, vLLM + FastAPI, Docker, latency benchmarking |
+| Integration & documentation | **DOC** | Repo hygiene, output schema, model card, 12-page report, demo |
+
+> **Template rule — every member runs at least one training job.** No one finishes the course without having touched a GPU directly. These were scheduled in task 2.5 and **have not happened yet**: `results/evals/` holds three models and no member reruns. They are now task **3.0h**, where each run doubles as something Week 3 needs.
+
+---
+
+## 6. Four-Week, Task-Wise Plan
+
+### 6.0 Execution model — how each week's work actually runs
+
+> **Amended 2026-11-17.** The draft assumed an unattended GPU box reached once a week through a single notebook per week, and specified a fixture, notebook execution tests and `src/` modules to survive that. **That is not the setup.** The team has interactive access to **VM03** (NVIDIA L40S) with **Slurm**, so work runs as submitted batch jobs against committed scripts, and a failure costs a resubmission rather than a week. The machinery the draft built to survive one-shot runs is therefore unnecessary, and was not built. The principles that survived the change of venue are below, each of them implemented.
+
+- **Code lives in `scripts/`, one run is one committed YAML.** `configs/run_a.yaml`, `run_b.yaml`, `ablation_answer_only.yaml` hold everything a comparison varies; `scripts/train.py` merges them over `DEFAULTS` and writes the full merged config into the run folder. Nothing a result depends on is typed at a prompt. `--set key=value` exists for a member's rerun and is recorded in the config it produces.
+- **Three reproducibility checks, and the run refuses to start if any fails.** Data files must match `data/v2.0/MANIFEST.txt` (no override — the data must match); tracked code must have no uncommitted changes; installed packages must match `requirements-vm03.lock`. `--allow-unclean` overrides the last two for throwaway tests and stamps the run `"clean": false`, and **an unclean run must not be reported**. This is the draft's "gates raise, they do not warn", relocated from a notebook cell to the entry point of every job.
+- **Dependencies resolved once, then pinned.** `requirements-vm03.lock` (Python 3.12.3, CUDA 12.6, torch 2.14.1+cu126, transformers 5.22.1, peft 0.21.2, bitsandbytes 0.50.2) is regenerated only on an intentional upgrade and committed in the same change. Weeks 2–4 are comparable only if the stack underneath them is identical, and that drift is invisible without a lockfile. **The lock does not yet cover the Week 4 serving stack** — see task 3.0f, which is the single most schedule-threatening gap in this plan.
+- **Every run writes its own provenance.** `provenance.json` before the GPU is touched; `config.json`; `metrics.jsonl` per step and per validation; resumable step checkpoints plus one per epoch that is never deleted; `adapter/` as the result; `run_summary.json` on any outcome, including failure. `docs/RUNS.md` is the contract for what later steps may rely on — if a field is not listed there, nothing may depend on it.
+- **Runs are never overwritten and never silently resumed onto different data.** `train.py` refuses an existing folder without `--resume`, and `--resume` compares the data fingerprint with the run's own `provenance.json` and stops if it differs.
+- **Evaluate adapters, not runs.** `scripts/evaluate.py` reads `variant`, `targets` and `max_pixels` from the adapter's own `train_config.json` and refuses a conflicting flag, so prompts at evaluation match prompts at training. A baseline measured against one prompt and a fine-tune trained against another differ by a prompt change no metric can see.
+- **One definition of "correct".** `scripts/scoring.py` is imported by the Week 1 notebook, by `evaluate.py` and by the write-up; `tests/test_evaluate.py::test_scorer_matches_the_notebook` holds it to the Week 1 numbers. Changing it means re-scoring every reported baseline, and the repository treats that as a deliberate act rather than an edit.
+- **Only clean, completed runs on a matching data fingerprint are compared**, and `summary.json` carries `reportable` so the rule is machine-checkable rather than remembered.
+- **Reported evaluations are committed.** `results/evals/<name>/{summary.json,predictions.jsonl}` holds the raw generations beside the scores, so a scorer change, a taxonomy (task 3.0e) or a re-scored metric (task 3.0b) can be applied **on the laptop, without a GPU and without regenerating anything**. This is the single most useful property the implementation has for Week 3, and several carry-forward tasks are cheap only because of it.
+- **`val` selects; `test` reports; test is scored once.** §4.3 rule 5. In Week 3 this extends to retrieval configuration: chunking, embedding, reranker and query plan are all selections, and all four are made on rows drawn from the training freeze.
+- **Week N+1 verifies what week N trained on.** Every evaluation summary records `trained_at_commit`, `adapter_sha256` and the training data's fingerprint, so a model trained on one dataset and scored against another is detectable rather than assumed away.
+- **Logic that runs twice moves out of the notebook.** `01_vlm_baselines.ipynb` imports `scripts/scoring.py` rather than carrying its own copy; the one place it diverged (an escaped quote inside a JSON string ending the string) was fixed in the module and the baselines re-scored to prove nothing moved.
+
+### Week 1 — Dataset, Baseline, Freeze · **complete, with two carry-forwards**
+
+**Objective:** a frozen dataset and honest baseline numbers. This was a hard gate, and it was met: the dataset is built, hashed and gated in code, and the baseline table below is the bar Week 2 had to beat. Two items did not land and are carried into Week 3 as tasks 3.0b and 3.0i; a third, a published `schema.json`, was dropped by decision rather than carried (§3.2).
+
+| # | Task | Status | What it actually produced |
+|---|---|---|---|
+| 1.1 | Repo skeleton, environment pinning, GPU access, experiment tracking | **Done, differently** | VM03 (L40S) with Slurm (`slurm/{train,eval,smoke}.sbatch`); `requirements-vm03.lock` generated by `pip freeze` on the box and compared against the installed set before every job; W&B project `chartqa-week2`, with `scripts/wandb_report.py` building the Week 2 report from the committed evaluations so the dashboard and the README cannot disagree. `scripts/smoke_test.py` is both the smoke run and the shared helper module (`load_base`, `encode`, `training_batch`, `LORA_TARGETS`), so training uses the code the smoke test checks. **Gap:** the lock covers the training and evaluation stack only — vLLM, FastAPI and the AWQ exporter are unresolved, which is what task **3.0f** now has to fix a week later than the draft intended |
+| 1.2 | Source the data, confirm the tables, stratify, normalise | **Done, better than the ladder** | Original ChartQA release used outright (§4), so tables are present in every record and §4.4 resolves at rung 1. `scripts/select_clean.py` + `chartqa_rules.py` (603 lines of rules, seed 2026) drop structural problems, filter to finance/economy, sample proportionally over source × chart type × answer type × question type, and add ~5% unanswerable items. `selection/stats.json` counts every exclusion reason. **Machine-generated questions excluded entirely**, which removes §3.5's human-vs-machine split |
+| 1.3 | Synthetic chart generator, partitioned style bank, disjointness check | **Dropped** | Not built. No Eval-B (§4.6). A minimal generator is still needed for the Week 4 red-team: task **3.0g** |
+| 1.4 | Unanswerable pairs | **Partial** | 41 train / 7 val / 9 test, built by pairing a real question with an unrelated chart (`make_unanswerable`, RULE 7). No `abstain_reason` vocabulary, not drawn from the same charts as the answerable records, and 9 test items is a saturated measurement. Task **3.0c** |
+| 1.5 | Teacher-generated QA, table validation, rationale traces | **Replaced by blind labelling** | `blind_labelling/` — packs under neutral names, `leak_check.py` on every pack, a fresh labeller instance per batch of 50, strict exact-match comparison against a key opened only afterwards, 122 train and 13 val items dropped and kept in `dropped_*.jsonl`. Pilot of 40 matched 38; a second model family agreed on 29 of 30. The acceptance rate (89.4% train, 90.5% val) is the reportable statistic, and it measures label quality rather than teacher fluency (§3.4) |
+| 1.6 | Output contract, validation as a test, manual audit | **Partial — one carry-forward** | The contract is frozen and every record follows it (§4.5), and 25 tests in `tests/` cover the scorer, the configs, the manifest and the lockfile — including one that scores every gold target in every variant, style and split through the reported scorer, which is the validation gate this project has. A separate **`schema.json` was dropped by decision** (§3.2), so the only outstanding item here is the **50-item three-reviewer audit workbook, built but unfilled** — `make_audit.py`, `audit_kappa.py` (Fleiss' κ plus pairwise Cohen's κ) and `audit/review.html` all exist, and no κ has been reported (task **3.0i**) |
+| 1.7 | Freeze, hash, commit | **Done** | `data/v2.0/MANIFEST.txt` over all twelve JSONL files; images fingerprinted at run time (941 for train+val, 143 for test) and recorded in every run's provenance; `stats.json`; `selection/` with its own manifest; `dropped_*.jsonl`. No `image_index.json` or `table_index.json` is needed — the image path and the serialised table live inside each record — but the RAG corpus still has to be pulled out of them and hashed: task **3.0d** |
+| 1.8 | Relaxed accuracy, schema scorer, paired abstention metrics | **Partial** | `scripts/scoring.py`: relaxed accuracy (5% numeric tolerance, normalised text, `null` for unanswerable), `json_valid`, `schema_valid`, `evidence_grounded`, `refusal_accuracy`, `answerable_accuracy`, and breakdowns by question type, answer type, source and chart type. **False-abstention is not implemented**, so §3.5's pair is half present in every number reported so far: task **3.0b** |
+| 1.9 | Baseline: zero-shot and few-shot on the held-out set | **Done, with one deviation** | Three regimes on all 180 test items, 4-bit NF4, greedy, `max_new_tokens` 384, raw generations persisted before scoring. Few-shot exemplars pinned from `train` only, so neither the selection nor the reported split leaks into the prompt. **Deviation:** neither pinned exemplar demonstrates abstention (one `arithmetic_comparison`/number, one `visual_reference`/text), although the prompt describes the refusal path — so the few-shot refusal figure measures the instruction rather than a demonstrated behaviour. It is recorded here rather than silently corrected, because changing the exemplars now would invalidate the comparison every Week 2 number is read against |
+
+**Baseline — the bar Week 2 had to beat** (base Qwen2.5-VL-3B, 180 test items, 4-bit, greedy; reproduced exactly by `scripts/evaluate.py` from the notebook, which is what certifies the scorer):
+
+| Baseline | Relaxed acc. | Schema valid | True abst. (9) | False abst. (171) | Tokens out | s / answer |
+|---|---|---|---|---|---|---|
+| Zero-shot | 52.8% | 98.9% | 4/9 | 2/171 | 22 | 0.30 |
+| **Few-shot (2)** | **57.2%** | 98.9% | 7/9 | 0/171 | 21 | 0.52 |
+| Chain-of-thought | 52.2% | 51.1% | 6/9 | 5/171 | 145 | 1.66 |
+
+*Abstention pair backfilled 2026-11-19 by task 3.0b (`scripts/rescore.py`) from the committed raw generations; no previously reported number moved. Chain-of-thought is the only regime that refuses answerable questions at a visible rate.*
+
+Few-shot is the stronger regime, so it — not zero-shot — is the reference every later comparison is made against. Chain-of-thought prompting *lowers* accuracy and halves schema validity on the base model, which is the clearest Week 1 evidence that the structured contract has to be trained rather than prompted.
+
+**Gate (end of Week 1):** met. Baseline numbers logged and committed under `results/evals/`; dataset hashed, frozen and gated in code.
+
+**Watch:** image token explosion. `max_pixels` is pinned at 640,000 (800 × 800) in `smoke_test.py`, in every config and in each adapter's `train_config.json`, so the resolution policy is identical across the baselines, the runs and every later evaluation.
+
+---
+
+### Week 2 — Fine-Tuning and the Supervision-Format Ablation
+
+**Objective:** beat the baseline, and know *why* you beat it. Both were met. Three runs are trained, selected on `val` and scored once on `test`; the headline is **+26.7 points over the stronger baseline at p < 0.001**, and the ablation says which part of the supervision bought it.
+
+> **Amended 2026-11-17 — the week's ablation is not the one the draft specified.** The draft's centrepiece was the vision-tower question and its arms were data-mix arms over synthetic, teacher and abstention slices that were never built. Both are gone (§3.1, §3.4). What was run is the supervision-format ablation — the draft's arms C and D, promoted to the headline — and it is attributable for the same reason the draft gave: the two arms use **the same items, the same rank, the same hyperparameters and the same seed**, and differ in exactly one field, `targets`. The configs are committed, and `tests/test_train.py` loads all three, so an arm that quietly differs in two fields is a test failure rather than a discovery made months later.
+
+| # | Task | Status | What it actually produced |
+|---|---|---|---|
+| 2.1 | QLoRA training script | **Done** | `scripts/train.py` (612 lines): 4-bit NF4 base, bf16 compute, LoRA on language-model projections only, **loss masked to the completion**, step and epoch checkpointing, W&B logging, metrics per step, and the three-check reproducibility gate (§6.0). Chat encoding and batching are shared with `smoke_test.py` so training and evaluation build prompts the same way |
+| 2.2 | **Config A** — rank 16 | **Done** | `configs/run_a.yaml` → `run_a_r16`: r 16, α 32, dropout 0.05, lr 2e-4, 2 epochs, grad-accum 8, seed 42, `max_pixels` 640k, `targets: reasoning` |
+| 2.3 | **Config B** — rank 64 | **Done** | `configs/run_b.yaml` → `run_b_r64`: identical to A except r 64 / α 128 (α = 2r, same scaling). One field varied |
+| 2.4 | **The ablation** | **Done — substituted** | `configs/ablation_answer_only.yaml` → `ablation_answer_only`: Run A's rank and hyperparameters on `image_only/answer_only/`, where the target carries `answer_type` / `unit` / `answer` and no `evidence` or `rationale`. **The vision encoder + merger arm was not run and is precluded by the code** — `train.py` exits if any adapted module name contains `visual`. **Revived and scheduled as Week 3 task 3.0j** (§9 decision 7), which replaces that guard with one that raises when a scope selects nothing or selects only decoder modules |
+| 2.5 | Every remaining member runs one training job | **Outstanding** | `docs/RUNS.md` defines the convention (`run_a_seed1_<name>`, via `--set run_name=... --set train.seed=...`) and run folders are per-member by construction, but `results/evals/` holds three models and no member reruns. This is a **graded template requirement** ("no one finishes without having touched a GPU directly") and is now task **3.0h**, where it doubles as the `image_table` adapter Week 3 needs |
+| 2.6 | Error taxonomy v1 on the best checkpoint | **Outstanding** | No taxonomy exists. What exists instead is strong and is not a substitute: paired exact McNemar tests (`scripts/compare.py`), breakdowns by question type, answer type, source and chart type, and a comparison made against the **stronger** of the two Week 1 regimes rather than against zero-shot. The categorised failure counts the model card's failure-modes section needs are task **3.0e**, and they are cheap because every raw generation is committed |
+| 2.7 | DPO on preference pairs | **Dropped** | Not run. Recorded as a decision in §9 rather than left open: the serving stack is unresolved (task 3.0f) and Week 4 is the graded deliverable |
+
+**Results — val selects, test reports, test scored once per model:**
+
+| Model | Val relaxed acc. | **Test relaxed acc.** | Schema valid | Abstention true (9) · false (171) | Arith./comp. (96) | Retrieval (35) | Visual ref. (40) | Tokens out | s / answer | vs few-shot |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Base, few-shot (2) | — | 57.2% | 98.9% | 7/9 · 0/171 | 42.7% | 82.9% | 65.0% | 21 | 0.52 | reference |
+| **Run A, r16 — final model** | 81.5% | **83.9%** | 100% | 9/9 · 1/171 | 78.1% | 94.3% | 85.0% | 73 | 1.18 | **+26.7 pts, p < 0.001** |
+| Run B, r64 | 84.7% | 83.3% | 99.4% | 9/9 · 1/171 | 79.2% | 91.4% | 82.5% | 74 | 1.19 | p < 0.001 |
+| Ablation, r16 answer-only | 82.3% | 75.6% | 98.3% | 8/9 · 0/171 | 63.5% | 100% | 80.0% | 21 | 0.39 | p < 0.001 |
+
+Three findings the report can defend:
+
+1. **Fine-tuning works, and the paired test says so.** 53 items only Run A gets right against 5 only few-shot gets right. Schema validity goes to 100% — the contract was learned, not prompted.
+2. **Rank does not matter here.** Run A vs Run B is 8 against 7 items (p = 1.0). r16 is kept on size: the same accuracy with a 114 MB adapter against 457 MB. Note that B led A on *val* (84.7 vs 81.5) and lost on test — a clean illustration of why selection and reporting splits are kept apart, and why ±7 points at n = 180 is quoted beside every number.
+3. **Showing working earns its tokens.** Run A vs the answer-only ablation is 22 against 7 (p = 0.008), concentrated in arithmetic and comparison (19 vs 5). It costs about 3× the latency per answer (1.18 s vs 0.39 s), which is a real Week 4 trade-off rather than a free win. The ablation's val lead on visual reference (p = 0.016, one of four per-type tests) **did not hold on test** — recorded because a lead that evaporates is evidence about multiple testing, and suppressing it would make the remaining per-type claims less believable, not more.
+
+**This was the hardest week** per the template, and the thing that made it survivable was that every run refuses to start unless the data, the code and the environment match what the last run used.
+
+---
+
+### Week 3 — Carry-Forward, Retrieval Grounding and Evaluation
+
+**Objective:** the mandatory three-way comparison and a full evaluation story — plus the Week 1 and Week 2 debt that Weeks 3 and 4 cannot be built on top of, and the one experiment the project decided it did not want to finish without (task 3.0j).
+
+> **Amended 2026-11-17 — this week now carries debt.** Five things the draft assumed would exist by now do not: a false-abstention metric, an abstention set worth measuring, a table corpus, an error taxonomy, and a pinned serving stack. None of them is optional in the sense that matters — each one blocks a specific later task, named in the table. They are small individually (most are laptop work against artefacts already committed) and fatal collectively, because Week 4 is the graded deliverable and three of its five tasks cannot start without them. A sixth, a published `schema.json`, was **dropped rather than carried** (§3.2); its row is kept struck through so the decision is visible and the lettering below does not shift.
+>
+> **One row in the table is not debt.** Task **3.0j** is the revived vision-tower ablation (§9 decision 7) — a new experiment, deliberately scheduled into the week that is already fullest, because it is the most publishable result still available and it will not happen in the gaps. It is the one item here with no downstream dependency, which makes it the easiest thing to lose to a bad Tuesday; the cut rule below is what stops that from happening by accident rather than by decision.
+>
+> **Order and cut rule.** Start **3.0f**, because it is the only one whose answer depends on something outside the team and the only one that can end the week with a result nobody can act on. Then 3.0b and 3.0d, which block Week 3's own tasks. 3.0c, 3.0h and 3.0j all need GPU slots and should be queued early and together — three short runs on the same data fingerprint, which is also how 3.0h's "every member runs a job" requirement gets satisfied without inventing work. 3.0e and 3.0i need no GPU at all and can run beside anything.
+>
+> If the week runs short, cut in this order: Eval-B (already dropped, keep it dropped), the reranker in 3.3, the judge sample size in 3.7, then **3.0j**. **3.0f is not cuttable** — without it Week 4 has no endpoint at all — and neither is **3.5**, the template's mandatory three-way comparison. Cutting 3.0j is a real loss and is allowed; cutting it silently is not, and the report then says the vision-tower question was scheduled and dropped for time, which is a different sentence from never having asked it.
+
+#### Carry-forward tasks (Week 1 and Week 2 debt)
+
+| # | Task | Owner | Output | Blocks |
+|---|---|---|---|---|
+| 3.0a | ~~Write `schema.json` and wire it as a test~~ — **dropped 2026-11-17.** The contract stays where it already is, in `scripts/scoring.py`, which the notebook, `evaluate.py` and the write-up all import and which the tests already hold to the reported numbers. A second definition of the same contract in a different formalism buys a published artefact and risks a disagreement that would move `schema_valid` for every number so far. The letter is kept rather than reused, so references in older notes still resolve | — | None. §3.2 records the decision; task 4.3 absorbs the consequence | — |
+| 3.0b | **Implement false-abstention and return the abstention pair.** A refusal on an answerable item is currently indistinguishable from a wrong answer: both score zero. Add it to `scoring.summarise`, return it **with** true-abstention as a pair (and test that neither can be returned alone), then **re-score the committed predictions on the laptop** and backfill the Week 1 and Week 2 tables. No GPU, no regeneration — the raw generations are in the repo | EV | `scoring.py` + tests; backfilled abstention pairs in `results/evals/` and in §6 Weeks 1–2 | 3.6 (the over-abstention flag is defined as a rise in this number), 3.7, 4.5, 4.6 |
+| 3.0c | **Build a real Eval-C.** ~50 abstention probes, built the way §3.4 Gap 1 says they should have been: questions drawn from the unused finance/economy pool in `selection/all_domains_catalogue.jsonl`, paired with **held-out charts**, and — new — carrying an `abstain_reason` derived at construction from which entity the paired chart's table proves absent (`series_absent`, `category_absent`, `not_in_chart`, `requires_external_knowledge`), balanced across reasons. Frozen in its own directory with its own manifest so `data/v2.0/MANIFEST.txt` stays byte-identical and no prior run's reproducibility gate breaks. Never trained on | DS, EV | `data/eval_c/` + manifest; `--split eval_c` in `evaluate.py` | 3.6, 3.7, 4.5, 4.6 — and it is what makes 3.0b's numbers worth reading |
+| 3.0d | **Extract the table corpus and the record→table join.** Every chart's table is already inside its record as `input_text`; nothing has pulled it out. Parse it to structured form per chart, deduplicate by `chart_id`, write `table_index.json` (record id → chart id → table) and hash the corpus. Report coverage, and report the ~5% unanswerable rows as **undefined gold** rather than as missing tables — their question belongs to a different chart by construction | RAG | `data/v2.0/tables/`, `table_index.json`, hashes, a coverage line | 3.1, 3.2, 3.4, 3.5 |
+| 3.0e | **Error taxonomy v1** (carried from task 2.6). Over Run A's committed test predictions, so it costs no GPU. `ok` must mean exactly what the relaxed-accuracy scorer counts as correct, so `1 − error_rate` reconciles with 83.9% in the same report; `schema_invalid` is broken down by **which rule broke**, not left as one bucket; a right answer with ungrounded evidence and a correct refusal for the wrong reason are carried as **flags**, not promoted to categories | EV | Categorised failure counts + the question-type breakdown; `scripts/taxonomy.py` | 4.6 (the model card's failure-modes section), 3.7 |
+| 3.0f | **Resolve and pin the serving stack — start this first.** vLLM, FastAPI and the AWQ/GPTQ exporter are absent from `requirements-vm03.lock`. The training environment is torch 2.14.1+cu126 on transformers 5.22.1, and **vLLM pins torch hard**: resolving it in Week 4 either moves torch underneath three weeks of measured numbers or fails to install, and Week 4 then has an endpoint serving nothing. Resolve it on VM03 in a **separate venv** (the `venv-report` precedent), confirm it loads a merged Qwen2.5-VL checkpoint and answers one multimodal request, then commit `requirements-serve.lock`. **A failure here is a decision, not a blocker:** serve through `transformers.generate` behind FastAPI and drop the vLLM claim, or accept a second environment that never touches the training stack — either is defensible, and both are only defensible if decided this week | SV | `requirements-serve.lock` + a one-request smoke log, or a recorded downgrade with its reason | 4.1, 4.2, 4.3, 4.4 — most of the graded deliverable |
+| 3.0g | **Minimal red-team chart generator.** Six families whose ground truth is exact by construction: truncated y-axis, dual-axis, absent series, caption-only answer, misleading legend order, and prompt injection stamped **on the canvas rather than over the plot** (an attack that occludes the bars measures occlusion; a payload appended to the title gets clipped and logs as resisted without the model ever having been attacked). Seeds from a **third range**, disjoint from everything in `data/v2.0`. ~20 charts is enough for task 4.5 | DS, EV | `scripts/redteam_charts.py` + 20 charts with their source DataFrames | 4.5 only. **Eval-B stays out of scope** unless the week finishes early |
+| 3.0h | **Every remaining member runs a training job** (carried from task 2.5; a graded template requirement). Seed reruns per `docs/RUNS.md`, and make one of them **`run_a_r16_table`** — Run A's hyperparameters on the frozen `image_table/train.jsonl` — so the week ends with the adapter task 3.5 needs. Without it the "fine-tuned + RAG" condition scores a model on a prompt format it never saw and calls the difference retrieval | FT, all | ≥3 member runs with clean provenance; `run_a_r16_table` adapter + its val evaluation | Template grading; 3.5 |
+| 3.0i | **Fill the audit and report κ** (carried from task 1.6). The sample is drawn and the workbook is built; three reviewer sheets are still empty. Two or three people, independently, then `scripts/audit_kappa.py` | DOC, EV | Filled `audit/audit_v2.xlsx`, per-check agreement, Fleiss' κ and pairwise Cohen's κ, written into `docs/` | 4.6, the report's data-quality section |
+| 3.0j | **The vision encoder + merger ablation** (revived from task 2.4, §9 decision 7 — *the week's one new experiment, not debt*). Run A's data, rank, hyperparameters and seed, with adapters extended to the vision tower and the vision–language merger, compared against `run_a_r16` on `val` and then once on `test`. Three guards, each of which has a failure mode that looks like a clean result: `train.py`'s `visual` guard must be **replaced, not deleted** — a scope that selects nothing, or selects only decoder modules, has to **raise**, because the alternative is a run that returns "vision adaptation does not help" having adapted no vision module, with a perfect-looking training log; the decoder MLP and the 2.5 vision MLP **share leaf names**, so the split is made on the module *path*, never the leaf; and each run writes `targets.json` recording the module names actually adapted, so the claim is checkable afterwards rather than inferred from a config. Expect more VRAM and a slower step — `max_pixels` stays pinned at 640k and the batch is **not** retuned, because an arm that differs in two things is evidence about neither | FT, SV | `run_a_r16_vision` + `targets.json`; a defensible answer to the one question a text-only project cannot ask | Nothing — and that is the risk; see the cut rule |
+
+#### Retrieval grounding and evaluation
+
+| # | Task | Owner | Output |
+|---|---|---|---|
+| 3.1 | Build the retrieval corpus from task 3.0d — **every** chart in the freeze (1,168), not only the ones an eval row points at: distractors are what make retrieval a task, and a corpus of gold tables alone scores well at any `k` and measures nothing. Chunking experiment: whole-table vs row-group, where **every row-group chunk repeats the table title and column headers**, because a chunk of bare numbers shares no vocabulary with the question — the words that connect them live in the header, and chunking a table the way one chunks prose yields a corpus that cannot be retrieved from, whose symptom is a flat recall@k that looks like a bad embedding model. If the embedding budget forces a trim toward the draft's 1,000 ceiling, drop **distractors only, never a gold table** | RAG | Indexed corpus; the chunking decision made by measurement in 3.4, not asserted; `scripts/rag/corpus.py` |
+| 3.2 | Query construction from the chart: title + axis/legend text as the retrieval key. **A gate raises if any query the team builds contains a value only the gold table knows.** Build the query from the table being retrieved and recall@k goes to 1.0, RAG looks transformative in 3.5, and none of it survives serving, where there is no table to build a query from. Row and column labels are exempt — they are the axis ticks and the legend, printed on the chart. Two query plans are measured as a **bracket**: `question_only` is the floor, `chart_metadata` (clean labels, the `input_text` header fields) is what perfect OCR would give, and a deployed pipeline lands between them. The gate raises only on the chart-side text **the team writes**; a ChartQA *question* that happens to quote one of its own table's values is counted and reported beside the recall, never raised on — nobody on the team wrote it, it cannot be fixed without rewriting ChartQA, and at serving time users ask exactly such questions | RAG | Query builder + the leak gate; `scripts/rag/query.py` |
+| 3.3 | Embedding model choice (documented comparison) + reranker over top-k tables, against a **lexical TF-IDF floor**. The floor is not a stub: table retrieval is substantially keyword matching — the question says *EMEA* and *Q3* and so does the table — so an embedding model that fails to beat it has not earned its latency, and a recall quoted without that floor says nothing about whether the embeddings did anything. The floor also runs with no network, which is what makes 3.1–3.4 testable on the authoring laptop. Retrieval ranks chunks but the experiment is about **tables**, so chunks collapse to their parent table *before* `k` is applied — the other order makes `k` mean different things for the two chunking strategies | RAG | Retrieval config; `scripts/rag/retrieve.py` |
+| 3.4 | Measure **retrieval recall@1/3/5 and MRR separately** from answer quality. The ~5% unanswerable rows have no gold table by construction and are excluded from the denominator and reported as `n_unscorable` — counting them as misses understates a retriever working perfectly on everything it can reach. Chunking, retriever, query plan and reranker are four choices made by looking at a number, so all four are made on a **selection set drawn from the training freeze** (≥80 rows), never on the reported split: this is the project's `val` selects / `test` reports rule one level out from checkpoints, and at n = 180 with six-row tie-breaks it is not academic. Both figures are kept and printed — the selection figure is what decided, the headline figure is what the report quotes, with its `n` beside it. Detect a saturated metric and say so: where every configuration scores 1.0 at a given `k`, report MRR as the actual basis rather than claiming a recall comparison that did not happen | RAG, EV | Recall + MRR with the denominator stated, on both sets; `scripts/rag/metrics.py` |
+| 3.5 | **Required comparison:** base, base+RAG, fine-tuned, fine-tuned+RAG — four conditions, with plain `base` as the floor the other three are read against. The headline split is **Eval-A** (180 items), which §4.4's rung-1 resolution makes legitimate and comparable to published ChartQA numbers, plus Eval-C from task 3.0c for the abstention pair. **The RAG conditions use the frozen `image_table` prompt format**, and the fine-tuned+RAG condition is reported for both `run_a_r16` (trained on `image_only`, so the prompt format is new to it) and `run_a_r16_table` from task 3.0h (trained on that format) — because otherwise a prompt change and a retrieval effect arrive in the same number and the table attributes both to RAG. Every condition is checked to have been scored on **identical rows** before the table is built, and the paired McNemar test from `compare.py` carries the significance claim, not the difference of two percentages | EV | The headline results table; `scripts/threeway.py` |
+| 3.6 | Retrieval-failure condition: behaviour when no correct table exists — the production case. Gold tables are **withheld from the corpus for half the rows**, so retrieval returns a confidently-ranked *wrong* table rather than nothing, which is the realistic failure and the dangerous one. Three outcomes, only the first acceptable: **graceful** (accuracy falls toward the no-RAG condition — the model fell back to the chart), **harmful** (it falls *below* no-RAG — the wrong table actively misled it), **over-abstaining** (false-abstention rises — it refuses rather than reading the chart it can see). Only the comparison against the no-RAG number separates the first two, which is why the context preamble must tell the model the supplied table may not correspond to the chart. Over-abstention is not exclusive with the other two — a pipeline can lose accuracy *and* start refusing — so it is a flag beside the accuracy verdict, measured as a **rise** against the same rows without RAG, which is computable only once task 3.0b lands | RAG, EV | Degradation profile + an explicit verdict and an over-abstention flag |
+| 3.7 | LLM-as-judge rubric (correctness, grounding, appropriate abstention) on the held-out sets, graded on the three axes **independently** because they come apart — an answer can be right with invented evidence, or correctly grounded and wrong. Grounding has a programmatic cross-check this project already owns: `evidence_grounded` from the scorer, which the judge's verdict should broadly track and whose disagreements are worth reading. A verdict the parser cannot read is **excluded, not scored zero**, or a judge whose output format drifted reads as a system that got worse. The judged sample is drawn from Eval-A **and Eval-C**: the abstention axis grades both directions and Eval-A holds only nine unanswerable rows, so a sample from it alone measures half the axis while the score reads as a whole one. Write `judge_spot_check.jsonl` for **two humans to grade independently** and report **Cohen's κ beside raw agreement** — these axes are skewed, and 0.9 raw agreement on a 90/10 split is what always-say-yes scores | EV | Judge scores over a mixed sample + human agreement spot-check; `scripts/judge.py` |
+| 3.8 | Latency and tokens/sec. Per-item latency and tokens/sec are already recorded in every evaluation summary (Run A: 1.18 s/answer, 62 tok/s on an L40S at batch 4), so this task is specifically about **the serving stack**, not the eval loop, and it waits on task 3.0f. Report the ablation's 3× latency advantage beside the accuracy it costs — that trade is a Week 4 design decision, not a footnote | SV | Performance table on the served stack |
+| 3.9 | Begin the 12-page report; draft results sections as they land. Numbers are **read from the committed `summary.json` files**, never retyped — a report full of hand-copied figures drifts from the runs that produced them, and this one has four weeks of figures to drift from | DOC | Report draft |
+
+**The diagnostic point for the report:** RAG separates *"the model cannot see the value"* from *"the model sees it but cannot reason over it."* If fine-tuned+RAG barely beats fine-tuned, the remaining errors are reasoning errors — that is a finding, not a disappointment. Week 2 already points that way: the supervision-format ablation moved arithmetic and comparison questions by 19 items against 5 while leaving retrieval-type questions alone, which is what a reasoning bottleneck looks like from the other side.
+
+---
+
+### Week 4 — Serving, Responsible AI, Ship
+
+**Objective:** a running endpoint and a defensible model card.
+
+> **Amended 2026-11-17 — read the module paths as roles, not as paths.** Week 4 was drafted against an `src/` package layout that this repository does not use: code lives in `scripts/`, runs are Slurm jobs driven by committed YAML, and there are no weekly driver notebooks (§6.0). `src/serve/merge.py` below means "the merge step, as a committed module with tests", and lands as `scripts/serve/merge.py` or similar. One precondition is now a Week 3 task and the week cannot start without it: the serving stack must be resolved and pinned (**3.0f**). A second was dropped rather than scheduled — there will be no `schema.json`, so task 4.3 below enforces the contract by validate-and-retry instead of constrained decoding (§3.2). The red-team charts come from **3.0g**, the failure-modes section of the card from **3.0e**, and the refusal section from **3.0b** and **3.0c**.
+
+| # | Task | Owner | Output |
+|---|---|---|---|
+| 4.1 | Merge best adapter into base weights; export. Two checks, neither ceremony. `adapter_config.json` records the base the adapter was trained against and **the merge raises on a mismatch**: PEFT will happily merge onto different weights, and the result loads and generates fluently without being the model Week 2 measured. Then the merged checkpoint is **scored against base+adapter on a sample** - merging folds `scaling * B @ A` into each weight, and a wrong dtype, scaling or module set drifts the output with nothing raising. Every Week 4 number comes from the merged weights, so undetected drift means the model card describes a model nobody evaluated. Compared on parsed answers, not raw strings: a check that fires on whitespace gets ignored the second time, and then it is not a check. Loaded in **bf16, never 4-bit** - folding full-precision deltas into already-quantised weights yields neither the trained model nor a clean quantisation of it | SV | Merged checkpoint + a verification report; `src/serve/{merge,generation}.py` |
+| 4.2 | Quantise - **AWQ/GPTQ on the language tower, vision tower left at fp16**. The vision tower turns pixels into the features every answer is read from, it is a small share of the parameters, and chart questions turn on fine distinctions; quantising it saves little and risks the thing the model is for. Three guards: the skip patterns are **verified against this checkpoint's own module names** (a pattern matching nothing quantises the vision tower while the config says it does not, and the symptom looks like ordinary quantisation loss); calibration rows are **checked disjoint from Eval-A/B/C** - no gradient step is taken, which is what makes the leak easy to wave through, but the grid is fitted to preserve activations on exactly those inputs; and the verdict is a **measured delta on identical rows against a tolerance fixed before the measurement**. `reject` is a result, and the plan's own fallback - serve fp16, drop 4.2 - is named in it. The export and the delta both run **in the pass**: a cell that prints instructions for a human produces no quantised model and no delta on a box nobody is watching, and the gate item asking for a measured delta could never be ticked. The delta is scored on the **headline split**, through the **same generation path 4.1 used** - a delta measured on another set, or through a second hand-written loop with its own token budget, is not a delta on the reported number. AWQ's packing is the one step here with no laptop-side test, so a backend that is absent or refuses a VL checkpoint is a **recorded downgrade** carrying the exception into the manifest, not a silent skip | SV | Quantised model + accuracy delta vs fp16 + an accept/reject verdict; `src/serve/{quantise,generation}.py` |
+| 4.3 | vLLM serving behind FastAPI; multimodal request handling; **validation + retry** (no constrained decoding — there is no schema to constrain against, §3.2). The two remaining layers are not redundant: validation applies `scoring.py`'s contract check, including the cross-field rule that an `unanswerable` answer_type carries a null answer, and retry re-asks **with the validation errors quoted**. What is given up is the guarantee that a first attempt is well-formed by construction, which is why the **retry and fallback counters are reported**, not just logged: a served endpoint quietly retrying a third of its requests is a different system from the one Week 2 measured at 100% schema validity, and only a counter distinguishes them. When retries are exhausted the endpoint returns a contract-valid abstention flagged `degraded` **in the envelope, never inside the contract object** - a fallback abstention that looks like the model's own refusal lands in the abstention rate the model card quotes. The API **refuses caller-supplied `context`** rather than ignoring it: accepting arbitrary prompt text hands every caller the injection surface 4.5 red-teams through pixels, only easier. The request path has no web framework in it, so the retry, the fallback, the image limits and the refusals are tested on the authoring laptop against a scripted engine | SV, EV | Running endpoint; `src/serve/{service,decoding,app,engine}.py`; 53 tests |
+| 4.4 | Containerise (Dockerfile, compose with the vector store). The image installs **from the lockfile and resolves nothing** - a container that pulled a newer `transformers` would serve a different model than the report measured, with no trace in any log. Weights are **mounted, not baked**: an image carrying a 3B checkpoint cannot be rebuilt without re-pushing it, which is how a container ends up serving weights nobody can identify. The healthcheck hits `/health`, which reports the merge manifest rather than merely that the process is up, because the question during a demo is whether the thing that is up is the thing that was measured | SV | `docker compose up` works from clean clone; `docker/` |
+| 4.5 | **Red-team log, 20 adversarial prompts** - truncated axes, dual-axis confusion, absent series, caption-only answers, misleading legends, prompt injection via chart text. The attacks are **generated from charts the notebook builds**, so the expected answer is known exactly and an attempt can be scored `misled` rather than logged as "looks wrong to me". The charts are the ones task **3.0g** generates, and their seeds come from a range **disjoint from everything in `data/v2.0`**: a red-team chart carrying training data tests memorisation and logs as a pass. Three families are resisted by **abstaining** and three by **answering correctly**, so the outcome vocabulary keeps `failed_to_abstain` and `wrongly_abstained` apart and a model that refuses everything scores near zero. Injection is stamped onto the image with a payload that appears nowhere in the data - obedience is then provable rather than inferred - and the stamp is **added to the canvas rather than drawn over the plot**, because an attack that occludes the bars measures occlusion, and because the first version appended it to the chart title where matplotlib clipped the payload off the edge: every attempt would have logged as resisted without the model ever having been attacked | EV | Logged attempts + outcomes; `src/eval/redteam.py`; 30 tests |
+| 4.6 | Model card: intended use, data provenance (ChartQA lineage, the finance/economics selection rules, and the blind-labelling procedure with its acceptance rate and κ), failure modes (task 3.0e), refusal behaviour (tasks 3.0b and 3.0c). **Generated from the committed `summary.json` files and the run manifests**, like the Week 3 report draft and for the same reason: a card is a document full of numbers, and numbers retyped by hand drift from the runs that produced them - here, in the document the plan calls defensible. One rule shapes it: **a number that was not measured says so.** Every section renders a figure or the string `NOT MEASURED`, never nothing, because an omitted row reads as "no issue here" and a reviewer cannot otherwise tell a model that abstains well from one whose abstention nobody checked. The gaps are enumerable, and the end-of-week gate counts them | DOC, EV | `MODEL_CARD.md`; `src/serve/modelcard.py`; 18 tests |
+| 4.7 | Finish 12-page report; repo hygiene; reproducibility check from clean clone. The check runs against the repository as a **stranger** sees it - unpinned or VCS requirements, absolute paths committed in configs, `src` modules that import only because `data/` happens to exist, manifests pointing at artefacts nobody has. Failures are split into **blocking** (the clone reproduces nothing; the gate raises) and warnings (a missing red-team log is a gap in the report, not a broken repo), because a gate that treats everything as fatal gets switched off in the week it matters. The report's Week 4 numbers are **generated by the run** into `report_draft_week4.md`, like the Week 3 draft and the model card and for the same reason, and it closes with what the week did **not** establish - assembled from the run's own gaps rather than from memory on the day of writing | DOC, all | Submitted report, a Week 4 draft and a clean-clone check; `src/serve/release.py`; 26 tests |
+| 4.8 | 10-minute demo of the deployed endpoint, rehearsed. The script is **generated by the run**, so every claim in it is one the notebook just verified and the demo cannot quote a number that was not produced; it carries a **"do not claim" list** assembled from the run's own gaps - no Eval-B, nine real abstention items unless task 3.0c landed, any scripted-engine fallback from task 3.0f, each unmeasured card section. The requests the demo makes are smoke-tested in the same order the demo makes them, because a demo that fails live usually fails on something never run in that order | all | Demo + `demo_script.md` |
+
+---
+
+## 7. Deliverables Checklist (per template)
+
+- [ ] Git repository with reproducible training and serving code
+- [ ] Experiment tracking dashboard (Weights & Biases or MLflow)
+- [ ] Model card: intended use, data provenance, failure modes, refusals
+- [ ] 12-page technical report
+- [ ] 10-minute demo of the deployed endpoint
+
+**Grading weights:** technical depth and rigour 30% · punctuality and consistent progress 25% · working deployed system 20% · report and demo 25%.
+
+---
+
+## 8. Risk Register
+
+**Amended 2026-11-17.** Risks that Weeks 1 and 2 settled are kept with their outcome rather than deleted — a register that only lists open risks reads as if nothing was ever at stake.
+
+| Risk | When it bites | Status / mitigation |
+|---|---|---|
+| **vLLM pins torch hard and the stack is unresolved.** Training ran on torch 2.14.1+cu126 / transformers 5.22.1; nothing has yet proved vLLM, FastAPI and an AWQ exporter resolve against it, or that the exporter accepts a VL checkpoint | Week 4, fatally | **Open — the week's top risk.** Task 3.0f resolves it in a separate venv now, and names the fallback (serve through `transformers.generate`, drop the vLLM claim) as a decision rather than a Week 4 discovery |
+| **Nine unanswerable test items carry the whole refusal story**, and every fine-tuned run already scores 9/9 — a saturated metric wearing a perfect score | Week 3–4, in the model card | **Open.** Task 3.0c builds ~50 probes with reasons; task 3.0b supplies the false-abstention half without which the rate means nothing |
+| **No Eval-B, so generalisation to unseen chart styles is untested** | Week 3–4, in the report's claims | **Accepted.** §3.7 states the weaker claim in the report's own words; the mitigations that remain are chart-disjoint splits, an unlabelled test split and blind-reproduced labels |
+| **Gold-label noise in the test split.** The earlier v1.0 image check found ~10% of train/val golds disputable, mostly percentages stored as fractions (0.64 for 64%); **test was never checked** and probably carries the same pattern | Every reported number, already | **Accepted and stated.** It caps relaxed accuracy for every model equally, so comparisons survive it and absolute numbers should be quoted with it. Read percentage items first in any error review |
+| **n = 180.** One score carries about ±7 points | Every comparison | **Mitigated.** Paired exact McNemar on identical items (`compare.py`), not two accuracies with overlapping intervals. Already caught one val-vs-test reversal (Run B) and one per-type lead that did not replicate |
+| **The data-quality claim is unevidenced.** The audit instrument exists; the workbook is empty | Week 4, in the card and report | **Open.** Task 3.0i — a few hours of reviewer time, no GPU |
+| **The vision-tower run adapts nothing and nobody notices.** A target scope that matches no module, or only decoder modules, trains and logs perfectly and returns "vision adaptation does not help". The decoder MLP and the 2.5 vision MLP share leaf names, so a leaf-name match is the likely way in | Week 3, task 3.0j, invisibly | Match on the module **path**, raise when a scope selects nothing or only decoder modules, and write `targets.json` per run so the claim is checkable after the fact. Also budget for more VRAM and a slower step — but do **not** retune `max_pixels` or the batch, or the arm differs in two things |
+| **Runtime LoRA with a VLM in vLLM is finicky** | Week 4 | Merge the adapter into base weights *before* serving (task 4.1), and verify the merge against base+adapter on a sample |
+| **GGUF support for Qwen2.5-VL is patchy** | Week 4 | Go AWQ or GPTQ, language tower only; document "we chose X because Y failed" — that is a graded-quality sentence, not an admission |
+| Corporate network blocks `huggingface.co` from the authoring laptop | Week 1 | **Settled.** Work happens on VM03; the dataset was built from a pinned release archive (revision and zip sha256 recorded), so the build does not depend on live access |
+| Source data tables absent from the M4 mirror | Week 1 (discovered), Week 3 (bites) | **Settled at rung 1** — the original release was used outright and every record carries its table (§4.4) |
+| Teacher-generated QA injects label noise | Week 1 | **Settled by removing the teacher.** Blind labelling with a strict exact-match gate; 10.6% rejected and kept in `dropped_*.jsonl`; a second model family agreed 29/30 |
+| Image token explosion → OOM on 3B | Week 1–2 | **Settled.** `max_pixels` pinned at 640k everywhere, including in each adapter's own config, so evaluation cannot drift from training |
+| Relaxed-accuracy scorer mishandles units | Week 1 | **Settled.** One scorer, imported by the notebook and both scripts, with unit tests and a test that holds it to the published Week 1 numbers |
+| Week 1 gate slips | Week 1 | **Did not slip.** DPO was dropped anyway (§9) to protect Week 4 |
+| **A working copy without git history cannot run a job.** `train.py` and `evaluate.py` read `git status` for provenance and refuse an unclean tree | Any week, on a fresh machine | Work from a clone, not from a downloaded archive. An archive copy is fine for reading and for laptop-side analysis of committed results |
+
+---
+
+## 9. Decisions — all settled
+
+Recorded here so they are not reopened. Where a decision was taken late, the date says so.
+
+1. **Dataset balance** — settled by what was built. There is no synthetic slice to balance: the dataset is 1,033 real, blind-verified finance/economics training records (§4.1). The trade made was breadth for verification, and the report must say so, because a reader who knows the template's 2,000 cap will ask why half of it is unused.
+2. **The §4.4 rung** — settled at rung 1. The original ChartQA release is the primary source and every record carries its table, so Week 3's headline comparison runs on Eval-A and is comparable to published ChartQA numbers.
+3. **DPO (task 2.7)** — **cut.** The template treats it as optional; the serving stack is unresolved (task 3.0f) and Week 4 carries 20% of the grade on a working deployed system.
+4. **The final model** — Run A, r16. Same test accuracy as r64 with a 114 MB adapter against 457 MB; the choice was made on `val` before `test` was scored.
+5. **A published `schema.json`** — **dropped 2026-11-17** (§3.2). `scripts/scoring.py` stays the single definition of the contract; serving enforces it by validate-and-retry rather than constrained decoding, and reports its retry and fallback counters.
+6. **Which fine-tuned model carries the Week 3 RAG conditions** — **settled 2026-11-17: train `run_a_r16_table` and report both.** Run A's hyperparameters on the already-frozen `image_table/train.jsonl`, as one of the task 3.0h member runs. Fine-tuned+RAG is then reported for both adapters, so the table separates *the prompt format changed* from *retrieval helped* instead of attributing both to RAG. Run A remains the headline fine-tuned model, so the Week 2 and Week 3 tables stay about the same model.
+7. **The vision encoder + merger ablation** — **settled 2026-11-17: revived and scheduled in Week 3 as task 3.0j.** It is the draft's original centrepiece and the one question a text-only fine-tuning project cannot ask, and it is the single most publishable result still available. It is scheduled rather than carried as a stretch, which means it has to be protected from the week's other work: §6, Week 3 names what it displaces if the week runs short, and it is cut **before** the mandatory three-way comparison and **after** the reranker and the judge sample.
+8. **How far the red-team generator goes** — **settled 2026-11-17: ~20 charts, six families, red-team only.** Enough that task 4.5 can score an attempt `misled` against ground truth known by construction. **Eval-B stays out of scope**, so §3.7's weakened generalisation claim is final and the report states it rather than hedging it.
+
+**Forced by what the repository turned out to contain — recorded 2026-11-18, during Week 3 implementation:**
+
+9. **The table corpus is 1,168 tables — every chart in the freeze.** *(First recorded 2026-11-18 as "1,084, not 1,168"; **corrected the same day**, when the missing table text turned out to be committed after all.)* 84 charts have an image but no record in any split — every question drawn from them was rejected in blind labelling — so no `input_text` anywhere carries their table, and that was first read as the repository holding no table text for them at all. It does: `data/v2.0/selection/{train,val,test}.jsonl`, the pre-labelling catalogue of every candidate question, carries the same serialisation for all 1,168 charts under `chart_data_table` rather than `input_text`, which is why a search for the latter found nothing. The two sources were compared on the 1,084 charts they share — 1,383 record-level comparisons, **zero disagreements** — and `rag.tables.add_distractors()` now raises if they ever stop agreeing. The corpus is therefore **1,168 tables / 7,675 rows**: 1,084 derived from frozen records, 84 distractor-only, each tagged with its `provenance`. A distractor-only chart can never be scored as a gold, because the record→table join is still built from the frozen splits alone, and `tests/test_rag.py::test_committed_corpus_covers_every_chart_in_the_freeze` asserts that disjointness. Distractor counts are reported against 1,168 — **1,025** distractors against the 143 test charts. What the correction cost: the corpus hash, the `data/rag/` prompt sets then committed (the val pair) and all of `results/rag/` were rebuilt. The chosen configuration did not flip and test recall@1 did not move (0.901, MRR 0.933 → 0.931); `rag_val` lost one gold from rank 1 (105 → 104 of 117 scorable). A slightly harder corpus is what 84 more distractors are supposed to buy.
+10. **Eval-C's paired charts come from `val`/`test`, not from the 84 unused images.** The plan asks for held-out charts; the truly unused 84 have no table, and without a table the absence of an entity cannot be *proved*, only assumed, which is exactly what `abstain_reason` is supposed to rule out. `val` and `test` charts were never trained on, so the probes are still held out from training; the limitation is that Eval-C shares chart images with Eval-A, which affects the independence of the two evaluations and nothing about validity. Recorded because a reader will otherwise assume the stronger pairing. **Premise corrected 2026-11-18:** those 84 charts *do* have table text (item 9), so the original objection — that an absence cannot be proved without a table — no longer holds. The decision stands as taken, because Eval-C is frozen and its abstention numbers are already reported against it; what changes is the reason, which is now *it was built before the tables were found* rather than *no table exists*. Pairing Eval-C against the 84 is available to future work, and would remove the shared-image limitation above.
+11. **The red-team generator has seven families, not six.** Task 4.5 wants three families resisted by abstaining and three by answering correctly. The six named families do not divide that way: only `absent_series` and `caption_only_answer` are abstain cases, and calling a third one an abstention would mislabel its correct behaviour. `absent_period` (a question about a year outside the chart's range) was added as the third, giving 3 abstain and 4 answer over 21 charts. Keeping `failed_to_abstain` and `wrongly_abstained` apart is what the three-and-three was for, and that survives the extra family.
+
+**What is still deliberately undecided — because it is decided by measurement, not by discussion:**
+
+- Chunking strategy, embedding model, reranker and query plan (task 3.4), chosen on a selection set drawn from the training freeze and never on the reported split. *(Measured 2026-11-18 on the selection set: whole-table chunking beats row-group at recall@1 on the lexical floor, and `chart_metadata` beats `question_only` by 0.74 — the bracket, not a winner. An embedding model has not been compared against the floor yet.)*
+- The AWQ/GPTQ accept-or-reject verdict (task 4.2), against a tolerance fixed **before** the delta is measured, with "serve fp16 and drop 4.2" named in advance as a legitimate result.

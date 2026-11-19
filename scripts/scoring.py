@@ -9,6 +9,13 @@ every reported number, so a change needs the baselines re-scored (#19, #8).
   json_valid        the output contains a parseable JSON object
   schema_valid      it has the fields of its target style and an allowed answer_type
   evidence grounded share of numbers cited as evidence that appear in the chart's data table
+  abstention        a pair, never one number alone (task 3.0b):
+                      true  = of the items the chart cannot answer, the share the model declined
+                      false = of the items the chart can answer, the share the model declined anyway
+                    "Declined" means a parseable object whose answer is null: the contract's abstain path.
+                    Unparseable output is not a refusal, it is a format failure, and counts in neither.
+                    Without the false half a wrong number and a refusal both score zero, so a model that
+                    refuses everything it finds hard is indistinguishable from one that guesses.
 """
 import json
 import re
@@ -88,6 +95,7 @@ def score(item, raw, style):
         and (style != "cot" or isinstance(out.get("evidence"), list))
     res["pred"] = out.get("answer") if out else None
     res["correct"] = bool(out) and relaxed_match(res["pred"], gold["answer"], item["answer_type"])
+    res["abstained"] = bool(out) and relaxed_match(res["pred"], None, "unanswerable")
     ev = [e for e in (out or {}).get("evidence") or [] if isinstance(e, str)]
     # Evidence grounding: numbers the model cites that really are in the chart's data table
     # (the model never sees that table in image_only).
@@ -103,6 +111,18 @@ def _mean(xs):
     return sum(xs) / len(xs) if xs else None
 
 
+def abstention(rows):
+    """The abstention pair over scored rows that carry the item's gold answer_type.
+
+    Returned as one object so neither rate can be reported without the other; a rate is None when its
+    denominator is empty, and the denominators travel with the rates so a 9/9 reads as nine items.
+    """
+    una = [r for r in rows if r["answer_type"] == "unanswerable"]
+    ans = [r for r in rows if r["answer_type"] != "unanswerable"]
+    return {"true_abstention": _mean(r["abstained"] for r in una), "n_unanswerable": len(una),
+            "false_abstention": _mean(r["abstained"] for r in ans), "n_answerable": len(ans)}
+
+
 def summarise(results, items):
     """Overall metrics and accuracy per group; the same numbers as the notebook's pandas summary."""
     by_id = {it["id"]: it for it in items}
@@ -113,7 +133,7 @@ def summarise(results, items):
         "json_valid": _mean(r["json_valid"] for r in rows),
         "schema_valid": _mean(r["schema_valid"] for r in rows),
         "evidence_grounded": sum(r["evidence_ok"] for r in rows) / max(sum(r["evidence_n"] for r in rows), 1),
-        "refusal_accuracy": _mean(r["correct"] for r in rows if r["answer_type"] == "unanswerable"),
+        "abstention": abstention(rows),
         "answerable_accuracy": _mean(r["correct"] for r in rows if r["answer_type"] != "unanswerable"),
     }
     by = {}
