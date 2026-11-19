@@ -55,4 +55,4 @@ The merged checkpoint is a smoke artefact: task 4.1 does the verified merge. Del
 | Date | Engine | Environment | Smoke log | Decision |
 |---|---|---|---|---|
 | 2026-11-19 | vLLM (attempted) | `~/venv-serve` | — | install failed: `Disk quota exceeded`; not retried (quota, second torch, scale) |
-| 2026-11-19 | transformers | `~/venv`, locked stack | pending | adopted; vLLM claim dropped |
+| 2026-11-19 | transformers | `~/venv`, locked stack | `docs/serve_smoke_log.json` (job 85: SERVE_SMOKE_OK) | adopted; vLLM claim dropped |

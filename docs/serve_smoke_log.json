@@ -1,0 +1,33 @@
+{
+  "task": "3.0f",
+  "versions": {
+    "python": "3.12.3",
+    "vllm": null,
+    "torch": "2.14.1+cu126",
+    "transformers": "5.22.1",
+    "fastapi": null,
+    "uvicorn": null,
+    "pydantic": "2.14.3",
+    "peft": "0.21.2",
+    "pillow": "13.0.0",
+    "autoawq": null,
+    "llmcompressor": null
+  },
+  "merge": {
+    "merged": "/storage/tracka/users/learner01/merged/run_a_r16_smoke",
+    "adapter": "/storage/tracka/users/learner01/runs/run_a_r16/adapter"
+  },
+  "engine": "transformers",
+  "model": "/storage/tracka/users/learner01/merged/run_a_r16_smoke",
+  "probe_id": "val-two_col_83529-542",
+  "raw": "{\"evidence\": [\"Bar=2016 (2.03%)\"], \"rationale\": \"The bar labelled 2.03% is the 2016 bar.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2016}",
+  "verdict": {
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "pred": 2016
+  },
+  "load_seconds": 2.9,
+  "generate_seconds": 1.67,
+  "status": "SERVE_SMOKE_OK"
+}
