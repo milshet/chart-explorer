@@ -65,7 +65,12 @@
     "json_valid": 0.9833,
     "schema_valid": 0.9833,
     "evidence_grounded": 0.0,
-    "refusal_accuracy": 0.8889,
+    "abstention": {
+      "true_abstention": 0.8889,
+      "n_unanswerable": 9,
+      "false_abstention": 0.0,
+      "n_answerable": 171
+    },
     "answerable_accuracy": 0.7485,
     "truncated": 0,
     "mean_new_tokens": 20.8,
@@ -148,5 +153,17 @@
   },
   "load_seconds": 4.1,
   "minutes": 1.3,
-  "peak_gpu_memory_mib": 8070
+  "peak_gpu_memory_mib": 8070,
+  "rescored": [
+    {
+      "by": "scripts/rescore.py",
+      "at_commit": "254da706804f898a23d9f6f3204b2da6ad50e864",
+      "added": [
+        "abstention"
+      ],
+      "retired": [
+        "refusal_accuracy"
+      ]
+    }
+  ]
 }

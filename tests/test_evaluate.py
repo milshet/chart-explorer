@@ -161,3 +161,55 @@ def test_compare_table_from_committed_results():
     out = compare.table(evals, "run_a_r16-adapter_val_image_only_cot_0shot_bf16")
     assert "81.5%" in out and "reference" in out and "4 / 8" not in out
     assert "8 / 4 (p = 0.388)" in out              # Run B vs Run A, as in results/evals/README.md
+
+
+# --- abstention pair (task 3.0b) -------------------------------------------------------------------
+
+def test_abstention_is_a_pair_and_counts_refusals_on_answerable_items():
+    groups = {"question_type": "q", "source": "s", "chart_type": "c"}
+    una, ans = {**item(None, "unanswerable"), **groups}, {**item(12.5, "number"), **groups, "id": "y"}
+    refuse = '{"answer": null, "answer_type": "unanswerable", "unit": null}'
+    guess = '{"answer": 3, "answer_type": "number", "unit": null}'
+    # refusing an answerable item: wrong, like a guess, but now visible as a false abstention
+    results = [scoring.score(una, refuse, "answer_only"), scoring.score(ans, refuse, "answer_only")]
+    overall, _ = scoring.summarise(results, [una, ans])
+    assert overall["abstention"] == {"true_abstention": 1.0, "n_unanswerable": 1,
+                                     "false_abstention": 1.0, "n_answerable": 1}
+    assert not results[1]["correct"]
+    guessed, _ = scoring.summarise([scoring.score(una, refuse, "answer_only"), scoring.score(ans, guess, "answer_only")],
+                                   [una, ans])
+    assert guessed["abstention"]["false_abstention"] == 0.0 and guessed["answerable_accuracy"] == overall["answerable_accuracy"]
+
+
+def test_neither_abstention_rate_is_reported_alone():
+    rows = [json.loads(l) for l in open(REPO / "data/v2.0/image_only/answer_only/val.jsonl", encoding="utf-8")]
+    overall, _ = scoring.summarise([scoring.score(r, r["messages"][2]["content"], "answer_only") for r in rows], rows)
+    assert "refusal_accuracy" not in overall and "true_abstention" not in overall and "false_abstention" not in overall
+    assert set(overall["abstention"]) == {"true_abstention", "n_unanswerable", "false_abstention", "n_answerable"}
+    assert overall["abstention"]["true_abstention"] == 1 and overall["abstention"]["false_abstention"] == 0
+
+
+def test_unparseable_output_is_not_a_refusal():
+    res = scoring.score(item(None, "unanswerable"), "I cannot tell.", "answer_only")
+    assert not res["abstained"] and not res["correct"]
+
+
+def test_committed_evaluations_carry_the_pair_and_rescore_without_moving():
+    import rescore
+    for folder in sorted((REPO / "results" / "evals").glob("*/summary.json")):
+        summary, _, problems = rescore.rescore(folder.parent)
+        assert problems == [], folder.parent.name
+        committed = json.loads(folder.read_text(encoding="utf-8"))["overall"]
+        assert "refusal_accuracy" not in committed and rescore.same(committed["abstention"], summary["overall"]["abstention"])
+
+
+def test_rescore_refuses_a_moved_number(tmp_path):
+    import shutil
+    import rescore
+    src = REPO / "results/evals/run_a_r16-adapter_val_image_only_cot_0shot_bf16"
+    dst = tmp_path / src.name
+    shutil.copytree(src, dst)
+    rows = [json.loads(l) for l in open(dst / "predictions.jsonl", encoding="utf-8")]
+    rows[0]["correct"] = not rows[0]["correct"]          # a verdict the current scorer would not give
+    (dst / "predictions.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    assert rescore.rescore(dst)[2]
