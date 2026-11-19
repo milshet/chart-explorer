@@ -136,3 +136,56 @@ def test_redteam_seeds_and_payloads_are_disjoint_from_the_dataset(redteam):
     assert len(set(tokens)) == 3
     corpus = (REPO / "data/v2.0/tables/corpus.jsonl").read_text(encoding="utf-8")
     assert not any(tok in corpus for tok in tokens)
+
+
+# --- retrieval: chunking, queries, retrievers, metrics (tasks 3.1-3.4) -----------------------------
+
+from rag import corpus as rcorpus  # noqa: E402
+from rag import metrics as rmetrics  # noqa: E402
+from rag import query as rquery  # noqa: E402
+from rag import retrieve as rretrieve  # noqa: E402
+
+
+def test_every_row_group_chunk_repeats_the_header():
+    t = tables.parse(SAMPLE.replace("| Australia | 38.0 | 1,037 |", "\n".join(f"| R{i} | {i} | {i} |" for i in range(12))))
+    chunks = rcorpus.chunks({**t, "chart_id": "c"}, "row_group")
+    assert len(chunks) == 3 and all(c["text"].startswith(rcorpus.header(t)) for c in chunks)
+    assert len(rcorpus.chunks({**t, "chart_id": "c"}, "whole_table")) == 1
+
+
+def test_query_gate_raises_on_a_data_value_and_exempts_labels():
+    t = tables.parse(SAMPLE)
+    q, leak = rquery.build("What was Chile in 1980?", "chart_metadata", t)   # 1980 is a column label: exempt
+    assert "Investment by sector" in q and not leak
+    with pytest.raises(rquery.LeakError):
+        rquery.gate("Chile 24.5", t)                                          # 24.5 is a data cell
+    assert rquery.build("Is Chile 24.5 in 1980?", "question_only", t)[1]     # a question leak is counted, not raised
+
+
+def test_chunks_collapse_to_tables_before_k():
+    chunks = [{"chart_id": "a", "chunk_id": "a#0", "text": "revenue emea"},
+              {"chart_id": "a", "chunk_id": "a#1", "text": "revenue emea q3"},
+              {"chart_id": "b", "chunk_id": "b#0", "text": "revenue apac"}]
+    r = rretrieve.make(chunks, "bm25")
+    assert rretrieve.rank_tables(r, "emea revenue q3", k=2) == ["a", "b"]   # two chunks of a count once
+
+
+def test_unanswerable_rows_are_unscorable_not_misses():
+    corpus, index = tables.load_corpus()
+    rows = rmetrics.eval_rows("test", index)
+    by_id = {t["chart_id"]: t for t in corpus}
+    r = rretrieve.make(rcorpus.build(corpus, "whole_table"), "bm25")
+    m, per_row = rmetrics.score(rows, r, "question_only", by_id)
+    assert (m["n_scorable"], m["n_unscorable"]) == (171, 9)
+    assert sum(p["rank"] is None and "top" not in p for p in per_row) == 9
+
+
+def test_selection_set_is_drawn_from_train_only():
+    _, index = tables.load_corpus()
+    sel = rmetrics.selection_rows(index)
+    assert len(sel) == rmetrics.SELECTION_N >= 80 and all(r["id"].startswith("train-") for r in sel)
+
+
+def test_committed_retrieval_results_reproduce():
+    committed = json.loads((REPO / "results/rag/retrieval.json").read_text(encoding="utf-8"))
+    assert rmetrics.run(["tfidf", "bm25"], write=False) == committed
