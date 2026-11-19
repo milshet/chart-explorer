@@ -213,3 +213,80 @@ def test_rescore_refuses_a_moved_number(tmp_path):
     rows[0]["correct"] = not rows[0]["correct"]          # a verdict the current scorer would not give
     (dst / "predictions.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
     assert rescore.rescore(dst)[2]
+
+
+# --- Eval-C (task 3.0c) ----------------------------------------------------------------------------
+
+def eval_c_rows(rel="image_only/eval_c.jsonl"):
+    return [json.loads(l) for l in open(REPO / "data/eval_c" / rel, encoding="utf-8")]
+
+
+def test_eval_c_prompts_are_built_exactly_like_the_frozen_dataset():
+    import build_eval_c as b
+    parts = b.prompt_parts()
+    for (variant, targets), rel in b.FILES.items():
+        for r in map(json.loads, open(REPO / "data/v2.0" / rel.replace("eval_c", "test"), encoding="utf-8")):
+            built = b.messages(parts, variant, targets, r["image"], r["question"], r["input_text"])
+            assert built[:2] == r["messages"][:2], r["id"]
+            if r["answer_type"] == "unanswerable":
+                assert json.loads(built[2]["content"]) == json.loads(r["messages"][2]["content"])
+
+
+def test_committed_eval_c_is_what_the_builder_produces():
+    import build_eval_c as b
+    probes, corpus = b.build()
+    recs = b.records(probes, corpus)
+    for key, rel in b.FILES.items():
+        assert recs[key] == eval_c_rows(rel)
+    manifest = dict(reversed(l.split()) for l in (REPO / "data/eval_c/MANIFEST.txt").read_text().splitlines() if l)
+    import hashlib
+    for rel, digest in manifest.items():
+        assert hashlib.sha256((REPO / "data/eval_c" / rel).read_bytes()).hexdigest() == digest
+
+
+def test_eval_c_reasons_are_proved_by_the_tables():
+    import build_eval_c as b
+    from rag import tables
+    corpus = {c["chart_id"]: c for c in tables.load_corpus()[0]}
+    rows = eval_c_rows()
+    assert len(rows) == 50 and {r["abstain_reason"] for r in rows} == set(b.QUOTA)
+    for r in rows:
+        assert all(not b.occurs(e, r["input_text"]) for e in r["absent_entities"]), r["id"]
+        assert all(b.occurs(e, r["input_text"]) for e in r["present_entities"]), r["id"]
+        assert corpus[r["chart_id"]]["image_split"] in ("val", "test")       # never a training chart
+        if r["origin"] == "catalogue":                                       # the question really names them
+            source = corpus[r["question_source_chart"]]["text"]
+            assert all(b.occurs(e, r["question"]) and b.occurs(e, source) for e in r["absent_entities"]), r["id"]
+
+
+def test_eval_c_questions_were_never_selected_into_the_dataset():
+    used = {json.loads(l)["question"] for s in ("train", "val", "test")
+            for l in open(REPO / f"data/v2.0/selection/{s}.jsonl", encoding="utf-8")}
+    assert not any(r["question"] in used for r in eval_c_rows() if r["origin"] == "catalogue")
+
+
+@pytest.mark.parametrize("variant", ["image_only", "image_table"])
+@pytest.mark.parametrize("targets", ["reasoning", "answer_only"])
+def test_eval_c_loads_through_evaluate_and_gold_scores_full_marks(variant, targets):
+    s = evaluate.resolve(evaluate.parse_args(["--split", "eval_c", "--targets", targets, "--variant", variant]))
+    assert s["items_dir"] == "data/eval_c" and s["data_dir"] == "data/v2.0"
+    items, shots, fp = evaluate.load_rows(s, "eval_c", evaluate.parse_args(["--split", "eval_c", "--targets", targets]))
+    assert len(items) == 50 and fp["data_dir"] == "data/eval_c" and fp["images"] == len({r["image"] for r in items})
+    res = [scoring.score(r, r["messages"][2]["content"], s["style"]) for r in items]
+    overall, _ = scoring.summarise(res, items)
+    assert overall["abstention"]["true_abstention"] == 1 and overall["abstention"]["n_answerable"] == 0
+
+
+def test_eval_c_few_shot_baseline_fingerprints_both_sets():
+    argv = ["--split", "eval_c", "--targets", "answer_only", "--shots", "2"]
+    s = evaluate.resolve(evaluate.parse_args(argv))
+    _, shots, fp = evaluate.load_rows(s, "eval_c", evaluate.parse_args(argv))
+    assert [r["id"] for r in shots] == evaluate.FEW_SHOT_IDS and fp["shots"]["data_dir"] == "data/v2.0"
+
+
+def test_adapter_on_eval_c_needs_final_test(tmp_path):
+    d = fake_adapter(tmp_path)
+    with pytest.raises(SystemExit):
+        evaluate.resolve(evaluate.parse_args(["--split", "eval_c", "--adapter", str(d)]))
+    s = evaluate.resolve(evaluate.parse_args(["--split", "eval_c", "--adapter", str(d), "--final-test"]))
+    assert s["items_dir"] == "data/eval_c" and s["name"].endswith("_eval_c_image_only_cot_0shot_bf16")

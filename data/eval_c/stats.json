@@ -1,0 +1,16 @@
+{
+ "n": 50,
+ "seed": 31003,
+ "by_reason": {
+  "series_absent": 13,
+  "category_absent": 13,
+  "not_in_chart": 12,
+  "requires_external_knowledge": 12
+ },
+ "by_origin": {
+  "catalogue": 38,
+  "template": 12
+ },
+ "distinct_charts": 49,
+ "corpus_sha256": "e66ab9661092f09865cac333dd1c5321db8d55ea7beda7392173de3b2c98094c"
+}

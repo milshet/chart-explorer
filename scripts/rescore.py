@@ -31,7 +31,8 @@ STYLE = {"reasoning": "cot", "answer_only": "answer_only"}
 
 def items_for(settings, root=REPO):
     sub = "answer_only/" if settings["targets"] == "answer_only" else ""
-    path = root / settings["data_dir"] / settings["variant"] / f"{sub}{settings['split']}.jsonl"
+    items_dir = settings.get("items_dir", settings["data_dir"])  # eval_c and later held-out sets live outside data_dir
+    path = root / items_dir / settings["variant"] / f"{sub}{settings['split']}.jsonl"
     return {r["id"]: r for r in map(json.loads, open(path, encoding="utf-8"))}
 
 
