@@ -55,7 +55,7 @@ def test_config_rejects_mistakes(tmp_path, yaml_text, overrides):
         train.load_config(write(tmp_path / "c.yaml", yaml_text), overrides)
 
 
-@pytest.mark.parametrize("name", ["run_a", "run_b", "ablation_answer_only", "run_a_vision"])
+@pytest.mark.parametrize("name", ["run_a", "run_b", "ablation_answer_only", "run_a_vision", "run_a_table"])
 def test_committed_configs_load(name):
     cfg = train.load_config(REPO / "configs" / f"{name}.yaml", [])
     assert cfg["run_name"]
@@ -158,7 +158,7 @@ def test_git_state_reports_a_commit():
     assert len(commit) == 40 and isinstance(dirty, list)
 
 
-# --- LoRA scope and the vision arm (task 3.0j) ----------------------------------------------
+# --- LoRA scope and the Week 3 arms (tasks 3.0h, 3.0j) ----------------------------------------------
 
 def flat(d, prefix=""):
     return {k2: v2 for k, v in d.items()
@@ -167,6 +167,7 @@ def flat(d, prefix=""):
 
 @pytest.mark.parametrize("name, differs", [
     ("run_a_vision", {"run_name", "lora.scope", "lora.target_modules"}),
+    ("run_a_table", {"run_name", "variant"}),
 ])
 def test_week3_arms_differ_from_run_a_in_one_thing(name, differs):
     a = flat(train.load_config(REPO / "configs/run_a.yaml", []))
