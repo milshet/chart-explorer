@@ -364,3 +364,42 @@ def test_serve_smoke_builds_an_openai_multimodal_request():
     kinds = [c["type"] for c in msgs[1]["content"]]
     assert kinds == ["image_url", "text"] and msgs[1]["content"][0]["image_url"]["url"].startswith("data:image/png;base64,")
     assert msgs[1]["content"][1] == item["messages"][1]["content"][1]
+
+
+# --- LLM-as-judge harness (task 3.7); no API calls ------------------------------------------------
+
+@pytest.mark.parametrize("text, ok", [
+    ('{"correctness": "yes", "grounding": "n/a", "abstention": "yes", "note": "x"}', True),
+    ('Sure! {"correctness": "Yes", "grounding": "no", "abstention": "no"}', True),
+    ('{"correctness": "maybe", "grounding": "no", "abstention": "yes"}', False),   # not in the vocabulary
+    ('{"correctness": "yes", "grounding": "no", "abstention": "n/a"}', False),     # abstention is always graded
+    ("I think it is correct.", False),
+    (None, False),                                                                 # judge refused
+])
+def test_judge_parse_excludes_unreadable_verdicts(text, ok):
+    import judge
+    assert (judge.parse(text) is not None) is ok
+
+
+def test_judge_summary_excludes_rather_than_scores_zero():
+    import judge
+    v = {"correctness": "yes", "grounding": "yes", "abstention": "yes"}
+    judged = [{"id": "a", "verdict": v, "scorer_evidence": [2, 2]}, {"id": "b", "verdict": None, "scorer_evidence": [0, 0]},
+              {"id": "c", "verdict": {**v, "grounding": "yes"}, "scorer_evidence": [0, 3]}]
+    s = judge.summarise(judged)
+    assert s["n_excluded"] == 1 and s["correctness"] == {"yes": 2, "n": 2}
+    assert s["grounding_disagreements"] == ["c"]           # judge says grounded, scorer found none of 3 in the table
+
+
+def test_kappa_exposes_always_yes_on_a_skewed_axis():
+    import judge
+    truth = ["yes"] * 9 + ["no"]
+    n, raw, kappa = judge.cohen(["yes"] * 10, truth)
+    assert raw == 0.9 and kappa == 0.0
+
+
+def test_judge_sample_mixes_eval_a_and_reports_missing_eval_c():
+    import judge
+    rows, missing = judge.draw("run_a_r16-adapter")
+    assert missing == ["eval_c"]                            # not yet scored on Eval-C: said, not silently skipped
+    assert len(rows) == judge.SAMPLE["test"] and sum(r["gold"] is None for r in rows) == 9
