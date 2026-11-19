@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Serving-stack smoke test (task 3.0f), in ~/venv-serve -- never ~/venv, whose torch the measured runs depend on.
-# docs/SERVING.md has the whole procedure (create the venv, resolve, freeze requirements-serve.lock).
+# Serving-stack smoke test (task 3.0f). docs/SERVING.md has the procedure and the decision record.
 #
-#   sbatch slurm/serve_smoke.sbatch --merge ~/runs/run_a_r16/adapter --merged ~/merged/run_a_r16_smoke
-#   sbatch slurm/serve_smoke.sbatch --model ~/merged/run_a_r16_smoke                    # vLLM
-#   sbatch slurm/serve_smoke.sbatch --model ~/merged/run_a_r16_smoke --engine transformers  # the fallback
+# Decided 2026-11-19: transformers.generate, run from ~/venv (the locked training stack; nothing installed).
+# vLLM never goes into ~/venv: it would install its own torch over the measured stack.
+#
+#   M=/storage/tracka/users/learner01/merged/run_a_r16_smoke                # ~7 GB: mind the 35 GB quota
+#   SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --merge ~/runs/run_a_r16/adapter --merged $M --engine transformers
+#   SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --model $M --engine transformers
 #   tail -f logs/chartqa-serve-smoke-<JOB_ID>.out
+#
+# Without SERVE_VENV the job activates ~/venv-serve, for a separate vLLM venv should one ever fit.
 #SBATCH --job-name=chartqa-serve-smoke
 #SBATCH --partition=vm3_slurm_partition
 #SBATCH --gres=gpu:1
@@ -19,7 +23,7 @@
 set -Eeuo pipefail
 
 source "$HOME/.tracka_environment"
-source "$HOME/venv-serve/bin/activate"
+source "${SERVE_VENV:-$HOME/venv-serve}/bin/activate"   # SERVE_VENV=$HOME/venv for the transformers fallback
 export HF_HUB_OFFLINE=1
 export PYTHONUNBUFFERED=1
 

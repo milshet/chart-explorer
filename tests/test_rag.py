@@ -291,3 +291,16 @@ def test_week3_report_draft_is_generated_and_says_what_is_missing():
     text = report_week3.build()
     assert "1168 tables / 7675 rows" in text and "NOT MEASURED" in text
     assert (REPO / "docs/report_draft_week3.md").read_text(encoding="utf-8") == text
+
+
+def test_gpu_runbook_commands_match_the_code():
+    """Every config, split and eval-set name the Week 3 runbook submits must exist."""
+    import re
+    import evaluate
+    text = (REPO / "docs/WEEK3_GPU_RUNBOOK.md").read_text(encoding="utf-8")
+    for cfg in set(re.findall(r"configs/(\w+)\.yaml", text)):
+        assert (REPO / f"configs/{cfg}.yaml").is_file(), cfg
+    for split in set(re.findall(r"--split (\w+)", text)):
+        assert split in ("val", "test", *evaluate.EVAL_SETS), split
+    for sb in set(re.findall(r"slurm/(\w+)\.sbatch", text)):
+        assert (REPO / f"slurm/{sb}.sbatch").is_file(), sb

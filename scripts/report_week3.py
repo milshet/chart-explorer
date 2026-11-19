@@ -85,7 +85,8 @@ def build():
     if not j:
         gaps.append("LLM-as-judge rubric not run; no human spot-check kappa (3.7)")
     if not (REPO / "docs/serve_smoke_log.json").is_file():
-        gaps.append("serving stack not resolved: no requirements-serve.lock or smoke log (3.0f), so no served latency (3.8)")
+        gaps.append("serving smoke test not run: no docs/serve_smoke_log.json (3.0f; engine decided: transformers), "
+                    "so no served latency (3.8)")
     for run in ("run_a_r16_table", "run_a_r16_vision"):
         if not list((REPO / "results/evals").glob(f"{run}-*")):
             gaps.append(f"{run} not trained or not evaluated (3.0h/3.0j)")

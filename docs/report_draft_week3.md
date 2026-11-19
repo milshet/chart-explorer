@@ -70,7 +70,7 @@ Judged: NOT MEASURED
 - retrieval-failure verdict for fine-tuned(table) (3.6)
 - retrieval-failure verdict for base (3.6)
 - LLM-as-judge rubric not run; no human spot-check kappa (3.7)
-- serving stack not resolved: no requirements-serve.lock or smoke log (3.0f), so no served latency (3.8)
+- serving smoke test not run: no docs/serve_smoke_log.json (3.0f; engine decided: transformers), so no served latency (3.8)
 - run_a_r16_table not trained or not evaluated (3.0h/3.0j)
 - run_a_r16_vision not trained or not evaluated (3.0h/3.0j)
 - data-quality audit kappa not reported (3.0i): needs two or three human reviewers
