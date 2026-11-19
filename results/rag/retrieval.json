@@ -35,6 +35,20 @@
    },
    {
     "chunking": "whole_table",
+    "plan": "question_only",
+    "retriever": "embed",
+    "metrics": {
+     "recall@1": 0.125,
+     "recall@3": 0.1833,
+     "recall@5": 0.225,
+     "mrr": 0.1831,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "whole_table",
     "plan": "chart_metadata",
     "retriever": "tfidf",
     "metrics": {
@@ -56,6 +70,20 @@
      "recall@3": 0.9667,
      "recall@5": 0.9667,
      "mrr": 0.9522,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "whole_table",
+    "plan": "chart_metadata",
+    "retriever": "embed",
+    "metrics": {
+     "recall@1": 0.9167,
+     "recall@3": 0.95,
+     "recall@5": 0.975,
+     "mrr": 0.9379,
      "n_scorable": 120,
      "n_unscorable": 0,
      "question_value_leaks": 7
@@ -91,6 +119,20 @@
    },
    {
     "chunking": "row_group",
+    "plan": "question_only",
+    "retriever": "embed",
+    "metrics": {
+     "recall@1": 0.1167,
+     "recall@3": 0.1833,
+     "recall@5": 0.225,
+     "mrr": 0.1777,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
     "plan": "chart_metadata",
     "retriever": "tfidf",
     "metrics": {
@@ -112,6 +154,20 @@
      "recall@3": 0.9583,
      "recall@5": 0.9667,
      "mrr": 0.9331,
+     "n_scorable": 120,
+     "n_unscorable": 0,
+     "question_value_leaks": 7
+    }
+   },
+   {
+    "chunking": "row_group",
+    "plan": "chart_metadata",
+    "retriever": "embed",
+    "metrics": {
+     "recall@1": 0.9,
+     "recall@3": 0.95,
+     "recall@5": 0.9667,
+     "mrr": 0.9288,
      "n_scorable": 120,
      "n_unscorable": 0,
      "question_value_leaks": 7
