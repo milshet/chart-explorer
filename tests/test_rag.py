@@ -86,3 +86,53 @@ def test_corpus_manifest_detects_an_edit(tmp_path, committed):
         f.write("\n")
     with pytest.raises(ValueError):
         tables.load_corpus(tmp_path)
+
+
+# --- red-team charts (task 3.0g) -------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def redteam():
+    import redteam_charts
+    return redteam_charts, redteam_charts.build()
+
+
+def test_redteam_files_regenerate_byte_identical(redteam):
+    import hashlib
+    rc, built = redteam
+    manifest = dict(reversed(l.split()) for l in (rc.OUT / "MANIFEST.txt").read_text().splitlines() if l)
+    for s, png, rows in built:
+        assert hashlib.sha256(png).hexdigest() == manifest[s["image"]], s["id"]
+        assert hashlib.sha256(rc.csv_text(rows).encode()).hexdigest() == manifest[s["table_csv"]]
+    specs = "".join(json.dumps(s, ensure_ascii=False) + "\n" for s, _, _ in built).encode()
+    assert hashlib.sha256(specs).hexdigest() == manifest["specs.jsonl"]
+
+
+def test_redteam_families_split_three_abstain_four_answer(redteam):
+    rc, built = redteam
+    from collections import Counter
+    assert Counter(rc.FAMILIES.values()) == {"answer": 4, "abstain": 3} and len(built) == 21
+    for s, _, _ in built:
+        assert (s["answer"] is None) == (s["expected_behaviour"] == "abstain")
+        assert s["answer"] not in s["misled_answers"]           # a misled answer must be distinguishable
+
+
+def test_redteam_ground_truth_is_in_its_own_table(redteam):
+    _, built = redteam
+    for s, _, rows in built:
+        t = tables.parse(s["input_text"])
+        assert t["columns"] == [str(c) for c in rows[0]]
+        assert t["rows"] == [[str(c) for c in r] for r in rows[1:]]
+        if s["expected_behaviour"] == "abstain":
+            assert not any(e in s["input_text"].split("Table:")[1] for e in s["absent_entities"]), s["id"]
+        if s["caption"]:
+            assert str(s["misled_answers"][0]) not in s["input_text"]   # the caption's figure is not plotted
+
+
+def test_redteam_seeds_and_payloads_are_disjoint_from_the_dataset(redteam):
+    _, built = redteam
+    seeds = [s["seed"] for s, _, _ in built]
+    assert len(set(seeds)) == 21 and min(seeds) >= 700_000 and not {2026, 31003} & set(seeds)
+    tokens = [s["injection_token"] for s, _, _ in built if s["injection_token"]]
+    assert len(set(tokens)) == 3
+    corpus = (REPO / "data/v2.0/tables/corpus.jsonl").read_text(encoding="utf-8")
+    assert not any(tok in corpus for tok in tokens)

@@ -6,3 +6,4 @@
 *.json text eol=lf
 MANIFEST.txt text eol=lf
 *.lock text eol=lf
+*.csv text eol=lf
