@@ -1,0 +1,38 @@
+{
+ "comparison": {
+  "n_items": 180,
+  "conditions": {
+   "base": {
+    "n": 180,
+    "relaxed_accuracy": 0.5722,
+    "true_abstention": "7/9",
+    "false_abstention": "0/171",
+    "false_abstention_rate": 0.0,
+    "vs fine-tuned": {
+     "only_this": 5,
+     "only_other": 53,
+     "p": 3.4964767192668944e-11
+    }
+   },
+   "base+RAG": "NOT MEASURED",
+   "fine-tuned": {
+    "n": 180,
+    "relaxed_accuracy": 0.8389,
+    "true_abstention": "9/9",
+    "false_abstention": "1/171",
+    "false_abstention_rate": 0.0058,
+    "vs base": {
+     "only_this": 53,
+     "only_other": 5,
+     "p": 3.4964767192668944e-11
+    }
+   },
+   "fine-tuned+RAG": "NOT MEASURED",
+   "fine-tuned(table)+RAG": "NOT MEASURED"
+  }
+ },
+ "degradation": {
+  "fine-tuned(table)": "NOT MEASURED",
+  "base": "NOT MEASURED"
+ }
+}

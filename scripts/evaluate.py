@@ -38,8 +38,12 @@ FEW_SHOT_IDS = ["train-multi_col_20389-6093", "train-87453827004907-3340"]
 STYLE = {"reasoning": "cot", "answer_only": "answer_only"}  # targets -> scorer style
 # Held-out sets frozen outside the training dataset, each with its own MANIFEST.txt and the same variant/target
 # layout. Scored like test: an adapter needs --final-test, once per compared model.
-EVAL_SETS = {"eval_c": "data/eval_c"}  # task 3.0c: abstention probes
-REPORTED = ("test", *EVAL_SETS)
+EVAL_SETS = {"eval_c": "data/eval_c",                       # task 3.0c: abstention probes
+             **{n: "data/rag" for n in ("rag_val", "rag_test", "rag_test_qo", "rag_test_withheld")}}  # 3.5, 3.6
+# RAG sets exist only in the image_table format. An adapter trained on image_only may be scored on them on
+# purpose (task 3.5 reports run_a_r16 there); the settings then record prompt_format_new_to_model = true.
+RAG_SETS = {n for n, d in EVAL_SETS.items() if d == "data/rag"}
+REPORTED = ("test", *(n for n in EVAL_SETS if n != "rag_val"))  # scored once per model, after selection
 
 
 def parse_args(argv=None):
@@ -81,6 +85,8 @@ def resolve(args):
         adapter, cfg, cfg_file = adapter_config(args.adapter)
         for key in ("variant", "targets"):
             given = getattr(args, key)
+            if key == "variant" and args.split in RAG_SETS:
+                continue
             if given and given != cfg[key]:
                 sys.exit(f"--{key} {given} differs from the run's {key} {cfg[key]} ({cfg_file}); prompts must match training")
         if cfg["max_pixels"] != st.MAX_PIXELS:
@@ -93,6 +99,9 @@ def resolve(args):
         sys.exit("--targets is required for the base model (answer_only for zero/few-shot, reasoning for CoT)")
     s["style"] = STYLE[s["targets"]]
     s["items_dir"] = EVAL_SETS.get(args.split, s["data_dir"])  # where the scored items live
+    if args.split in RAG_SETS:
+        s["prompt_format_new_to_model"] = bool(args.adapter) and s["variant"] != "image_table"
+        s["variant"] = "image_table"
     s["name"] = f"{s['source']}_{args.split}_{s['variant']}_{s['style']}_{args.shots}shot_{args.precision}" + \
         (f"_limit{args.limit}" if args.limit else "")
     return s

@@ -1,0 +1,40 @@
+{
+ "chunking": "whole_table",
+ "retriever": "bm25",
+ "withhold_seed": 51003,
+ "corpus_sha256": "e66ab9661092f09865cac333dd1c5321db8d55ea7beda7392173de3b2c98094c",
+ "sets": {
+  "rag_val": {
+   "source_split": "val",
+   "query_plan": "chart_metadata",
+   "n": 124,
+   "n_scorable": 117,
+   "top1_correct": 108,
+   "withheld": 0
+  },
+  "rag_test": {
+   "source_split": "test",
+   "query_plan": "chart_metadata",
+   "n": 180,
+   "n_scorable": 171,
+   "top1_correct": 154,
+   "withheld": 0
+  },
+  "rag_test_qo": {
+   "source_split": "test",
+   "query_plan": "question_only",
+   "n": 180,
+   "n_scorable": 171,
+   "top1_correct": 41,
+   "withheld": 0
+  },
+  "rag_test_withheld": {
+   "source_split": "test",
+   "query_plan": "chart_metadata",
+   "n": 180,
+   "n_scorable": 171,
+   "top1_correct": 74,
+   "withheld": 85
+  }
+ }
+}

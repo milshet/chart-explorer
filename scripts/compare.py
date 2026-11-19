@@ -73,7 +73,7 @@ def table(evals, reference):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--split", choices=("val", "test", "eval_c"), required=True)
+    p.add_argument("--split", required=True, help="val, test, eval_c, rag_val, rag_test, rag_test_qo or rag_test_withheld")
     p.add_argument("--reference", required=True, help="folder name of the evaluation to test against")
     p.add_argument("--root", default=str(REPO / "results" / "evals"))
     args = p.parse_args()

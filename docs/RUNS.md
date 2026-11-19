@@ -147,3 +147,18 @@ sbatch slurm/eval.sbatch --adapter ~/runs/<run>/adapter --split eval_c --final-t
 Eval-C also needs the existing models scored once each (`run_a_r16`, `run_b_r64`, `ablation_answer_only`, and
 the few-shot base: `--split eval_c --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384`).
 Copy every `~/evals/<name>/` into `results/evals/` and run `python scripts/taxonomy.py --all --write`.
+
+**RAG conditions (tasks 3.5, 3.6).** The prompt sets are frozen in `data/rag/` (retrieved tables, ids identical
+to test). Score each once, then run `python scripts/threeway.py --write` and `python scripts/report_week3.py --write`:
+
+```bash
+# base + RAG (few-shot, the Week 1 reference regime), bracket floor, and retrieval failure
+sbatch slurm/eval.sbatch --split rag_test --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384
+sbatch slurm/eval.sbatch --split rag_test_withheld --targets answer_only --shots 2 --precision 4bit --max-new-tokens 384
+# fine-tuned + RAG: Run A (prompt format new to it) and the image_table adapter (trained on it)
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16/adapter --split rag_test --final-test
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_val
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_test --final-test
+sbatch slurm/eval.sbatch --adapter ~/runs/run_a_r16_table/adapter --split rag_test_withheld --final-test
+# optional, the floor end of the bracket: --split rag_test_qo
+```

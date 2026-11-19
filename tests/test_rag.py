@@ -189,3 +189,98 @@ def test_selection_set_is_drawn_from_train_only():
 def test_committed_retrieval_results_reproduce():
     committed = json.loads((REPO / "results/rag/retrieval.json").read_text(encoding="utf-8"))
     assert rmetrics.run(["tfidf", "bm25"], write=False) == committed
+
+
+# --- RAG prompt sets (tasks 3.5, 3.6) --------------------------------------------------------------
+
+def rag_rows(name, sub=""):
+    return [json.loads(l) for l in open(REPO / f"data/rag/image_table/{sub}{name}.jsonl", encoding="utf-8")]
+
+
+def test_rag_prompt_sets_rebuild_identically():
+    import hashlib
+    from rag import prompts
+    files, _ = prompts.build()
+    manifest = dict(reversed(l.split()) for l in (REPO / "data/rag/MANIFEST.txt").read_text().splitlines() if l)
+    assert set(manifest) == set(files)
+    for rel, rows in files.items():
+        text = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
+        assert hashlib.sha256(text.encode()).hexdigest() == manifest[rel], rel
+
+
+def test_rag_sets_pair_item_for_item_with_eval_a_and_only_the_table_differs():
+    from rag import prompts
+    test ={json.loads(l)["id"]: json.loads(l) for l in open(REPO / "data/v2.0/image_table/test.jsonl", encoding="utf-8")}
+    for name in ("rag_test", "rag_test_qo", "rag_test_withheld"):
+        rows = rag_rows(name)
+        assert [r["id"] for r in rows] == list(test)
+        for r in rows:
+            src = test[r["id"]]
+            assert r["input_text"] == src["input_text"]                           # grounding still vs the shown chart
+            assert r["messages"][2] == src["messages"][2] and r["messages"][0] == src["messages"][0]
+            text = r["messages"][1]["content"][1]["text"]
+            question = src["messages"][1]["content"][1]["text"].split("\n\nQuestion: ", 1)[1]
+            assert text.startswith(prompts.PREAMBLE + r["retrieved_table"]) and text.endswith("Question: " + question)
+            assert r["image"] == "../v2.0/" + src["image"]
+
+
+def test_withheld_rows_never_get_their_gold_table():
+    _, index = tables.load_corpus()
+    rows = rag_rows("rag_test_withheld")
+    held = [r for r in rows if r["withheld"]]
+    assert len(held) == 85 and all(r["retrieved_chart_id"] != index["records"][r["id"]]["gold_chart_id"] for r in held)
+
+
+def test_rag_sets_resolve_in_evaluate(tmp_path):
+    import evaluate
+    d = tmp_path / "run_x" / "adapter"
+    d.mkdir(parents=True)
+    (d / "adapter_model.safetensors").write_bytes(b"w")
+    (d / "train_config.json").write_text(json.dumps({"run_name": "run_x", "data_dir": "data/v2.0", "variant": "image_only",
+                                                     "targets": "reasoning", "max_pixels": 800 * 800}))
+    with pytest.raises(SystemExit):     # rag_test is a reported set
+        evaluate.resolve(evaluate.parse_args(["--split", "rag_test", "--adapter", str(d)]))
+    argv = ["--split", "rag_test", "--adapter", str(d), "--final-test"]
+    s = evaluate.resolve(evaluate.parse_args(argv))
+    assert s["variant"] == "image_table" and s["prompt_format_new_to_model"] and s["items_dir"] == "data/rag"
+    items, _, fp = evaluate.load_rows(s, "rag_test", evaluate.parse_args(argv))
+    assert len(items) == 180 and fp["data_dir"] == "data/rag"
+    s = evaluate.resolve(evaluate.parse_args(["--split", "rag_val", "--adapter", str(d)]))   # val-side: no --final-test
+    assert s["prompt_format_new_to_model"]
+
+
+# --- three-way comparison and retrieval-failure verdict (tasks 3.5, 3.6) ---------------------------
+
+def preds(correct, abstained=None, una=()):
+    return {i: {"id": i, "correct": c, "abstained": (abstained or {}).get(i, False),
+                "answer_type": "unanswerable" if i in una else "number"} for i, c in correct.items()}
+
+
+def test_threeway_marks_missing_conditions_and_pairs_the_rest():
+    import threeway
+    ids = [f"q{i}" for i in range(10)]
+    data = {"b": preds({i: n < 4 for n, i in enumerate(ids)}), "f": preds({i: n < 8 for n, i in enumerate(ids)})}
+    out = threeway.comparison({"base": "b", "fine-tuned": "f", "base+RAG": "missing"}, loader=data.get)
+    assert out["conditions"]["base+RAG"] == "NOT MEASURED"
+    assert out["conditions"]["fine-tuned"]["vs base"] == {"only_this": 4, "only_other": 0, "p": 0.125}
+
+
+def test_threeway_refuses_conditions_scored_on_different_rows():
+    import threeway
+    data = {"b": preds({"a": True, "b": False}), "f": preds({"a": True})}
+    with pytest.raises(SystemExit):
+        threeway.comparison({"base": "b", "fine-tuned": "f"}, loader=data.get)
+
+
+@pytest.mark.parametrize("rag_correct, rag_abstain, expected, over", [
+    ([1, 1, 1, 0], {}, "graceful", False),          # no lower than without RAG
+    ([1, 0, 0, 0], {}, "harmful", False),           # the wrong table misled it
+    ([1, 1, 1, 0], {"q3": True}, "graceful", True), # same accuracy, but it started refusing
+])
+def test_degradation_verdict(rag_correct, rag_abstain, expected, over):
+    import threeway
+    ids = ["q0", "q1", "q2", "q3"]
+    no_rag = preds({i: i != "q3" for i in ids})
+    rag = preds({i: bool(c) for i, c in zip(ids, rag_correct)}, rag_abstain)
+    v = threeway.verdict(rag, no_rag, ids)
+    assert (v["verdict"], v["over_abstention"]) == (expected, over)
