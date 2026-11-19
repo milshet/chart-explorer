@@ -284,3 +284,10 @@ def test_degradation_verdict(rag_correct, rag_abstain, expected, over):
     rag = preds({i: bool(c) for i, c in zip(ids, rag_correct)}, rag_abstain)
     v = threeway.verdict(rag, no_rag, ids)
     assert (v["verdict"], v["over_abstention"]) == (expected, over)
+
+
+def test_week3_report_draft_is_generated_and_says_what_is_missing():
+    import report_week3
+    text = report_week3.build()
+    assert "1168 tables / 7675 rows" in text and "NOT MEASURED" in text
+    assert (REPO / "docs/report_draft_week3.md").read_text(encoding="utf-8") == text
