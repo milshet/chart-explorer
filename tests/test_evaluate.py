@@ -344,3 +344,23 @@ def test_taxonomy_reconciles_with_every_committed_evaluation():
         assert sum(t["categories"].values()) == t["n"]
         committed = folder.parent / "taxonomy.json"
         assert committed.is_file() and json.loads(committed.read_text(encoding="utf-8")) == t
+
+
+# --- serving smoke (task 3.0f) ---------------------------------------------------------------------
+
+def test_serve_smoke_probe_is_answered_correctly_by_run_a_on_val():
+    import serve_smoke
+    item = serve_smoke.probe()
+    preds = {json.loads(l)["id"]: json.loads(l) for l in
+             open(REPO / "results/evals/run_a_r16-adapter_val_image_only_cot_0shot_bf16/predictions.jsonl", encoding="utf-8")}
+    assert scoring.score(item, preds[item["id"]]["raw"], "cot")["correct"]
+
+
+def test_serve_smoke_builds_an_openai_multimodal_request():
+    import serve_smoke
+    item = serve_smoke.probe()
+    msgs = serve_smoke.openai_messages(item, REPO / "data/v2.0" / item["image"])
+    assert msgs[0] == {"role": "system", "content": item["messages"][0]["content"]}
+    kinds = [c["type"] for c in msgs[1]["content"]]
+    assert kinds == ["image_url", "text"] and msgs[1]["content"][0]["image_url"]["url"].startswith("data:image/png;base64,")
+    assert msgs[1]["content"][1] == item["messages"][1]["content"][1]
