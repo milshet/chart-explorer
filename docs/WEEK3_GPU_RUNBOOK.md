@@ -184,8 +184,8 @@ sbatch slurm/judge.sbatch --name run_a_r16
 - **Commit and push** `results/judge/`.
 - **Delete the model:** `rm -rf ~/.cache/huggingface/hub/models--openai--gpt-oss-20b`
 - **Fallback, only if the model fails to load or run** (an error in `logs/chartqa-judge-<JOB_ID>.err`, never because
-  of the verdicts): download `flowaicom/Flow-Judge-v0.1`, then
-  `sbatch slurm/judge.sbatch --name run_a_r16 --model flowaicom/Flow-Judge-v0.1`
+  of the verdicts): delete gpt-oss-20b first, download `microsoft/Phi-4-mini-instruct` (~7.7 GB), then
+  `sbatch slurm/judge.sbatch --name run_a_r16 --model microsoft/Phi-4-mini-instruct`
 
 ### 6c. Served latency (3.14): two jobs, ~10 min each, ~7 GB each, written and deleted per job
 

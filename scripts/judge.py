@@ -27,8 +27,9 @@ image, so it grades against the table, which is the ground truth the labels came
 The local judge (plan §9 decision 13) is openai/gpt-oss-20b: not Qwen, so it does not grade its own family; free and
 ungated; a reasoning model, which the grounding axis needs (it checks computations against the table). Greedy
 decoding, reasoning effort low, and only the final channel of its reply is parsed. Its fallback,
-flowaicom/Flow-Judge-v0.1, is used only if gpt-oss-20b fails to load, never after reading verdicts. The summary
-records the judge model, its snapshot revision, the backend, the decoding and the commit.
+microsoft/Phi-4-mini-instruct, follows the same JSON rubric (no code change) and is used only if gpt-oss-20b fails
+to load, never after reading verdicts. The summary records the judge model, its snapshot revision, the backend, the
+decoding and the commit.
 """
 import argparse
 import collections
@@ -49,7 +50,7 @@ VERDICTS = ("yes", "no", "n/a")
 SAMPLE = {"test": 60, "eval_c": 20}   # cut rule: the judge sample size is the second thing cut if the week runs short
 SEED = 61003
 MODEL = "claude-opus-5-5"            # --backend anthropic
-LOCAL_MODEL = "openai/gpt-oss-20b"   # --backend local (decision 13); fallback flowaicom/Flow-Judge-v0.1
+LOCAL_MODEL = "openai/gpt-oss-20b"   # --backend local (decision 13); fallback microsoft/Phi-4-mini-instruct
 LOCAL_MAX_NEW_TOKENS = 1024          # reasoning + verdict; a reply cut off before its verdict is excluded, and counted
 REASONING_EFFORT = "low"
 RUBRIC = """You are grading one answer from a chart question-answering system used in regulated financial reporting.

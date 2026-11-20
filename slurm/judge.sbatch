@@ -5,7 +5,7 @@
 #   python scripts/judge.py sample --name run_a_r16                  # once; commit results/judge/run_a_r16/sample.jsonl
 #   python scripts/judge.py run --name run_a_r16 --dry-run           # login shell: renders the prompts, no GPU
 #   sbatch slurm/judge.sbatch --name run_a_r16
-#   sbatch slurm/judge.sbatch --name run_a_r16 --model flowaicom/Flow-Judge-v0.1   # fallback, only if gpt-oss fails to load
+#   sbatch slurm/judge.sbatch --name run_a_r16 --model microsoft/Phi-4-mini-instruct   # fallback, only if gpt-oss fails to load
 #   tail -f logs/chartqa-judge-<JOB_ID>.out
 #
 # Results: results/judge/<name>/judged.jsonl and summary.json (judge model, revision, decoding, commit).
