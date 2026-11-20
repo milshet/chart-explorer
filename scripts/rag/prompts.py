@@ -65,7 +65,13 @@ def build():
     by_id = {t["chart_id"]: t for t in corpus}
     chunking, kind = chosen()
     chunks = C.build(corpus, chunking)
-    full = R.make(chunks, kind)
+    by_plan = {}   # a reranker's depth depends on the query plan; the lexical and embedding retrievers do not
+
+    def retriever(plan):
+        key = plan if R.is_reranker(kind) else None
+        if key not in by_plan:
+            by_plan[key] = R.make(chunks, kind, plan=plan)
+        return by_plan[key]
     out, stats = {}, {}
     for name, (split, plan, withhold) in SETS.items():
         withheld = set()
@@ -79,7 +85,7 @@ def build():
             for rec in T.read_jsonl(T.DATA / "image_table" / f"{sub}{split}.jsonl"):
                 j = index["records"][rec["id"]]
                 text, _ = Q.build(rec["question"], plan, by_id[j["image_chart_id"]])
-                ranked = R.rank_tables(full, text, k=6)
+                ranked = R.rank_tables(retriever(plan), text, k=6)
                 if rec["id"] in withheld:
                     ranked = [c for c in ranked if c != j["gold_chart_id"]]
                 top = ranked[0]

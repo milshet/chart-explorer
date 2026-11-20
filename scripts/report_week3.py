@@ -67,9 +67,9 @@ def build():
     out += ["## Retrieval (3.1–3.4)", "",
             f"Chosen on {r['selection']['n']} train rows ({r['chosen_basis']}): {ch['chunking']} chunks, {ch['retriever']}.",
             "Embedding retriever against the lexical floor: "
-            + ("measured." if any(x["retriever"] == "embed" for x in r["selection"]["results"]) else NM) , "",
+            + ("measured." if any(x["retriever"].startswith("embed") for x in r["selection"]["results"]) else NM) , "",
             "| Split / query plan | recall@1 | recall@3 | recall@5 | MRR | n scorable | n unscorable |", "|---|---|---|---|---|---|---|"]
-    if not any(x["retriever"] == "embed" for x in r["selection"]["results"]):
+    if not any(x["retriever"].startswith("embed") for x in r["selection"]["results"]):
         gaps.append("no embedding model compared against the lexical floor (task 3.3)")
     for k, m in r["headline"].items():
         out.append(f"| {k} | {m['recall@1']} | {m['recall@3']} | {m['recall@5']} | {m['mrr']} | {m['n_scorable']} | {m['n_unscorable']} |")

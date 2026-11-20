@@ -3,7 +3,7 @@
 
   python scripts/rag/metrics.py                 # selection set: every chunking x plan x lexical retriever
   python scripts/rag/metrics.py --write         # also score the chosen config on val and test; write results/rag/
-  python scripts/rag/metrics.py --retrievers bm25 tfidf embed --write   # on VM03, with sentence-transformers
+  python scripts/rag/metrics.py --retrievers all --write   # on VM03 in ~/venv-embed: + 4 embedders, 2 rerankers
 
 recall@1/3/5 and MRR, separately from answer quality. Rows whose gold table is undefined (the ~5% unanswerable
 items pair a question with an unrelated chart) are excluded from the denominator and reported as n_unscorable:
@@ -13,7 +13,11 @@ Chunking, retriever and query plan are choices made by looking at a number, so t
 drawn from the training freeze (SELECTION_N rows, seed 41003), never on the reported split: val selects / test
 reports, one level out from checkpoints. Both figures are written, the selection one (what decided) and the
 headline one (what the report quotes, with its n). If every configuration scores 1.0 at some k, the metric is
-saturated there and the choice is made on MRR, which the output says.
+saturated there and the choice is made on MRR, which the output says. An exact tie goes to the lexical retriever,
+which has no model to serve (tasks 3.10, 3.11).
+
+Rerankers run over whole-table chunks only (they read whole tables), at the depth retrieve.RERANK_DEPTH sets per
+query plan; each reranker row carries BM25's recall at that depth as "ceiling", the most any reordering can reach.
 """
 import argparse
 import json
@@ -49,7 +53,7 @@ def selection_rows(index):
 
 
 def score(rows, retriever, plan, tables_by_id):
-    ranks, leaks, per_row = [], 0, []
+    ranks, leaks, per_row, first = [], 0, [], []
     for r in rows:
         # the query is built from the chart the user sees (its labels), which for an unanswerable row is the
         # unrelated chart shown, not the question's own
@@ -60,22 +64,27 @@ def score(rows, retriever, plan, tables_by_id):
             continue
         ranked = R.rank_tables(retriever, text)
         rank = ranked.index(r["gold"]) + 1 if r["gold"] in ranked else None
+        if hasattr(retriever, "first"):
+            first.append(r["gold"] in R.rank_tables(retriever.first, text, k=retriever.depth))
         ranks.append(rank)
         per_row.append({"id": r["id"], "rank": rank, "top": ranked[:5]})
     n = len(ranks)
     out = {f"recall@{k}": round(sum(1 for x in ranks if x and x <= k) / n, 4) for k in KS}
     out.update({"mrr": round(sum(1 / x for x in ranks if x) / n, 4), "n_scorable": n,
                 "n_unscorable": len(rows) - n, "question_value_leaks": leaks})
+    if first:
+        out[f"ceiling_recall@{retriever.depth}"] = round(sum(first) / n, 4)
     return out, per_row
 
 
 def configs(retrievers):
-    return [(s, p, r) for s in C.STRATEGIES for p in Q.PLANS for r in retrievers]
+    return [(s, p, r) for s in C.STRATEGIES for p in Q.PLANS for r in retrievers
+            if not (R.is_reranker(r) and s != "whole_table")]
 
 
 def choose(results):
-    """The best config on the selection set: recall@1, then MRR. Says when recall@1 is saturated."""
-    best = max(results, key=lambda x: (x["metrics"]["recall@1"], x["metrics"]["mrr"]))
+    """The best config on the selection set: recall@1, then MRR, then lexical. Says when recall@1 is saturated."""
+    best = max(results, key=lambda x: (x["metrics"]["recall@1"], x["metrics"]["mrr"], x["retriever"] in R.LEXICAL))
     saturated = sum(x["metrics"]["recall@1"] == 1.0 for x in results) > 1
     return best, ("mrr (recall@1 saturated)" if saturated else "recall@1, then mrr")
 
@@ -87,20 +96,27 @@ def run(retrievers, write):
     built = {s: C.build(corpus_rows, s) for s in C.STRATEGIES}
     cache, results = {}, []
     for strategy, plan, kind in configs(retrievers):
-        if (strategy, kind) not in cache:
-            cache[(strategy, kind)] = R.make(built[strategy], kind)
-        m, _ = score(sel, cache[(strategy, kind)], plan, tables_by_id)
-        results.append({"chunking": strategy, "plan": plan, "retriever": kind, "metrics": m})
-        print(f"selection  {strategy:12} {plan:15} {kind:6} " + "  ".join(f"{k} {v}" for k, v in m.items()))
+        key = (strategy, kind, plan if R.is_reranker(kind) else None)
+        if key not in cache:
+            cache[key] = R.make(built[strategy], kind, plan=plan)
+        retr = cache[key]
+        m, _ = score(sel, retr, plan, tables_by_id)
+        row = {"chunking": strategy, "plan": plan, "retriever": kind, "metrics": m}
+        if hasattr(retr, "info"):
+            row["model"] = dict(retr.info)
+        results.append(row)
+        print(f"selection  {strategy:12} {plan:15} {kind:28} " + "  ".join(f"{k} {v}" for k, v in m.items()))
     best, basis = choose(results)
     print(f"chosen on the selection set ({basis}): {best['chunking']} / {best['plan']} / {best['retriever']}")
     report = {"corpus_sha256": index["stats"]["corpus_sha256"], "selection": {"n": len(sel), "seed": SELECTION_SEED,
               "from": "train", "results": results}, "chosen": {k: best[k] for k in ("chunking", "plan", "retriever")},
               "chosen_basis": basis, "headline": {}}
-    retr = cache[(best["chunking"], best["retriever"])]
     for split in ("val", "test"):
         for plan in Q.PLANS:   # the bracket: both plans on the chosen chunking and retriever
-            m, per_row = score(eval_rows(split, index), retr, plan, tables_by_id)
+            key = (best["chunking"], best["retriever"], plan if R.is_reranker(best["retriever"]) else None)
+            if key not in cache:
+                cache[key] = R.make(built[best["chunking"]], best["retriever"], plan=plan)
+            m, per_row = score(eval_rows(split, index), cache[key], plan, tables_by_id)
             report["headline"][f"{split}/{plan}"] = m
             print(f"{split:9}  {plan:15} " + "  ".join(f"{k} {v}" for k, v in m.items()))
             if write:
@@ -114,10 +130,11 @@ def run(retrievers, write):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--retrievers", nargs="+", default=["tfidf", "bm25"], choices=R.RETRIEVERS)
+    ap.add_argument("--retrievers", nargs="+", default=list(R.LEXICAL), choices=R.RETRIEVERS + ("all",),
+                    help="'all' = every lexical, embedding and reranking retriever")
     ap.add_argument("--write", action="store_true")
     args = ap.parse_args()
-    run(args.retrievers, args.write)
+    run(list(R.RETRIEVERS) if "all" in args.retrievers else args.retrievers, args.write)
 
 
 if __name__ == "__main__":

@@ -180,6 +180,94 @@ def test_chunks_collapse_to_tables_before_k():
     assert rretrieve.rank_tables(r, "emea revenue q3", k=2) == ["a", "b"]   # two chunks of a count once
 
 
+class _FakeTokenizer:
+    def __call__(self, a, b=None):
+        texts = a if b is None else [x + " " + y for x, y in zip(a, b)]
+        return {"input_ids": [t.split() for t in texts]}   # one "token" per word
+
+
+@pytest.fixture
+def fake_st(monkeypatch):
+    """sentence_transformers stand-in: embeds by keyword, cross-scores by word overlap, records what it was given."""
+    import types
+
+    import numpy as np
+    seen = {"encode": [], "pairs": []}
+
+    class SentenceTransformer:
+        max_seq_length = 4
+
+        def __init__(self, model_id):
+            self.tokenizer = _FakeTokenizer()
+
+        def encode(self, texts, normalize_embeddings=True, batch_size=32):
+            seen["encode"] += texts
+            return np.array([[float("emea" in t), float("apac" in t), 1.0] for t in texts])
+
+    class CrossEncoder:
+        def __init__(self, model_id, max_length):
+            self.tokenizer = _FakeTokenizer()
+
+        def predict(self, pairs, batch_size=32, show_progress_bar=False):
+            seen["pairs"] += pairs
+            return [len(set(q.split()) & set(t.split())) + 2 * ("apac" in t) for q, t in pairs]
+
+    monkeypatch.setitem(sys.modules, "sentence_transformers",
+                        types.SimpleNamespace(SentenceTransformer=SentenceTransformer, CrossEncoder=CrossEncoder))
+    return seen
+
+
+TABLES = [{"chart_id": "a", "chunk_id": "a#0", "text": "revenue emea q3"},
+          {"chart_id": "b", "chunk_id": "b#0", "text": "revenue apac q3"},
+          {"chart_id": "c", "chunk_id": "c#0", "text": "headcount emea"}]
+
+
+def test_embedding_applies_the_model_cards_prefixes_and_counts_truncation(fake_st):
+    r = rretrieve.make(TABLES, "embed:e5-small")
+    assert fake_st["encode"][:3] == ["passage: " + t["text"] for t in TABLES]
+    assert r.info["passages_truncated"] == 0 and r.info["max_seq_length"] == 4
+    rretrieve.rank_tables(r, "emea revenue")
+    assert fake_st["encode"][-1] == "query: emea revenue"
+    assert rretrieve.make(TABLES, "embed:bge-small").info["passages_truncated"] == 0
+    assert fake_st["encode"][-1] == "headcount emea"                         # bge: no passage prefix
+
+
+def test_reranker_reorders_only_its_depth_and_reports_its_ceiling(fake_st, monkeypatch):
+    monkeypatch.setitem(rretrieve.RERANK_DEPTH, "chart_metadata", 2)
+    r = rretrieve.make(TABLES, "bm25>rerank:ms-marco-minilm", plan="chart_metadata")
+    first = rretrieve.rank_tables(r.first, "emea revenue q3")
+    assert first == ["a", "b", "c"]
+    assert rretrieve.rank_tables(r, "emea revenue q3") == ["b", "a", "c"]   # head reordered, tail kept
+    assert [t for _, t in fake_st["pairs"]] == ["revenue emea q3", "revenue apac q3"]
+    assert (r.info["pairs"], r.info["depth"]) == (2, 2)
+    with pytest.raises(ValueError):
+        rretrieve.make(TABLES, "bm25>rerank:ms-marco-minilm")              # depth needs the plan
+    with pytest.raises(ValueError):
+        rretrieve.make(TABLES + [{"chart_id": "a", "chunk_id": "a#1", "text": "x"}],
+                       "bm25>rerank:ms-marco-minilm", plan="chart_metadata")   # row-group chunks refused
+
+
+def test_reranker_rows_score_their_bm25_ceiling(fake_st, monkeypatch):
+    monkeypatch.setitem(rretrieve.RERANK_DEPTH, "question_only", 1)
+    r = rretrieve.make(TABLES, "bm25>rerank:ms-marco-minilm", plan="question_only")
+    t = {"chart_id": "b", "title": "", "category_axis": "", "series": [], "columns": [], "rows": []}
+    rows = [{"id": "x", "question": "emea revenue q3", "image_chart_id": "b", "gold": "b"}]
+    m, _ = rmetrics.score(rows, r, "question_only", {"b": t})
+    assert m["ceiling_recall@1"] == 0.0 and m["recall@1"] == 0.0   # BM25 put "a" first; depth 1 can't recover b
+
+
+def test_retriever_names_configs_and_ties():
+    assert "embed" not in rretrieve.RETRIEVERS and "embed:bge-base" in rretrieve.RETRIEVERS
+    with pytest.raises(ValueError):
+        rretrieve.make(TABLES, "embed:unknown")
+    cfg = rmetrics.configs(["bm25", "bm25>rerank:bge-reranker-base"])
+    assert all(s == "whole_table" for s, _, r in cfg if r != "bm25")
+    m = {"recall@1": 0.9, "mrr": 0.95}
+    tie = [{"retriever": "embed:bge-base", "metrics": m}, {"retriever": "bm25", "metrics": m},
+           {"retriever": "bm25>rerank:ms-marco-minilm", "metrics": m}]
+    assert rmetrics.choose(tie)[0]["retriever"] == "bm25"                  # an exact tie goes to the lexical floor
+
+
 def test_unanswerable_rows_are_unscorable_not_misses():
     corpus, index = tables.load_corpus()
     rows = rmetrics.eval_rows("test", index)
