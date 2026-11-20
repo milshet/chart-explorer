@@ -408,6 +408,15 @@ def test_judge_sample_mixes_eval_a_and_eval_c():
     assert len(evc) == judge.SAMPLE["eval_c"] and all(r["gold"] is None for r in evc)
 
 
+def test_judge_grades_the_served_condition_of_exactly_that_run():
+    import judge
+    # run_a_r16 must not pick up run_a_r16_table / _vision or its own RAG folder, all of which sort near it
+    assert judge.eval_folder("run_a_r16", "test").name == "run_a_r16-adapter_test_image_only_cot_0shot_bf16"
+    assert judge.eval_folder("run_a_r16", "eval_c").name == "run_a_r16-adapter_eval_c_image_only_cot_0shot_bf16"
+    with pytest.raises(ValueError):
+        judge.eval_folder("base", "test")                  # three prompt settings: ambiguous, so it refuses
+
+
 def test_judge_sample_reports_a_missing_split(monkeypatch):
     import judge
     real = judge.eval_folder
@@ -415,3 +424,36 @@ def test_judge_sample_reports_a_missing_split(monkeypatch):
     rows, missing = judge.draw("run_a_r16-adapter")
     assert missing == ["eval_c"]                            # not scored on Eval-C: said, not silently skipped
     assert {r["split"] for r in rows} == {"test"}
+
+
+# --- local judge backend (task 3.13); no model is loaded -------------------------------------------
+
+@pytest.mark.parametrize("raw, final", [
+    ('<|channel|>analysis<|message|>maybe {"correctness": "no"}<|end|><|start|>assistant<|channel|>final<|message|>'
+     '{"correctness": "yes", "grounding": "yes", "abstention": "yes"}<|return|>',
+     '{"correctness": "yes", "grounding": "yes", "abstention": "yes"}'),        # reasoning's JSON is not the verdict
+    ('<|channel|>analysis<|message|>still thinking {"correctness": "no"', ""),   # cut off before the final channel
+    ('{"correctness": "no", "grounding": "n/a", "abstention": "yes"}<|endoftext|>',
+     '{"correctness": "no", "grounding": "n/a", "abstention": "yes"}'),         # a model without channels
+])
+def test_judge_reads_only_the_final_channel(raw, final):
+    import judge
+    assert judge.final_text(raw) == final
+
+
+def test_local_judge_rows_exclude_cut_off_replies_and_keep_raw():
+    import judge
+    v = '{"correctness": "yes", "grounding": "no", "abstention": "yes"}'
+    replies = {"a": f"<|channel|>final<|message|>{v}<|return|>", "b": "<|channel|>analysis<|message|>hmm", "c": None}
+    rows = [{"id": k, "scorer_evidence": [1, 1]} for k in replies]
+    judged = judge.judge_rows(rows, lambda r: (replies[r["id"]], {"new_tokens": 7}))
+    assert [bool(j["verdict"]) for j in judged] == [True, False, False]
+    assert judged[1]["judge_raw"] == replies["b"] and judged[0]["new_tokens"] == 7
+    assert judge.summarise(judged)["n_excluded"] == 2
+
+
+def test_judge_defaults_to_the_free_local_model():
+    import judge
+    assert judge.LOCAL_MODEL == "openai/gpt-oss-20b" and "qwen" not in judge.LOCAL_MODEL.lower()
+    text = (REPO / "slurm/judge.sbatch").read_text(encoding="utf-8")
+    assert "HF_HUB_OFFLINE=1" in text and 'scripts/judge.py run "$@"' in text

@@ -2,7 +2,8 @@
 """LLM-as-judge rubric (task 3.7): correctness, grounding and appropriate abstention, graded independently.
 
   python scripts/judge.py sample --name run_a_r16             # draw the judged sample; writes results/judge/<name>/sample.jsonl
-  python scripts/judge.py run --name run_a_r16                # call the judge (needs Anthropic credentials; costs money)
+  sbatch slurm/judge.sbatch --name run_a_r16                  # judge it locally on VM03 (default, free; task 3.13)
+  python scripts/judge.py run --name run_a_r16 --backend anthropic   # or via the API (credentials; costs money)
   python scripts/judge.py spotcheck --name run_a_r16          # write judge_spot_check.jsonl for two human graders
   python scripts/judge.py agree --name run_a_r16              # judge vs humans: raw agreement AND Cohen's kappa
 
@@ -22,12 +23,20 @@ on a 90/10 split is what always-say-yes scores.
 
 The judge reads text only (question, gold answer, the chart's data table, the model's output); it never sees the
 image, so it grades against the table, which is the ground truth the labels came from.
+
+The local judge (plan §9 decision 13) is openai/gpt-oss-20b: not Qwen, so it does not grade its own family; free and
+ungated; a reasoning model, which the grounding axis needs (it checks computations against the table). Greedy
+decoding, reasoning effort low, and only the final channel of its reply is parsed. Its fallback,
+flowaicom/Flow-Judge-v0.1, is used only if gpt-oss-20b fails to load, never after reading verdicts. The summary
+records the judge model, its snapshot revision, the backend, the decoding and the commit.
 """
 import argparse
 import collections
 import json
 import random
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -39,7 +48,10 @@ AXES = ("correctness", "grounding", "abstention")
 VERDICTS = ("yes", "no", "n/a")
 SAMPLE = {"test": 60, "eval_c": 20}   # cut rule: the judge sample size is the second thing cut if the week runs short
 SEED = 61003
-MODEL = "claude-opus-5-5"
+MODEL = "claude-opus-5-5"            # --backend anthropic
+LOCAL_MODEL = "openai/gpt-oss-20b"   # --backend local (decision 13); fallback flowaicom/Flow-Judge-v0.1
+LOCAL_MAX_NEW_TOKENS = 1024          # reasoning + verdict; a reply cut off before its verdict is excluded, and counted
+REASONING_EFFORT = "low"
 RUBRIC = """You are grading one answer from a chart question-answering system used in regulated financial reporting.
 You see the question, the gold answer, the chart's underlying data table, and the system's raw output (JSON with
 evidence, rationale, answer_type, unit, answer). Grade three axes independently:
@@ -56,8 +68,14 @@ Reply with only a JSON object: {"correctness": "yes"|"no"|"n/a", "grounding": "y
 
 
 def eval_folder(name, split):
-    matches = sorted(p.parent for p in (REPO / "results/evals").glob(f"{name}*_{split}_*/summary.json")
-                     if "_limit" not in p.parent.name)
+    """The model's image-only evaluation on a split: the served condition, never a RAG one. `name` is the run
+    (adapter evals are '<run>-adapter_...') and must match exactly, so run_a_r16 never picks up run_a_r16_table,
+    run_a_r16_vision or a RAG folder. More than one match (the base model has several prompt settings) raises."""
+    evals = REPO / "results/evals"
+    matches = sorted(p.parent for pat in (f"{name}-adapter_{split}_image_only_*", f"{name}_{split}_image_only_*")
+                     for p in evals.glob(f"{pat}/summary.json") if "_limit" not in p.parent.name)
+    if len(matches) > 1:
+        raise ValueError(f"{name} has {len(matches)} {split} evaluations; judge one: {[m.name for m in matches]}")
     return matches[0] if matches else None
 
 
@@ -116,6 +134,59 @@ def call_judge(client, row, model):
     return text, response._request_id
 
 
+def final_text(text):
+    """The final answer of a reply. gpt-oss writes an analysis channel, then a final one; only the final is the
+    verdict (its reasoning may quote JSON). Replies with no channel markers are returned whole."""
+    marker = "<|channel|>final<|message|>"
+    if marker in text:
+        text = text.rsplit(marker, 1)[1]
+    elif "<|channel|>" in text:
+        return ""                                       # reasoning only: cut off before it reached a verdict
+    for end in ("<|return|>", "<|end|>", "<|endoftext|>"):
+        text = text.split(end, 1)[0]
+    return text.strip()
+
+
+class LocalJudge:
+    """A Hugging Face chat model on the local GPU: loaded once, greedy, chat template applied by the tokenizer."""
+
+    def __init__(self, model_id):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from rag.retrieve import snapshot
+        self.torch, self.model_id, self.revision = torch, model_id, snapshot(model_id)
+        self.tok = AutoTokenizer.from_pretrained(model_id)
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype="auto", device_map="cuda")
+        self.model.eval()
+
+    def __call__(self, row):
+        msgs = [{"role": "system", "content": RUBRIC}, {"role": "user", "content": prompt(row)}]
+        # reasoning_effort is read by gpt-oss's chat template and ignored by templates that do not use it
+        ids = self.tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt", return_dict=True,
+                                           reasoning_effort=REASONING_EFFORT).to(self.model.device)
+        with self.torch.inference_mode():
+            out = self.model.generate(**ids, do_sample=False, max_new_tokens=LOCAL_MAX_NEW_TOKENS)
+        new = out[0, ids["input_ids"].shape[1]:]
+        return self.tok.decode(new, skip_special_tokens=False), {"new_tokens": int(new.shape[0])}
+
+
+def judge_rows(rows, ask):
+    """Every sampled row with the judge's raw reply and its verdict; ask(row) -> (raw text or None, extra dict)."""
+    judged = []
+    for i, r in enumerate(rows, 1):
+        raw, extra = ask(r)
+        judged.append({**r, "judge_raw": raw, **extra, "verdict": parse(final_text(raw)) if raw else None})
+        print(f"  {i}/{len(rows)} {r['id']} {'ok' if judged[-1]['verdict'] else 'EXCLUDED'}", flush=True)
+    return judged
+
+
+def commit():
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO, capture_output=True, text=True).stdout.strip()
+    except OSError:
+        return None
+
+
 def summarise(judged):
     ok = [j for j in judged if j["verdict"]]
     out = {"n": len(judged), "n_excluded": len(judged) - len(ok)}
@@ -144,8 +215,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("step", choices=("sample", "run", "spotcheck", "agree"))
     ap.add_argument("--name", required=True, help="evaluation folder prefix, e.g. run_a_r16")
-    ap.add_argument("--model", default=MODEL)
+    ap.add_argument("--backend", choices=("local", "anthropic"), default="local")
+    ap.add_argument("--model", help=f"default: {LOCAL_MODEL} (local) or {MODEL} (anthropic)")
+    ap.add_argument("--dry-run", action="store_true", help="run step, local backend: render the prompts, no GPU")
     args = ap.parse_args()
+    args.model = args.model or (LOCAL_MODEL if args.backend == "local" else MODEL)
     d = OUT / args.name
     d.mkdir(parents=True, exist_ok=True)
     if args.step == "sample":
@@ -153,15 +227,38 @@ def main():
         (d / "sample.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8", newline="\n")
         print(f"{len(rows)} rows; not yet evaluated, so not sampled: {missing or 'none'}")
     elif args.step == "run":
-        import anthropic
-        client = anthropic.Anthropic()
         rows = [json.loads(l) for l in open(d / "sample.jsonl", encoding="utf-8")]
-        judged = []
-        for r in rows:
-            text, req = call_judge(client, r, args.model)
-            judged.append({**r, "judge_model": args.model, "judge_raw": text, "request_id": req, "verdict": parse(text)})
+        if args.dry_run:   # login shell, no GPU: the chat template renders and the prompts fit
+            from transformers import AutoTokenizer
+            tok = AutoTokenizer.from_pretrained(args.model)
+            texts = [tok.apply_chat_template([{"role": "system", "content": RUBRIC}, {"role": "user", "content": prompt(r)}],
+                                             add_generation_prompt=True, tokenize=False, reasoning_effort=REASONING_EFFORT)
+                     for r in rows]
+            lengths = [len(tok(t, add_special_tokens=False)["input_ids"]) for t in texts]
+            print(texts[0][-600:])
+            print(f"\n{len(rows)} prompts, {min(lengths)}-{max(lengths)} tokens; reasoning effort "
+                  f"{'in template' if 'Reasoning: ' + REASONING_EFFORT in texts[0] else 'NOT in template'}")
+            print("JUDGE_DRY_RUN_OK")
+            return
+        t0 = time.monotonic()
+        if args.backend == "local":
+            ask = LocalJudge(args.model)
+            meta = {"judge_revision": ask.revision, "decoding": "greedy", "max_new_tokens": LOCAL_MAX_NEW_TOKENS,
+                    "reasoning_effort": REASONING_EFFORT}
+        else:
+            import anthropic
+            client = anthropic.Anthropic()
+
+            def ask(r):
+                text, req = call_judge(client, r, args.model)
+                return text, {"request_id": req}
+            meta = {"effort": "medium"}
+        judged = judge_rows(rows, ask)
         (d / "judged.jsonl").write_text("".join(json.dumps(j, ensure_ascii=False) + "\n" for j in judged), encoding="utf-8", newline="\n")
-        s = summarise(judged)
+        s = {"judge_model": args.model, "backend": args.backend, **meta, "commit": commit(),
+             "minutes": round((time.monotonic() - t0) / 60, 1), **summarise(judged)}
+        if args.backend == "local":
+            s["peak_gpu_memory_mib"] = round(ask.torch.cuda.max_memory_allocated() / 2**20)
         (d / "summary.json").write_text(json.dumps(s, indent=1) + "\n", encoding="utf-8", newline="\n")
         print(json.dumps(s, indent=1))
     elif args.step == "spotcheck":
