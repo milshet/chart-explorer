@@ -1,0 +1,44 @@
+{
+ "judge_model": "arena-education/Llama-3.1-8B-Instruct-bnb-8bit",
+ "backend": "local",
+ "judge_revision": "dc7b239966c829a1e21fa9e2c7f59e89b3c2c306",
+ "decoding": "greedy",
+ "max_new_tokens": 1024,
+ "reasoning_effort": "low",
+ "commit": "6fb6ba2015db64bf29b75753c11d69d949104653",
+ "minutes": 5.7,
+ "n": 80,
+ "n_excluded": 0,
+ "correctness": {
+  "yes": 47,
+  "n": 58
+ },
+ "grounding": {
+  "yes": 57,
+  "n": 72
+ },
+ "abstention": {
+  "yes": 57,
+  "n": 80
+ },
+ "grounding_disagreements": [
+  "test-multi_col_60240-999",
+  "test-multi_col_60911-1037",
+  "test-multi_col_60928-1041",
+  "test-multi_col_80177-1060",
+  "test-multi_col_805-896",
+  "test-multi_col_970-905",
+  "test-two_col_100718-670",
+  "test-two_col_1716-716",
+  "test-two_col_20322-758",
+  "test-two_col_22179-770",
+  "test-two_col_24274-793",
+  "test-two_col_3582-739",
+  "test-two_col_4148-743",
+  "test-two_col_81937-651",
+  "eval_c-023-category_absent",
+  "eval_c-035-not_in_chart",
+  "eval_c-042-requires_external_knowledge"
+ ],
+ "peak_gpu_memory_mib": 8893
+}
