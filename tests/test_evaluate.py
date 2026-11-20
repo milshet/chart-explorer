@@ -519,3 +519,5 @@ def test_judge_review_page_is_generated_and_uses_the_judges_rubric():
     assert ".verdict" not in html and "judge_raw" not in html   # the page never reads the judge's fields...
     for line in open(REPO / "results/judge/run_a_r16/judge_spot_check.jsonl", encoding="utf-8"):
         assert set(json.loads(line)) == {"id", "question", "gold", "table", "raw", "grader_1", "grader_2"}  # ...nor has them
+    images = page.chart_images()   # every spot-check row has its chart, and the path resolves from audit/
+    assert images and all((REPO / "audit" / p).resolve().is_file() for p in images.values())

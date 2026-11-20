@@ -9,8 +9,9 @@ browser asks for permission once); other browsers download the updated file inst
 Then: python scripts/judge.py agree --name <run>.
 
 What the page guarantees, because kappa is only meaningful if they hold:
-  - graders see exactly what the judge saw: question, gold answer, the data table and the model's raw output, no
-    chart image, and the rubric text below is judge.RUBRIC's own axis definitions, so the two grade the same task;
+  - graders see what the judge saw: question, gold answer, the data table and the model's raw output, and the
+    rubric text below is judge.RUBRIC's own axis definitions, so the two grade the same task. The chart image, which
+    the judge did not see, sits in a closed panel for checking a reading; the table stays the ground truth;
   - a grader never sees the judge's verdicts or the other grader's;
   - Submit re-reads the file and replaces only this grader's "grader_N" object on each line, byte for byte everything
     else, so the two graders can submit in either order without overwriting each other;
@@ -27,6 +28,24 @@ sys.path.insert(0, str(REPO / "scripts"))
 import judge  # noqa: E402
 
 OUT = REPO / "audit" / "judge_review.html"
+RECORDS = [*sorted((REPO / "data/v2.0/image_only").glob("*.jsonl")), REPO / "data/eval_c/image_only/eval_c.jsonl"]
+
+
+def chart_images():
+    """Row id -> chart image path relative to audit/, for every row of every committed spot-check file."""
+    want = {json.loads(l)["id"] for f in sorted((REPO / "results/judge").glob("*/judge_spot_check.jsonl"))
+            for l in f.read_text(encoding="utf-8").splitlines() if l.strip()}
+    found = {}
+    for f in RECORDS:
+        for line in f.read_text(encoding="utf-8").splitlines():
+            r = json.loads(line)
+            if r["id"] in want:
+                # image paths are relative to the dataset version folder (v2.0) or to data/eval_c (eval_c)
+                img = next(q for q in (REPO / "data/v2.0" / r["image"], f.parents[1] / r["image"]) if q.is_file())
+                found[r["id"]] = "../" + img.resolve().relative_to(REPO).as_posix()
+    missing = want - found.keys()
+    assert not missing, f"no chart image for {sorted(missing)}"
+    return dict(sorted(found.items()))
 
 
 def axis_definitions():
@@ -66,6 +85,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .out dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:0}.out dt{color:var(--soft)}.out dd{margin:0;font-weight:600;overflow-wrap:anywhere}
 .out ul{margin:0;padding-left:18px;font-weight:500}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:var(--bg);padding:8px;border-radius:6px;margin:6px 0 0}
+details.chart img{display:block;max-width:100%;margin-top:8px;border:1px solid var(--line);border-radius:6px;background:#fff}
 details summary{cursor:pointer;color:var(--soft);font-size:13px;margin-top:8px}
 .ax{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.ax:first-of-type{border-top:0;padding-top:0}
 .ax h3{margin:0;font-size:16px;text-transform:capitalize}.ax p{margin:4px 0 8px;color:var(--soft);font-size:13px}
@@ -86,6 +106,7 @@ button.sec{background:#c9d3e3;color:#14213d}button.go{background:var(--yes)}butt
 <script>
 const AXES = __AXES__;
 const DEFS = __DEFS__;
+const IMAGES = __IMAGES__;
 const CHOICES = {correctness: ["yes", "no", "n/a"], grounding: ["yes", "no", "n/a"], abstention: ["yes", "no"]};
 const FS = "showOpenFilePicker" in window;
 const S = {grader: null, rows: [], text: "", name: "", handle: null, grades: {}, i: 0, status: ""};
@@ -191,7 +212,7 @@ function render() {
   if (!S.rows.length) {
     app.innerHTML = `<div class="start"><h1>Judge spot-check</h1>
       <p class="hint">Task 3.7. You grade a sample of the model's answers on the same three axes as the LLM judge. Your verdicts and the other grader's are compared with the judge's (Cohen's κ), so <b>grade on your own</b>: don't look at or discuss the other grader's answers until you've both submitted.</p>
-      <div class="rule">You see exactly what the judge saw: the question, the gold answer, the chart's data table and the model's output. There is no chart image, on purpose. Judge each axis <b>independently</b>: a right decision to answer is still "yes" on abstention even if the answer is wrong.</div>
+      <div class="rule">You see exactly what the judge saw: the question, the gold answer, the chart's data table and the model's output. The judge never saw the chart image; it is in a closed panel under the table if you need to check a reading, but grade against the table. Judge each axis <b>independently</b>: a right decision to answer is still "yes" on abstention even if the answer is wrong.</div>
       <p><b>1. Who are you?</b></p>
       <label><input type="radio" name="g" value="1" ${S.grader === 1 ? "checked" : ""}> Grader 1</label>
       <label><input type="radio" name="g" value="2" ${S.grader === 2 ? "checked" : ""}> Grader 2</label>
@@ -211,6 +232,7 @@ function render() {
       <div class="lbl">Question</div><div class="qtext">${esc(r.question)}</div>
       <div class="lbl">Gold answer</div><div class="gold">${gold}</div>
       <div class="lbl">The chart's data table</div>${tableHTML(r.table)}
+      ${IMAGES[r.id] ? `<details class="chart"><summary>Show the chart (the judge did not see it)</summary><img src="${esc(IMAGES[r.id])}" alt="chart for ${esc(r.id)}"></details>` : ""}
       <div class="lbl">Model output</div><div class="out">${outputHTML(r.raw)}</div>
       <p class="hint" style="margin-top:12px">${esc(r.id)}</p>
     </section>
@@ -246,7 +268,8 @@ render();
 
 def build():
     return (PAGE.replace("__AXES__", json.dumps(list(judge.AXES)))
-                .replace("__DEFS__", json.dumps(axis_definitions(), ensure_ascii=False)))
+                .replace("__DEFS__", json.dumps(axis_definitions(), ensure_ascii=False))
+                .replace("__IMAGES__", json.dumps(chart_images())))
 
 
 def main():

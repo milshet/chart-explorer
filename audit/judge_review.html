@@ -20,6 +20,7 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
 .out dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:0}.out dt{color:var(--soft)}.out dd{margin:0;font-weight:600;overflow-wrap:anywhere}
 .out ul{margin:0;padding-left:18px;font-weight:500}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:var(--bg);padding:8px;border-radius:6px;margin:6px 0 0}
+details.chart img{display:block;max-width:100%;margin-top:8px;border:1px solid var(--line);border-radius:6px;background:#fff}
 details summary{cursor:pointer;color:var(--soft);font-size:13px;margin-top:8px}
 .ax{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.ax:first-of-type{border-top:0;padding-top:0}
 .ax h3{margin:0;font-size:16px;text-transform:capitalize}.ax p{margin:4px 0 8px;color:var(--soft);font-size:13px}
@@ -40,6 +41,7 @@ button.sec{background:#c9d3e3;color:#14213d}button.go{background:var(--yes)}butt
 <script>
 const AXES = ["correctness", "grounding", "abstention"];
 const DEFS = {"correctness": "is the system's answer the gold answer (numbers within 5%)? \"n/a\" when the gold says the question is unanswerable.", "grounding": "are the values the system cites as evidence actually in the data table (or correct computations from it)? \"n/a\" when it cites no evidence.", "abstention": "was answering, or declining (answer null), the right call? The question is unanswerable exactly when the gold answer is null. Always \"yes\" or \"no\"."};
+const IMAGES = {"eval_c-005-series_absent": "../data/v2.0/images/val/OECD_PRIVATE_SPENDING_ON_EDUCATION_ARG_RUS_000004.png", "eval_c-010-series_absent": "../data/v2.0/images/test/multi_col_100960.png", "eval_c-034-not_in_chart": "../data/v2.0/images/test/30922516017795.png", "eval_c-035-not_in_chart": "../data/v2.0/images/test/multi_col_80102.png", "eval_c-036-not_in_chart": "../data/v2.0/images/test/multi_col_40258.png", "eval_c-037-not_in_chart": "../data/v2.0/images/test/multi_col_100237.png", "eval_c-040-requires_external_knowledge": "../data/v2.0/images/val/OECD_CRUDE_OIL_IMPORT_PRICES_PRT_000090.png", "eval_c-043-requires_external_knowledge": "../data/v2.0/images/test/multi_col_20213.png", "eval_c-046-requires_external_knowledge": "../data/v2.0/images/test/multi_col_60681.png", "test-11832048004655-229": "../data/v2.0/images/test/11832048004655.png", "test-5480-79-unans": "../data/v2.0/images/test/two_col_61188.png", "test-8124-197": "../data/v2.0/images/test/8124.png", "test-OECD_DEATHS_FROM_CANCER_COL_CRI_SVN_000015-69": "../data/v2.0/images/test/OECD_DEATHS_FROM_CANCER_COL_CRI_SVN_000015.png", "test-OECD_HOUSING_PRICES_JPN_RUS_000007-528": "../data/v2.0/images/test/OECD_HOUSING_PRICES_JPN_RUS_000007.png", "test-OECD_INVESTMENT_BY_SECTOR_AUS_CHL_CRI_ITA_ZAF_000130-581": "../data/v2.0/images/test/OECD_INVESTMENT_BY_SECTOR_AUS_CHL_CRI_ITA_ZAF_000130.png", "test-OECD_PRICE_LEVEL_INDICES_AUT_CHL_000024-588": "../data/v2.0/images/test/OECD_PRICE_LEVEL_INDICES_AUT_CHL_000024.png", "test-multi_col_40258-1102": "../data/v2.0/images/test/multi_col_40258.png", "test-multi_col_60240-999": "../data/v2.0/images/test/multi_col_60240.png", "test-multi_col_60284-1114": "../data/v2.0/images/test/multi_col_60284.png", "test-multi_col_60562-1014-unans": "../data/v2.0/images/test/04675954001679.png", "test-multi_col_60799-1030": "../data/v2.0/images/test/multi_col_60799.png", "test-multi_col_805-896": "../data/v2.0/images/test/multi_col_805.png", "test-multi_col_959-900-unans": "../data/v2.0/images/test/two_col_22205.png", "test-multi_col_970-905": "../data/v2.0/images/test/multi_col_970.png", "test-two_col_24274-793": "../data/v2.0/images/test/two_col_24274.png", "test-two_col_40213-791": "../data/v2.0/images/test/two_col_40213.png", "test-two_col_4148-743": "../data/v2.0/images/test/two_col_4148.png", "test-two_col_5327-756-unans": "../data/v2.0/images/test/OECD_NATIVE-BORN_EMPLOYMENT_SVN_TUR_000043.png", "test-two_col_60276-827": "../data/v2.0/images/test/two_col_60276.png", "test-two_col_83219-1211-unans": "../data/v2.0/images/test/two_col_83125.png"};
 const CHOICES = {correctness: ["yes", "no", "n/a"], grounding: ["yes", "no", "n/a"], abstention: ["yes", "no"]};
 const FS = "showOpenFilePicker" in window;
 const S = {grader: null, rows: [], text: "", name: "", handle: null, grades: {}, i: 0, status: ""};
@@ -145,7 +147,7 @@ function render() {
   if (!S.rows.length) {
     app.innerHTML = `<div class="start"><h1>Judge spot-check</h1>
       <p class="hint">Task 3.7. You grade a sample of the model's answers on the same three axes as the LLM judge. Your verdicts and the other grader's are compared with the judge's (Cohen's κ), so <b>grade on your own</b>: don't look at or discuss the other grader's answers until you've both submitted.</p>
-      <div class="rule">You see exactly what the judge saw: the question, the gold answer, the chart's data table and the model's output. There is no chart image, on purpose. Judge each axis <b>independently</b>: a right decision to answer is still "yes" on abstention even if the answer is wrong.</div>
+      <div class="rule">You see exactly what the judge saw: the question, the gold answer, the chart's data table and the model's output. The judge never saw the chart image; it is in a closed panel under the table if you need to check a reading, but grade against the table. Judge each axis <b>independently</b>: a right decision to answer is still "yes" on abstention even if the answer is wrong.</div>
       <p><b>1. Who are you?</b></p>
       <label><input type="radio" name="g" value="1" ${S.grader === 1 ? "checked" : ""}> Grader 1</label>
       <label><input type="radio" name="g" value="2" ${S.grader === 2 ? "checked" : ""}> Grader 2</label>
@@ -165,6 +167,7 @@ function render() {
       <div class="lbl">Question</div><div class="qtext">${esc(r.question)}</div>
       <div class="lbl">Gold answer</div><div class="gold">${gold}</div>
       <div class="lbl">The chart's data table</div>${tableHTML(r.table)}
+      ${IMAGES[r.id] ? `<details class="chart"><summary>Show the chart (the judge did not see it)</summary><img src="${esc(IMAGES[r.id])}" alt="chart for ${esc(r.id)}"></details>` : ""}
       <div class="lbl">Model output</div><div class="out">${outputHTML(r.raw)}</div>
       <p class="hint" style="margin-top:12px">${esc(r.id)}</p>
     </section>
