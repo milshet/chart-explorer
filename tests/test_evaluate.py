@@ -398,8 +398,20 @@ def test_kappa_exposes_always_yes_on_a_skewed_axis():
     assert raw == 0.9 and kappa == 0.0
 
 
-def test_judge_sample_mixes_eval_a_and_reports_missing_eval_c():
+def test_judge_sample_mixes_eval_a_and_eval_c():
     import judge
     rows, missing = judge.draw("run_a_r16-adapter")
-    assert missing == ["eval_c"]                            # not yet scored on Eval-C: said, not silently skipped
-    assert len(rows) == judge.SAMPLE["test"] and sum(r["gold"] is None for r in rows) == 9
+    assert missing == []
+    test = [r for r in rows if r["split"] == "test"]
+    evc = [r for r in rows if r["split"] == "eval_c"]
+    assert len(test) == judge.SAMPLE["test"] and sum(r["gold"] is None for r in test) == 9  # all nine unanswerable
+    assert len(evc) == judge.SAMPLE["eval_c"] and all(r["gold"] is None for r in evc)
+
+
+def test_judge_sample_reports_a_missing_split(monkeypatch):
+    import judge
+    real = judge.eval_folder
+    monkeypatch.setattr(judge, "eval_folder", lambda name, split: None if split == "eval_c" else real(name, split))
+    rows, missing = judge.draw("run_a_r16-adapter")
+    assert missing == ["eval_c"]                            # not scored on Eval-C: said, not silently skipped
+    assert {r["split"] for r in rows} == {"test"}
