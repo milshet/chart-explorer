@@ -483,3 +483,26 @@ def test_serve_bench_summary_uses_observed_percentiles():
     s = serve_bench.summarise(rows)
     assert s["e2e_s"]["p50"] == 2.0 and s["e2e_s"]["p95"] == 4.0 and s["overall_tok_s"] == 20.0
     assert s["accuracy_on_these_items"] == round(2 / 3, 4)
+
+
+def test_judge_abstention_is_scored_against_the_exact_answer():
+    import judge
+    yes = {"correctness": "yes", "grounding": "yes", "abstention": "yes"}
+    rows = [  # (gold, model's raw output, judge's verdict)
+        {"id": "a", "gold": 5, "raw": '{"answer": 5}', "verdict": yes},                               # right, judge right
+        {"id": "b", "gold": 5, "raw": '{"answer": 7}', "verdict": {**yes, "abstention": "no"}},       # leakage: wrong answer, right call
+        {"id": "c", "gold": None, "raw": '{"answer": null}', "verdict": {**yes, "correctness": "n/a"}},
+        {"id": "d", "gold": None, "raw": '{"answer": 3}', "verdict": {**yes, "abstention": "no"}},    # wrong call, judge right
+    ]
+    x = judge.abstention_vs_exact(rows)
+    assert (x["agree"], x["n"], x["disagreements"]) == (3, 4, ["b"])
+    assert x["by_case"]["answerable, answered: judge no"] == 1
+    s = judge.summarise([{**r, "scorer_evidence": [1, 1]} for r in rows])
+    assert s["correctness_graded_when_gold_null"] == 1                    # row d graded correctness on a null gold
+
+
+def test_committed_judge_summary_carries_the_exact_abstention_check():
+    s = json.loads((REPO / "results/judge/run_a_r16/summary.json").read_text(encoding="utf-8"))
+    import judge
+    judged = [json.loads(l) for l in open(REPO / "results/judge/run_a_r16/judged.jsonl", encoding="utf-8")]
+    assert s["abstention_vs_exact"] == judge.summarise(judged)["abstention_vs_exact"]

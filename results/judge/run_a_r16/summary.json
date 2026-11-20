@@ -40,5 +40,35 @@
   "eval_c-035-not_in_chart",
   "eval_c-042-requires_external_knowledge"
  ],
- "peak_gpu_memory_mib": 8893
+ "peak_gpu_memory_mib": 8893,
+ "abstention_vs_exact": {
+  "agree": 63,
+  "n": 80,
+  "by_case": {
+   "answerable, answered: judge no": 17,
+   "answerable, answered: judge yes": 34,
+   "unanswerable, answered: judge no": 6,
+   "unanswerable, declined: judge yes": 23
+  },
+  "disagreements": [
+   "test-77342851005157-21",
+   "test-OECD_DEATHS_FROM_CANCER_COL_CRI_SVN_000015-69",
+   "test-OECD_PUBLIC_UNEMPLOYMENT_SPENDING_KOR_TUR_000098-594",
+   "test-multi_col_101027-1121",
+   "test-multi_col_20801-1170",
+   "test-multi_col_60681-1023",
+   "test-multi_col_60911-1037",
+   "test-multi_col_60928-1041",
+   "test-multi_col_80177-1060",
+   "test-multi_col_805-896",
+   "test-multi_col_970-905",
+   "test-two_col_100718-670",
+   "test-two_col_3582-739",
+   "test-two_col_40213-791",
+   "test-two_col_41814-813",
+   "test-two_col_62027-1145",
+   "test-two_col_81937-651"
+  ]
+ },
+ "correctness_graded_when_gold_null": 7
 }

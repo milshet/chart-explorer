@@ -99,6 +99,15 @@ def build():
                 "| Axis | yes / graded |", "|---|---|"]
         out += [f"| {a} | {s[a]['yes']}/{s[a]['n']} |" for a in ("correctness", "grounding", "abstention")]
         out += ["", f"Judge vs the scorer's `evidence_grounded`: {len(s['grounding_disagreements'])} disagreements.", ""]
+        x = s.get("abstention_vs_exact")
+        if x:
+            out += [f"**The judge checked against an exact answer:** declining is right if and only if the gold is null, "
+                    f"so its abstention verdict can be scored without a human. It agrees on {x['agree']}/{x['n']}. "
+                    "By case: " + "; ".join(f"{k} {v}" for k, v in x["by_case"].items()) + ". It graded correctness "
+                    f"on {s['correctness_graded_when_gold_null']} rows where the rubric says n/a.", ""]
+        else:
+            gaps.append(f"judge on {p.parent.name} not checked against the exact abstention answer: "
+                        f"run `python scripts/judge.py summarise --name {p.parent.name}`")
         agree = p.parent / "agreement.json"
         if agree.is_file():
             a = json.loads(agree.read_text(encoding="utf-8"))

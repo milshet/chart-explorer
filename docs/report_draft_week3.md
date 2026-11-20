@@ -76,6 +76,8 @@ Retrieval failure (task 3.6), rows whose gold table was withheld:
 
 Judge vs the scorer's `evidence_grounded`: 17 disagreements.
 
+**The judge checked against an exact answer:** declining is right if and only if the gold is null, so its abstention verdict can be scored without a human. It agrees on 63/80. By case: answerable, answered: judge no 17; answerable, answered: judge yes 34; unanswerable, answered: judge no 6; unanswerable, declined: judge yes 23. It graded correctness on 7 rows where the rubric says n/a.
+
 Human spot-check κ: NOT MEASURED.
 
 ## Served latency (3.8, 3.14)

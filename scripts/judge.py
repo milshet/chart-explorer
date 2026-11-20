@@ -215,7 +215,38 @@ def summarise(judged):
     # the scorer's grounding vs the judge's, where both have an opinion
     out["grounding_disagreements"] = [j["id"] for j in ok if j["verdict"]["grounding"] != "n/a" and j["scorer_evidence"][1]
                                       and (j["verdict"]["grounding"] == "yes") != (j["scorer_evidence"][0] == j["scorer_evidence"][1])]
+    exact = [j for j in ok if "gold" in j and "raw" in j]
+    if exact:
+        out["abstention_vs_exact"] = abstention_vs_exact(exact)
+        # the rubric says correctness is n/a when the gold is null; grading it anyway is a judge error, counted
+        out["correctness_graded_when_gold_null"] = sum(j["gold"] is None and j["verdict"]["correctness"] != "n/a"
+                                                       for j in exact)
     return out
+
+
+def declined(raw):
+    import scoring
+    v = scoring.extract_json(raw or "")
+    return isinstance(v, dict) and v.get("answer") is None
+
+
+def abstention_vs_exact(judged):
+    """The judge's accuracy on the one axis whose answer is exact. Declining was the right call if and only if the
+    gold answer is null, so the judge's abstention verdict can be checked row by row without a human. Broken down by
+    case, because the failure that matters is which way it errs: e.g. marking a right call wrong because the answer
+    or its evidence was wrong is leakage from the other two axes, which 3.7 requires be graded independently."""
+    cases = collections.Counter()
+    wrong = []
+    for j in judged:
+        should, did = j["gold"] is None, declined(j["raw"])
+        right_call = should == did
+        says_yes = j["verdict"]["abstention"] == "yes"
+        case = f"{'unanswerable' if should else 'answerable'}, {'declined' if did else 'answered'}"
+        cases[f"{case}: judge {'yes' if says_yes else 'no'}"] += 1
+        if says_yes != right_call:
+            wrong.append(j["id"])
+    return {"agree": len(judged) - len(wrong), "n": len(judged), "by_case": dict(sorted(cases.items())),
+            "disagreements": wrong}
 
 
 def cohen(a, b):
@@ -232,7 +263,8 @@ def cohen(a, b):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("step", choices=("sample", "run", "spotcheck", "agree"))
+    ap.add_argument("step", choices=("sample", "run", "summarise", "spotcheck", "agree"),
+                    help="summarise: recompute summary.json's counts from a committed judged.jsonl, no model")
     ap.add_argument("--name", required=True, help="evaluation folder prefix, e.g. run_a_r16")
     ap.add_argument("--backend", choices=("local", "anthropic"), default="local")
     ap.add_argument("--model", help=f"default: {LOCAL_MODEL} (local) or {MODEL} (anthropic)")
@@ -281,6 +313,13 @@ def main():
             s["peak_gpu_memory_mib"] = round(ask.torch.cuda.max_memory_allocated() / 2**20)
         (d / "summary.json").write_text(json.dumps(s, indent=1) + "\n", encoding="utf-8", newline="\n")
         print(json.dumps(s, indent=1))
+    elif args.step == "summarise":   # the judge's run metadata is kept; only the counts are recomputed
+        judged = [json.loads(l) for l in open(d / "judged.jsonl", encoding="utf-8")]
+        s = json.loads((d / "summary.json").read_text(encoding="utf-8"))
+        s.update(summarise(judged))
+        (d / "summary.json").write_text(json.dumps(s, indent=1) + "\n", encoding="utf-8", newline="\n")
+        print(json.dumps({k: s[k] for k in ("n", "n_excluded", "abstention_vs_exact", "correctness_graded_when_gold_null")
+                          if k in s}, indent=1))
     elif args.step == "spotcheck":
         judged = [json.loads(l) for l in open(d / "judged.jsonl", encoding="utf-8")]
         pick = random.Random(SEED).sample(judged, min(30, len(judged)))
