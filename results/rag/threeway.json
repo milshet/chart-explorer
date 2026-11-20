@@ -14,7 +14,23 @@
      "p": 3.4964767192668944e-11
     }
    },
-   "base+RAG": "NOT MEASURED",
+   "base+RAG": {
+    "n": 180,
+    "relaxed_accuracy": 0.4889,
+    "true_abstention": "8/9",
+    "false_abstention": "5/171",
+    "false_abstention_rate": 0.0292,
+    "vs base": {
+     "only_this": 21,
+     "only_other": 36,
+     "p": 0.0627366803558285
+    },
+    "vs fine-tuned": {
+     "only_this": 7,
+     "only_other": 70,
+     "p": 3.5245694262351566e-14
+    }
+   },
    "fine-tuned": {
     "n": 180,
     "relaxed_accuracy": 0.8389,
@@ -27,12 +43,90 @@
      "p": 3.4964767192668944e-11
     }
    },
-   "fine-tuned+RAG": "NOT MEASURED",
-   "fine-tuned(table)+RAG": "NOT MEASURED"
+   "fine-tuned+RAG": {
+    "n": 180,
+    "relaxed_accuracy": 0.7611,
+    "true_abstention": "9/9",
+    "false_abstention": "2/171",
+    "false_abstention_rate": 0.0117,
+    "vs base": {
+     "only_this": 49,
+     "only_other": 15,
+     "p": 2.436457216293327e-05
+    },
+    "vs fine-tuned": {
+     "only_this": 5,
+     "only_other": 19,
+     "p": 0.006610751152038574
+    }
+   },
+   "fine-tuned(table)+RAG": {
+    "n": 180,
+    "relaxed_accuracy": 0.8444,
+    "true_abstention": "9/9",
+    "false_abstention": "1/171",
+    "false_abstention_rate": 0.0058,
+    "vs base": {
+     "only_this": 55,
+     "only_other": 6,
+     "p": 5.380614009897755e-11
+    },
+    "vs fine-tuned": {
+     "only_this": 9,
+     "only_other": 8,
+     "p": 1.0
+    }
+   }
   }
  },
  "degradation": {
-  "fine-tuned(table)": "NOT MEASURED",
-  "base": "NOT MEASURED"
+  "fine-tuned(table)": {
+   "n_withheld": 85,
+   "with_rag": {
+    "n": 85,
+    "relaxed_accuracy": 0.7765,
+    "true_abstention": "0/0",
+    "false_abstention": "1/85",
+    "false_abstention_rate": 0.0118
+   },
+   "without_rag": {
+    "n": 85,
+    "relaxed_accuracy": 0.8353,
+    "true_abstention": "0/0",
+    "false_abstention": "1/85",
+    "false_abstention_rate": 0.0118
+   },
+   "paired": {
+    "only_this": 3,
+    "only_other": 8,
+    "p": 0.2265625
+   },
+   "verdict": "harmful",
+   "over_abstention": false
+  },
+  "base": {
+   "n_withheld": 85,
+   "with_rag": {
+    "n": 85,
+    "relaxed_accuracy": 0.2118,
+    "true_abstention": "0/0",
+    "false_abstention": "8/85",
+    "false_abstention_rate": 0.0941
+   },
+   "without_rag": {
+    "n": 85,
+    "relaxed_accuracy": 0.5412,
+    "true_abstention": "0/0",
+    "false_abstention": "0/85",
+    "false_abstention_rate": 0.0
+   },
+   "paired": {
+    "only_this": 2,
+    "only_other": 30,
+    "p": 2.4633482098579407e-07
+   },
+   "verdict": "harmful",
+   "over_abstention": true
+  }
  }
 }

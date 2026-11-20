@@ -1,0 +1,490 @@
+{
+ "name": "ablation_answer_only-adapter_eval_c_image_only_answer_only_0shot_bf16",
+ "n": 50,
+ "relaxed_accuracy": 0.6,
+ "error_rate": 0.4,
+ "categories": {
+  "ok": 30,
+  "schema_invalid": 0,
+  "failed_to_abstain": 20,
+  "false_abstention": 0,
+  "answer_type_mismatch": 0,
+  "scale_error": 0,
+  "near_miss": 0,
+  "reasoning_error": 0,
+  "extraction_error": 0,
+  "text_mismatch": 0
+ },
+ "schema_rules": {},
+ "flags": {
+  "refusal_reason_unstated": 30
+ },
+ "by_question_type": {
+  "unanswerable": {
+   "ok": 30,
+   "failed_to_abstain": 20
+  }
+ },
+ "items": [
+  {
+   "id": "eval_c-000-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-001-series_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-002-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-003-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-004-series_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-005-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-006-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-007-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-008-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-009-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-010-series_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-011-series_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-012-series_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-013-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-014-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-015-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-016-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-017-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-018-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-019-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-020-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-021-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-022-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-023-category_absent",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-024-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-025-category_absent",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-026-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-027-not_in_chart",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-028-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-029-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-030-not_in_chart",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-031-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-032-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-033-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-034-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-035-not_in_chart",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-036-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-037-not_in_chart",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-038-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-039-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-040-requires_external_knowledge",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-041-requires_external_knowledge",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-042-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-043-requires_external_knowledge",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-044-requires_external_knowledge",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-045-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-046-requires_external_knowledge",
+   "category": "ok",
+   "schema_rules": [],
+   "flags": [
+    "refusal_reason_unstated"
+   ],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-047-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-048-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  },
+  {
+   "id": "eval_c-049-requires_external_knowledge",
+   "category": "failed_to_abstain",
+   "schema_rules": [],
+   "flags": [],
+   "question_type": "unanswerable",
+   "answer_type": "unanswerable"
+  }
+ ]
+}
