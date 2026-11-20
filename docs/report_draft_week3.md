@@ -82,11 +82,14 @@ Human spot-check κ: NOT MEASURED.
 
 ## Served latency (3.8, 3.14)
 
-Served latency: NOT MEASURED.
+Merged bf16, `transformers.generate`, batch 1, one request at a time, the same 50 val requests for every adapter. Latency is end to end minus HTTP.
+
+| Run | e2e p50 (s) | e2e p95 (s) | TTFT p50 (s) | decode tok/s p50 | overall tok/s | mean new tokens | accuracy on these items |
+|---|---|---|---|---|---|---|---|
+| ablation_answer_only | 0.442 | 0.538 | 0.085 | 59.8 | 50.5 | 21.8 | 82.0% |
+| run_a_r16 | 1.256 | 1.81 | 0.086 | 60.3 | 57.0 | 72.4 | 84.0% |
 
 ## What Week 3 has not yet established
 
 - human spot-check of the judge on run_a_r16: two graders, Cohen's κ (3.7)
-- served latency for run_a_r16 not measured (3.8, 3.14)
-- served latency for ablation_answer_only not measured (3.8, 3.14)
 - data-quality audit kappa not reported (3.0i): needs two or three human reviewers
