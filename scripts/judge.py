@@ -24,12 +24,12 @@ on a 90/10 split is what always-say-yes scores.
 The judge reads text only (question, gold answer, the chart's data table, the model's output); it never sees the
 image, so it grades against the table, which is the ground truth the labels came from.
 
-The local judge (plan §9 decision 13) is openai/gpt-oss-20b: not Qwen, so it does not grade its own family; free and
-ungated; a reasoning model, which the grounding axis needs (it checks computations against the table). Greedy
-decoding, reasoning effort low, and only the final channel of its reply is parsed. Its fallback,
-microsoft/Phi-4-mini-instruct, follows the same JSON rubric (no code change) and is used only if gpt-oss-20b fails
-to load, never after reading verdicts. The summary records the judge model, its snapshot revision, the backend, the
-decoding and the commit.
+The local judge (plan §9 decision 13) is arena-education/Llama-3.1-8B-Instruct-bnb-8bit: Llama-3.1-8B-Instruct stored in
+bitsandbytes 8-bit, which loads on the locked transformers/bitsandbytes with nothing installed. It is not Qwen, so it
+does not grade its own family. openai/gpt-oss-20b was planned and did not fit the L40S once expanded to bf16 (VM03
+jobs 119, 120); its loading path (MXFP4 dequantised, final channel only) is kept for a machine where it does fit.
+Greedy decoding. The summary records the judge model, its snapshot revision, the backend, the decoding and the
+commit.
 """
 import argparse
 import collections
@@ -50,7 +50,7 @@ VERDICTS = ("yes", "no", "n/a")
 SAMPLE = {"test": 60, "eval_c": 20}   # cut rule: the judge sample size is the second thing cut if the week runs short
 SEED = 61003
 MODEL = "claude-opus-5-5"            # --backend anthropic
-LOCAL_MODEL = "openai/gpt-oss-20b"   # --backend local (decision 13); fallback microsoft/Phi-4-mini-instruct
+LOCAL_MODEL = "arena-education/Llama-3.1-8B-Instruct-bnb-8bit"   # --backend local (decision 13); gpt-oss-20b did not fit
 LOCAL_MAX_NEW_TOKENS = 1024          # reasoning + verdict; a reply cut off before its verdict is excluded, and counted
 REASONING_EFFORT = "low"
 RUBRIC = """You are grading one answer from a chart question-answering system used in regulated financial reporting.

@@ -66,7 +66,17 @@ Retrieval failure (task 3.6), rows whose gold table was withheld:
 
 ## LLM-as-judge (3.7, 3.13)
 
-Judge verdicts: NOT MEASURED.
+**run_a_r16**, judged by `arena-education/Llama-3.1-8B-Instruct-bnb-8bit` (local): 80 rows, 0 excluded as unreadable (not scored zero).
+
+| Axis | yes / graded |
+|---|---|
+| correctness | 47/58 |
+| grounding | 57/72 |
+| abstention | 57/80 |
+
+Judge vs the scorer's `evidence_grounded`: 17 disagreements.
+
+Human spot-check κ: NOT MEASURED.
 
 ## Served latency (3.8, 3.14)
 
@@ -74,7 +84,7 @@ Served latency: NOT MEASURED.
 
 ## What Week 3 has not yet established
 
-- LLM-as-judge rubric not run (3.7, 3.13)
+- human spot-check of the judge on run_a_r16: two graders, Cohen's κ (3.7)
 - served latency for run_a_r16 not measured (3.8, 3.14)
 - served latency for ablation_answer_only not measured (3.8, 3.14)
 - data-quality audit kappa not reported (3.0i): needs two or three human reviewers

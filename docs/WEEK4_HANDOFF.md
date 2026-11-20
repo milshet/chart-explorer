@@ -26,7 +26,7 @@ runs them on VM03. Until those results are committed, `docs/report_draft_week3.m
 | 3.10 | Three more embedding models against BM25 |
 | 3.11 | Two cross-encoder rerankers, each with BM25's ceiling at its depth |
 | 3.12 | `docs/RAG.md`, the generated decision record for chunking, query plan, embedding model and reranker |
-| 3.13 | The LLM judge on VM03 with `openai/gpt-oss-20b` (free; plan §9 decision 13) |
+| 3.13 | The LLM judge on VM03 with `arena-education/Llama-3.1-8B-Instruct-bnb-8bit` (free; gpt-oss-20b did not fit; plan §9 decision 13) |
 | 3.14 | Served latency and tokens/sec, from `scripts/serve_bench.py` |
 
 Still open after that, all of it **human** work:

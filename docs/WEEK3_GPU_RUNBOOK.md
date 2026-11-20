@@ -166,15 +166,20 @@ grep -A3 '"chosen"' results/rag/retrieval.json
 - If anything else was chosen, the adoption rule fired. Run `~/venv-embed/bin/python scripts/rag/prompts.py
   --write` and commit `data/rag/` with the results. Then rerun the RAG evaluations in step 4 before quoting any
   RAG number.
-- Afterwards, free the space: `rm -rf ~/.cache/huggingface/hub/models--{BAAI,intfloat,cross-encoder}--*`
+- Afterwards, free the space: `rm -rf ~/.cache/huggingface/hub/models--{BAAI,intfloat,cross-encoder}--*`, then the blob
+  sweep in 6b (the folders alone hold only links).
 
-### 6b. Judge (3.13): ~14 GB download, then one ~10–20 min job
+### 6b. Judge (3.13): ~9 GB download, then one ~6 min job
+
+The judge is `arena-education/Llama-3.1-8B-Instruct-bnb-8bit` (plan §9 decision 13). gpt-oss-20b was tried first and does not fit the L40S as bf16; don't
+retry it. `~/venv` has no `hf` command, so download from Python:
 
 ```bash
-quota -s                                                        # need ~14 GB free under the 32 GB soft limit
-hf download openai/gpt-oss-20b --exclude "original/*" "metal/*"   # never the duplicate original/ and metal/ weights
-python scripts/judge.py run --name run_a_r16 --dry-run          # JUDGE_DRY_RUN_OK; "reasoning effort in template"
-sbatch slurm/judge.sbatch --name run_a_r16
+quota -s                                                        # need ~10 GB free under the 32 GB soft limit
+HF_HUB_OFFLINE=0 python -c "from huggingface_hub import snapshot_download; print(snapshot_download('arena-education/Llama-3.1-8B-Instruct-bnb-8bit'))"
+python scripts/judge.py run --name run_a_r16 --dry-run          # JUDGE_DRY_RUN_OK ("NOT in template" is expected)
+sbatch --time=02:00:00 slurm/judge.sbatch --name run_a_r16
+tail -f logs/chartqa-judge-<JOB_ID>.out                         # the job's own number, once squeue shows R
 ```
 
 - **If the log ends `JUDGE_OK`:** check `n_excluded` in `results/judge/run_a_r16/summary.json`. A few exclusions are
@@ -182,10 +187,21 @@ sbatch slurm/judge.sbatch --name run_a_r16
   `judged.jsonl` before deciding anything.
 - **Write the human sheet:** `python scripts/judge.py spotcheck --name run_a_r16`.
 - **Commit and push** `results/judge/`.
-- **Delete the model:** `rm -rf ~/.cache/huggingface/hub/models--openai--gpt-oss-20b`
-- **Fallback, only if the model fails to load or run** (an error in `logs/chartqa-judge-<JOB_ID>.err`, never because
-  of the verdicts): delete gpt-oss-20b first, download `microsoft/Phi-4-mini-instruct` (~7.7 GB), then
-  `sbatch slurm/judge.sbatch --name run_a_r16 --model microsoft/Phi-4-mini-instruct`
+- **Delete the model.** This cache keeps one shared `blobs/` store, so removing the `models--` folder frees nothing
+  on its own. Sweep the blobs nothing links to any more, and check that "kept" stays ~7 GB (Qwen) first:
+
+  ```bash
+  rm -rf ~/.cache/huggingface/hub/models--arena-education--Llama-3.1-8B-Instruct-bnb-8bit
+  H=~/.cache/huggingface/hub
+  find $H/models--* -type l -exec readlink -f {} + | sort -u > ~/tmp/hf_ref.txt
+  find $H/blobs -type f | sort > ~/tmp/hf_all.txt
+  comm -23 ~/tmp/hf_all.txt ~/tmp/hf_ref.txt > ~/tmp/hf_orphan.txt
+  echo kept:; xargs -a ~/tmp/hf_ref.txt du -ch | tail -1
+  echo orphans:; xargs -a ~/tmp/hf_orphan.txt du -ch | tail -1
+  xargs -a ~/tmp/hf_orphan.txt rm -f
+  ```
+
+- **Run on 2026-11-20:** jobs 119 and 120 (gpt-oss-20b) failed to load; job 121 judged 80/80 with 0 excluded.
 
 ### 6c. Served latency (3.14): two jobs, ~10 min each, ~7 GB each, written and deleted per job
 

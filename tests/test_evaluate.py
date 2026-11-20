@@ -454,7 +454,9 @@ def test_local_judge_rows_exclude_cut_off_replies_and_keep_raw():
 
 def test_judge_defaults_to_the_free_local_model():
     import judge
-    assert judge.LOCAL_MODEL == "openai/gpt-oss-20b" and "qwen" not in judge.LOCAL_MODEL.lower()
+    assert judge.LOCAL_MODEL == "arena-education/Llama-3.1-8B-Instruct-bnb-8bit" and "qwen" not in judge.LOCAL_MODEL.lower()
+    s = json.loads((REPO / "results/judge/run_a_r16/summary.json").read_text(encoding="utf-8"))
+    assert s["judge_model"] == judge.LOCAL_MODEL                         # a rerun with defaults reproduces it
     text = (REPO / "slurm/judge.sbatch").read_text(encoding="utf-8")
     assert "HF_HUB_OFFLINE=1" in text and 'scripts/judge.py run "$@"' in text
 
