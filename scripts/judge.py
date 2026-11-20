@@ -148,6 +148,13 @@ def final_text(text):
     return text.strip()
 
 
+def mxfp4(model_id):
+    """Whether a model's checkpoint ships MXFP4-quantised weights (gpt-oss does), read from its config.json."""
+    from transformers import AutoConfig
+    q = getattr(AutoConfig.from_pretrained(model_id), "quantization_config", None) or {}
+    return (q.get("quant_method") if isinstance(q, dict) else getattr(q, "quant_method", None)) == "mxfp4"
+
+
 class LocalJudge:
     """A Hugging Face chat model on the local GPU: loaded once, greedy, chat template applied by the tokenizer."""
 
@@ -157,7 +164,18 @@ class LocalJudge:
         from rag.retrieve import snapshot
         self.torch, self.model_id, self.revision = torch, model_id, snapshot(model_id)
         self.tok = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype="auto", device_map="cuda")
+        kw, self.load_notes = {}, {}
+        if mxfp4(model_id):
+            # Without the MXFP4 kernels transformers expands the experts to bf16 itself, and left to infer that
+            # (VM03 job 119) it kept them on the CPU while the rest went to the GPU. Ask for it explicitly.
+            from transformers import Mxfp4Config
+            kw = {"quantization_config": Mxfp4Config(dequantize=True), "dtype": torch.bfloat16}
+            self.load_notes["quantization"] = "mxfp4 dequantized to bf16"
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, device_map="cuda", **{"dtype": "auto", **kw})
+        stray = sorted({str(t.device) for t in (*self.model.parameters(), *self.model.buffers())} - {"cuda:0"})
+        if stray:   # anything still off the GPU is moved, and recorded: a silent CPU expert is a 100x slowdown
+            self.load_notes["moved_to_cuda_from"] = stray
+            self.model.to("cuda:0")
         self.model.eval()
 
     def __call__(self, row):
@@ -245,7 +263,8 @@ def main():
         if args.backend == "local":
             ask = LocalJudge(args.model)
             meta = {"judge_revision": ask.revision, "decoding": "greedy", "max_new_tokens": LOCAL_MAX_NEW_TOKENS,
-                    "reasoning_effort": REASONING_EFFORT}
+                    "reasoning_effort": REASONING_EFFORT, **ask.load_notes}
+            print(f"loaded {args.model} {ask.load_notes or ''}", flush=True)
         else:
             import anthropic
             client = anthropic.Anthropic()
