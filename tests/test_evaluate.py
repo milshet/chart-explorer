@@ -457,3 +457,27 @@ def test_judge_defaults_to_the_free_local_model():
     assert judge.LOCAL_MODEL == "openai/gpt-oss-20b" and "qwen" not in judge.LOCAL_MODEL.lower()
     text = (REPO / "slurm/judge.sbatch").read_text(encoding="utf-8")
     assert "HF_HUB_OFFLINE=1" in text and 'scripts/judge.py run "$@"' in text
+
+
+# --- served latency benchmark (tasks 3.8, 3.14); no model is loaded --------------------------------
+
+def test_serve_bench_times_every_adapter_on_the_same_val_requests():
+    import serve_bench
+    import smoke_test as st
+    cot = st.read_jsonl(REPO / "data/v2.0/image_only/val.jsonl", None)
+    ans = st.read_jsonl(REPO / "data/v2.0/image_only/answer_only/val.jsonl", None)
+    (w1, t1), (w2, t2) = serve_bench.bench_items(cot), serve_bench.bench_items(list(reversed(ans)))
+    assert [i["id"] for i in w1 + t1] == [i["id"] for i in w2 + t2]     # same requests, same order, any file order
+    assert (len(w1), len(t1)) == (serve_bench.WARMUP, serve_bench.N_REQUESTS)
+    assert not {i["id"] for i in w1} & {i["id"] for i in t1}           # warm-up requests are not timed
+
+
+def test_serve_bench_summary_uses_observed_percentiles():
+    import serve_bench
+    assert serve_bench.pct(list(range(1, 101)), 50) == 50 and serve_bench.pct(list(range(1, 101)), 95) == 95
+    assert serve_bench.pct([3.0], 95) == 3.0
+    rows = [{"e2e_s": e, "ttft_s": 0.1, "decode_tok_s": 60.0, "new_tokens": 10, "generate_s": 0.5, "prompt_tokens": 900,
+             "correct": c, "schema_valid": True} for e, c in ((1.0, True), (2.0, False), (4.0, True))]
+    s = serve_bench.summarise(rows)
+    assert s["e2e_s"]["p50"] == 2.0 and s["e2e_s"]["p95"] == 4.0 and s["overall_tok_s"] == 20.0
+    assert s["accuracy_on_these_items"] == round(2 / 3, 4)
