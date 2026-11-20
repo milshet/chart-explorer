@@ -101,8 +101,10 @@
     "only_other": 8,
     "p": 0.2265625
    },
-   "verdict": "harmful",
-   "over_abstention": false
+   "verdict": "lower, not significant",
+   "over_abstention": false,
+   "compared_with": "Run A, image only",
+   "without_rag_eval": "run_a_r16-adapter_test_image_only_cot_0shot_bf16"
   },
   "base": {
    "n_withheld": 85,
@@ -126,7 +128,9 @@
     "p": 2.4633482098579407e-07
    },
    "verdict": "harmful",
-   "over_abstention": true
+   "over_abstention": true,
+   "compared_with": "base, image only",
+   "without_rag_eval": "base_test_image_only_answer_only_2shot_4bit"
   }
  }
 }

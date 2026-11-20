@@ -8,5 +8,5 @@
 
 Retrieval failure (task 3.6), rows whose gold table was withheld:
 
-- fine-tuned(table): **harmful** — 77.6% with RAG vs 83.5% without (n = 85, p = 0.227); false abstention 1/85 vs 1/85
-- base: **harmful** + over-abstaining — 21.2% with RAG vs 54.1% without (n = 85, p = 2.46e-07); false abstention 8/85 vs 0/85
+- fine-tuned(table): **lower, not significant** — 77.6% with RAG vs 83.5% without RAG (Run A, image only) (n = 85, p = 0.227); false abstention 1/85 vs 1/85
+- base: **harmful** + over-abstaining — 21.2% with RAG vs 54.1% without RAG (base, image only) (n = 85, p = 2.46e-07); false abstention 8/85 vs 0/85

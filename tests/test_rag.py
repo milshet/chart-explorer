@@ -287,14 +287,15 @@ def test_threeway_refuses_conditions_scored_on_different_rows():
 
 
 @pytest.mark.parametrize("rag_correct, rag_abstain, expected, over", [
-    ([1, 1, 1, 0], {}, "graceful", False),          # no lower than without RAG
-    ([1, 0, 0, 0], {}, "harmful", False),           # the wrong table misled it
-    ([1, 1, 1, 0], {"q3": True}, "graceful", True), # same accuracy, but it started refusing
+    ([1] * 9 + [0], {}, "graceful", False),                   # no lower than without RAG
+    ([0] * 9 + [1], {}, "harmful", False),                    # 1 / 9 discordant, p = 0.021: the table misled it
+    ([0, 0] + [1] * 7 + [0], {}, "lower, not significant", False),  # 0 / 2 discordant, p = 0.5: could be chance
+    ([1] * 9 + [0], {"q9": True}, "graceful", True),          # same accuracy, but it started refusing
 ])
 def test_degradation_verdict(rag_correct, rag_abstain, expected, over):
     import threeway
-    ids = ["q0", "q1", "q2", "q3"]
-    no_rag = preds({i: i != "q3" for i in ids})
+    ids = [f"q{i}" for i in range(10)]
+    no_rag = preds({i: i != "q9" for i in ids})
     rag = preds({i: bool(c) for i, c in zip(ids, rag_correct)}, rag_abstain)
     v = threeway.verdict(rag, no_rag, ids)
     assert (v["verdict"], v["over_abstention"]) == (expected, over)

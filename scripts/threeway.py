@@ -15,9 +15,12 @@ Conditions on Eval-A (180 test items), every one scored on the SAME item ids (ch
 Reading the last two together separates "the prompt format changed" from "retrieval helped". Significance is the
 paired exact McNemar test (compare.mcnemar) against base and against fine-tuned, never a difference of percentages.
 
-Task 3.6 compares, on the rows whose gold table was withheld, rag_test_withheld against the same model without
-RAG. Verdict: graceful (accuracy no lower than without RAG: it fell back to the chart), harmful (lower: the wrong
-table misled it). Over-abstention is a separate flag, raised when false abstention on those rows rises.
+Task 3.6 compares, on the rows whose gold table was withheld, rag_test_withheld against a model without RAG: the
+base model against itself, and the table-trained model against Run A on image-only prompts (the system it would
+replace; the table model has no no-RAG format of its own). The comparison model is printed with each verdict.
+Verdict: graceful (accuracy no lower than without RAG: it fell back to the chart); harmful (lower, and the paired
+McNemar p < ALPHA: the wrong table misled it); "lower, not significant" (lower, but within what pairing allows by
+chance at this n). Over-abstention is a separate flag, raised when false abstention on those rows rises.
 """
 import argparse
 import json
@@ -37,12 +40,13 @@ CONDITIONS = {
     "fine-tuned+RAG": "run_a_r16-adapter_rag_test_image_table_cot_0shot_bf16",
     "fine-tuned(table)+RAG": "run_a_r16_table-adapter_rag_test_image_table_cot_0shot_bf16",
 }
-WITHHELD = {  # task 3.6: (with RAG, gold withheld for half the rows) vs (the same model without RAG)
+WITHHELD = {  # task 3.6: (with RAG, gold withheld for half the rows) vs (a model without RAG, named)
     "fine-tuned(table)": ("run_a_r16_table-adapter_rag_test_withheld_image_table_cot_0shot_bf16",
-                          "run_a_r16-adapter_test_image_only_cot_0shot_bf16"),
+                          "run_a_r16-adapter_test_image_only_cot_0shot_bf16", "Run A, image only"),
     "base": ("base_rag_test_withheld_image_table_answer_only_2shot_4bit",
-             "base_test_image_only_answer_only_2shot_4bit"),
+             "base_test_image_only_answer_only_2shot_4bit", "base, image only"),
 }
+ALPHA = 0.05  # a lower accuracy is called harmful only when the paired test says it is unlikely to be chance
 
 
 def load(folder):
@@ -94,19 +98,21 @@ def verdict(rag, no_rag, withheld_ids):
     """Task 3.6 on the withheld rows: graceful or harmful, plus the over-abstention flag."""
     with_rag, without = rates(rag, withheld_ids), rates(no_rag, withheld_ids)
     test = paired(rag, no_rag, withheld_ids)
-    harmful = with_rag["relaxed_accuracy"] < without["relaxed_accuracy"]
+    lower = with_rag["relaxed_accuracy"] < without["relaxed_accuracy"]
     over = (with_rag["false_abstention_rate"] or 0) > (without["false_abstention_rate"] or 0)
+    label = "graceful" if not lower else "harmful" if test["p"] < ALPHA else "lower, not significant"
     return {"n_withheld": len(withheld_ids), "with_rag": with_rag, "without_rag": without, "paired": test,
-            "verdict": "harmful" if harmful else "graceful", "over_abstention": over}
+            "verdict": label, "over_abstention": over}
 
 
 def degradation(withheld=WITHHELD, loader=load):
     rows = [json.loads(l) for l in open(REPO / "data/rag/image_table/rag_test_withheld.jsonl", encoding="utf-8")]
     ids = sorted(r["id"] for r in rows if r["withheld"])
     out = {}
-    for name, (rag_folder, base_folder) in withheld.items():
+    for name, (rag_folder, base_folder, compared_with) in withheld.items():
         rag, base = loader(rag_folder), loader(base_folder)
-        out[name] = "NOT MEASURED" if rag is None or base is None else verdict(rag, base, ids)
+        out[name] = ("NOT MEASURED" if rag is None or base is None
+                     else {**verdict(rag, base, ids), "compared_with": compared_with, "without_rag_eval": base_folder})
     return out
 
 
@@ -129,7 +135,8 @@ def markdown(cmp, deg):
         else:
             lines.append(f"- {n}: **{v['verdict']}**{' + over-abstaining' if v['over_abstention'] else ''} — "
                          f"{100 * v['with_rag']['relaxed_accuracy']:.1f}% with RAG vs "
-                         f"{100 * v['without_rag']['relaxed_accuracy']:.1f}% without (n = {v['n_withheld']}, "
+                         f"{100 * v['without_rag']['relaxed_accuracy']:.1f}% without RAG ({v['compared_with']}) "
+                         f"(n = {v['n_withheld']}, "
                          f"p = {v['paired']['p']:.3g}); false abstention {v['with_rag']['false_abstention']} vs "
                          f"{v['without_rag']['false_abstention']}")
     return "\n".join(lines)
