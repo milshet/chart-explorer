@@ -407,3 +407,8 @@ def test_gpu_runbook_commands_match_the_code():
         assert split in ("val", "test", *evaluate.EVAL_SETS), split
     for sb in set(re.findall(r"slurm/(\w+)\.sbatch", text)):
         assert (REPO / f"slurm/{sb}.sbatch").is_file(), sb
+
+
+def test_rag_decision_record_is_regenerated_not_edited():
+    from rag import record
+    assert record.build() == (REPO / "docs/RAG.md").read_text(encoding="utf-8")
