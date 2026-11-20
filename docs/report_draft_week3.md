@@ -47,6 +47,8 @@ Embedding retriever against the lexical floor: measured.
 | test/question_only | 0.2398 | 0.3509 | 0.4211 | 0.3271 | 171 | 9 |
 | test/chart_metadata | 0.9006 | 0.9708 | 0.9825 | 0.9338 | 171 | 9 |
 
+Every chunking, query-plan, embedding and reranking decision, with its rule and outcome: `docs/RAG.md`. Not yet measured: `embed:minilm`, `embed:bge-small`, `embed:e5-small`, `embed:bge-base`, `bm25>rerank:ms-marco-minilm`, `bm25>rerank:bge-reranker-base`.
+
 ## Required comparison (3.5) and retrieval failure (3.6)
 
 | Condition | Relaxed acc. | True abst. | False abst. | vs base (only this / only base, p) | vs fine-tuned |
@@ -62,11 +64,18 @@ Retrieval failure (task 3.6), rows whose gold table was withheld:
 - fine-tuned(table): **lower, not significant** — 77.6% with RAG vs 83.5% without RAG (Run A, image only) (n = 85, p = 0.227); false abstention 1/85 vs 1/85
 - base: **harmful** + over-abstaining — 21.2% with RAG vs 54.1% without RAG (base, image only) (n = 85, p = 2.46e-07); false abstention 8/85 vs 0/85
 
-## LLM-as-judge (3.7)
+## LLM-as-judge (3.7, 3.13)
 
-Judged: NOT MEASURED
+Judge verdicts: NOT MEASURED.
+
+## Served latency (3.8, 3.14)
+
+Served latency: NOT MEASURED.
 
 ## What Week 3 has not yet established
 
-- LLM-as-judge rubric not run; no human spot-check kappa (3.7)
+- 6 embedding/reranking candidates not measured (tasks 3.10, 3.11)
+- LLM-as-judge rubric not run (3.7, 3.13)
+- served latency for run_a_r16 not measured (3.8, 3.14)
+- served latency for ablation_answer_only not measured (3.8, 3.14)
 - data-quality audit kappa not reported (3.0i): needs two or three human reviewers

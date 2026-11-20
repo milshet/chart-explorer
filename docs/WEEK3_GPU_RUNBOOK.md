@@ -136,8 +136,80 @@ git push
 ```
 
 Read the "What Week 3 has not yet established" list at the end of `docs/report_draft_week3.md`. After this runbook,
-it should hold only the human tasks: the audit κ (3.0i) and the judge with its spot-check (3.7, which runs from a
-machine with Anthropic API credentials, not VM03).
+it should hold only the human tasks and what step 6 measures. The judge no longer needs API credentials: it runs on
+VM03 since task 3.13.
+
+## 6. Template completion (tasks 3.10–3.14) — added 2026-11-20
+
+Three sessions, in this order: retrieval → judge → serving benchmark. The order keeps disk use under ~30 GB at
+every point: the judge model (~13 GB) is deleted before the benchmark writes its ~7 GB merge. Start each session
+with:
+
+```bash
+source ~/.tracka_environment && source ~/venv/bin/activate
+cd ~/chart-explorer && git pull && git status --short          # must print nothing tracked
+python -m pytest tests -q                                       # 160 passed
+quota -s
+```
+
+### 6a. Embedding models and rerankers (3.10, 3.11, 3.12): login shell, ~10 min, ~2 GB of models
+
+```bash
+~/venv-embed/bin/python scripts/rag/metrics.py --retrievers all --write
+python scripts/rag/record.py --write
+git diff --stat results/rag/ docs/RAG.md
+grep -A3 '"chosen"' results/rag/retrieval.json
+```
+
+- If `"retriever"` under `"chosen"` is still `"bm25"`, nothing was adopted: commit `results/rag/` and `docs/RAG.md`,
+  then push.
+- If anything else was chosen, the adoption rule fired. Run `~/venv-embed/bin/python scripts/rag/prompts.py
+  --write` and commit `data/rag/` with the results. Then rerun the RAG evaluations in step 4 before quoting any
+  RAG number.
+- Afterwards, free the space: `rm -rf ~/.cache/huggingface/hub/models--{BAAI,intfloat,cross-encoder}--*`
+
+### 6b. Judge (3.13): ~14 GB download, then one ~10–20 min job
+
+```bash
+quota -s                                                        # need ~14 GB free under the 32 GB soft limit
+hf download openai/gpt-oss-20b --exclude "original/*" "metal/*"   # never the duplicate original/ and metal/ weights
+python scripts/judge.py run --name run_a_r16 --dry-run          # JUDGE_DRY_RUN_OK; "reasoning effort in template"
+sbatch slurm/judge.sbatch --name run_a_r16
+```
+
+- **If the log ends `JUDGE_OK`:** check `n_excluded` in `results/judge/run_a_r16/summary.json`. A few exclusions are
+  normal. More than ~10 of 80 means the replies are being cut off: read the `judge_raw` of an excluded row in
+  `judged.jsonl` before deciding anything.
+- **Write the human sheet:** `python scripts/judge.py spotcheck --name run_a_r16`.
+- **Commit and push** `results/judge/`.
+- **Delete the model:** `rm -rf ~/.cache/huggingface/hub/models--openai--gpt-oss-20b`
+- **Fallback, only if the model fails to load or run** (an error in `logs/chartqa-judge-<JOB_ID>.err`, never because
+  of the verdicts): download `flowaicom/Flow-Judge-v0.1`, then
+  `sbatch slurm/judge.sbatch --name run_a_r16 --model flowaicom/Flow-Judge-v0.1`
+
+### 6c. Served latency (3.14): two jobs, ~10 min each, ~7 GB each, written and deleted per job
+
+```bash
+python scripts/serve_bench.py --adapter ~/runs/run_a_r16/adapter --dry-run              # SERVE_BENCH_DRY_RUN_OK
+python scripts/serve_bench.py --adapter ~/runs/ablation_answer_only/adapter --dry-run
+sbatch slurm/serve_bench.sbatch --adapter ~/runs/run_a_r16/adapter
+sbatch slurm/serve_bench.sbatch --adapter ~/runs/ablation_answer_only/adapter
+```
+
+- Each log ends `SERVE_BENCH_OK` and writes `results/serve/<run>.json`.
+- Check that `ls ~/merged` shows no `*_bench` folder left behind.
+
+### 6d. Regenerate and push
+
+```bash
+python scripts/report_week3.py --write
+python -m pytest tests -q
+git add results/ docs/ && git commit -m "Week 3 template completion results: embedders, rerankers, judge, served latency"
+git push
+```
+
+After this, the "not yet established" list in `docs/report_draft_week3.md` should hold only the human items: the
+audit κ (3.0i) and the judge spot-check κ (3.7).
 
 ## If something refuses to start
 

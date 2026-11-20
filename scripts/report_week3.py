@@ -15,6 +15,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 import threeway  # noqa: E402
+from rag import retrieve as R  # noqa: E402
 
 NM = "NOT MEASURED"
 
@@ -73,20 +74,61 @@ def build():
         gaps.append("no embedding model compared against the lexical floor (task 3.3)")
     for k, m in r["headline"].items():
         out.append(f"| {k} | {m['recall@1']} | {m['recall@3']} | {m['recall@5']} | {m['mrr']} | {m['n_scorable']} | {m['n_unscorable']} |")
-    out.append("")
+    measured = {x["retriever"] for x in r["selection"]["results"]}
+    missing = [f"embed:{n}" for n in R.EMBED_MODELS if f"embed:{n}" not in measured] + \
+              [f"bm25>rerank:{n}" for n in R.RERANKERS if f"bm25>rerank:{n}" not in measured]
+    out += ["", "Every chunking, query-plan, embedding and reranking decision, with its rule and outcome: "
+            "`docs/RAG.md`. Not yet measured: " + (", ".join(f"`{m}`" for m in missing) if missing else "none") + ".", ""]
+    if missing:
+        gaps.append(f"{len(missing)} embedding/reranking candidates not measured (tasks 3.10, 3.11)")
 
     cmp, deg = threeway.comparison(), threeway.degradation()
     out += ["## Required comparison (3.5) and retrieval failure (3.6)", "", threeway.markdown(cmp, deg), ""]
     gaps += [f"{n} (3.5)" for n, v in cmp["conditions"].items() if v == NM]
     gaps += [f"retrieval-failure verdict for {n} (3.6)" for n, v in deg.items() if v == NM]
 
-    j = sorted((REPO / "results/judge").glob("*/summary.json")) if (REPO / "results/judge").is_dir() else []
-    out += ["## LLM-as-judge (3.7)", "", "Judged: " + (", ".join(p.parent.name for p in j) if j else NM), ""]
+    out += ["## LLM-as-judge (3.7, 3.13)", ""]
+    j = sorted((REPO / "results/judge").glob("*/summary.json"))
     if not j:
-        gaps.append("LLM-as-judge rubric not run; no human spot-check kappa (3.7)")
-    if not (REPO / "docs/serve_smoke_log.json").is_file():
-        gaps.append("serving smoke test not run: no docs/serve_smoke_log.json (3.0f; engine decided: transformers), "
-                    "so no served latency (3.8)")
+        out += [f"Judge verdicts: {NM}.", ""]
+        gaps.append("LLM-as-judge rubric not run (3.7, 3.13)")
+    for p in j:
+        s = json.loads(p.read_text(encoding="utf-8"))
+        out += [f"**{p.parent.name}**, judged by `{s.get('judge_model', 'unrecorded')}` ({s.get('backend', 'anthropic')}): "
+                f"{s['n']} rows, {s['n_excluded']} excluded as unreadable (not scored zero).", "",
+                "| Axis | yes / graded |", "|---|---|"]
+        out += [f"| {a} | {s[a]['yes']}/{s[a]['n']} |" for a in ("correctness", "grounding", "abstention")]
+        out += ["", f"Judge vs the scorer's `evidence_grounded`: {len(s['grounding_disagreements'])} disagreements.", ""]
+        agree = p.parent / "agreement.json"
+        if agree.is_file():
+            a = json.loads(agree.read_text(encoding="utf-8"))
+            out += ["| Axis | human vs human (n, raw, κ) | judge vs grader 1 | judge vs grader 2 |", "|---|---|---|---|"]
+            out += [f"| {k} | {v['human_vs_human']} | {v['judge_vs_grader_1']} | {v['judge_vs_grader_2']} |"
+                    for k, v in a.items()]
+            out.append("")
+        else:
+            out += [f"Human spot-check κ: {NM}.", ""]
+            gaps.append(f"human spot-check of the judge on {p.parent.name}: two graders, Cohen's κ (3.7)")
+
+    out += ["## Served latency (3.8, 3.14)", ""]
+    serve = sorted((REPO / "results/serve").glob("*.json"))
+    if serve:
+        out += ["Merged bf16, `transformers.generate`, batch 1, one request at a time, the same 50 val requests for "
+                "every adapter. Latency is end to end minus HTTP.", "",
+                "| Run | e2e p50 (s) | e2e p95 (s) | TTFT p50 (s) | decode tok/s p50 | overall tok/s | mean new tokens "
+                "| accuracy on these items |", "|---|---|---|---|---|---|---|---|"]
+        for p in serve:
+            b = json.loads(p.read_text(encoding="utf-8"))
+            m = b["summary"]
+            out.append(f"| {b['run']} | {m['e2e_s']['p50']} | {m['e2e_s']['p95']} | {m['ttft_s']['p50']} | "
+                       f"{m['decode_tok_s']['p50']} | {m['overall_tok_s']} | {m['mean_new_tokens']} | "
+                       f"{pct(m['accuracy_on_these_items'])} |")
+        out.append("")
+    else:
+        out += [f"Served latency: {NM}.", ""]
+    for run in ("run_a_r16", "ablation_answer_only"):
+        if not (REPO / f"results/serve/{run}.json").is_file():
+            gaps.append(f"served latency for {run} not measured (3.8, 3.14)")
     for run in ("run_a_r16_table", "run_a_r16_vision"):
         if not list((REPO / "results/evals").glob(f"{run}-*")):
             gaps.append(f"{run} not trained or not evaluated (3.0h/3.0j)")
