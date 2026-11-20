@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""Make audit/judge_review.html: the page two people use to grade the judge spot-check (task 3.7).
+
+  python scripts/make_judge_review_page.py          # writes audit/judge_review.html
+
+Open the page in Chrome or Edge, choose Grader 1 or Grader 2, open results/judge/<run>/judge_spot_check.jsonl and
+grade every row on the judge's three axes. Submit writes that grader's verdicts back into the same file (the
+browser asks for permission once); other browsers download the updated file instead, to be saved over the original.
+Then: python scripts/judge.py agree --name <run>.
+
+What the page guarantees, because kappa is only meaningful if they hold:
+  - graders see exactly what the judge saw: question, gold answer, the data table and the model's raw output, no
+    chart image, and the rubric text below is judge.RUBRIC's own axis definitions, so the two grade the same task;
+  - a grader never sees the judge's verdicts or the other grader's;
+  - Submit re-reads the file and replaces only this grader's "grader_N" object on each line, byte for byte everything
+    else, so the two graders can submit in either order without overwriting each other;
+  - Submit refuses until every row has all three axes, and abstention is never n/a (judge.parse's rule).
+Progress is kept in the browser between sessions; the file is the record.
+"""
+import argparse
+import json
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+import judge  # noqa: E402
+
+OUT = REPO / "audit" / "judge_review.html"
+
+
+def axis_definitions():
+    """The three axis bullets of judge.RUBRIC, verbatim, so graders and the judge read the same definitions."""
+    text = judge.RUBRIC.split("Grade three axes independently:", 1)[1].split("Reply with only", 1)[0]
+    defs, cur = {}, None
+    for line in text.strip().splitlines():
+        line = line.strip()
+        if line.startswith("- "):
+            cur, rest = line[2:].split(":", 1)
+            defs[cur] = rest.strip()
+        elif cur:
+            defs[cur] += " " + line
+    assert tuple(defs) == judge.AXES, defs
+    return defs
+
+
+PAGE = r"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Judge spot-check</title>
+<style>
+:root{--btn:#14213d;--bg:#f7f6f1;--card:#fff;--ink:#14213d;--soft:#4a5568;--line:#ddd8cc;--acc:#b4531a;--yes:#2b6b4f;--no:#b4531a;--na:#6b7a90;--hl:#fff4d6}
+@media (prefers-color-scheme:dark){:root{--btn:#3d6bb3;--bg:#14171c;--card:#1d2128;--ink:#e8e6e1;--soft:#a0a7b4;--line:#323844;--acc:#f2a65a;--yes:#4f9d78;--no:#e07a3c;--na:#8792a6;--hl:#3a3320}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:2;display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#14213d;color:#f7f6f1}
+header b{font-size:17px}.bar{flex:1;min-width:140px;height:8px;background:#3a5584;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:#f2a65a;transition:width .2s}
+header .pill{font-size:13px;padding:2px 10px;border-radius:12px;background:#3a5584}
+main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:18px;padding:18px;max-width:1500px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:12px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);font-weight:700;margin:14px 0 4px}.lbl:first-child{margin-top:0}
+.qtext{font-size:19px;font-weight:600}.gold{font-size:19px;font-weight:700}.null{color:var(--no)}
+.meta{color:var(--soft);font-size:13px;white-space:pre-wrap}
+.tw{overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;font-size:13px;width:100%}th,td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{position:sticky;top:0;background:var(--card)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.out dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:0}.out dt{color:var(--soft)}.out dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.out ul{margin:0;padding-left:18px;font-weight:500}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:var(--bg);padding:8px;border-radius:6px;margin:6px 0 0}
+details summary{cursor:pointer;color:var(--soft);font-size:13px;margin-top:8px}
+.ax{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.ax:first-of-type{border-top:0;padding-top:0}
+.ax h3{margin:0;font-size:16px;text-transform:capitalize}.ax p{margin:4px 0 8px;color:var(--soft);font-size:13px}
+.opts{display:flex;gap:8px}.opts button{flex:1;padding:10px 6px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font-size:15px;cursor:pointer}
+.opts button:hover{border-color:var(--soft)}
+.opts button.on[data-v=yes]{background:var(--yes);border-color:var(--yes);color:#fff}.opts button.on[data-v=no]{background:var(--no);border-color:var(--no);color:#fff}.opts button.on[data-v="n/a"]{background:var(--na);border-color:var(--na);color:#fff}
+.opts kbd{font-size:11px;opacity:.7;margin-left:4px}
+nav{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}button.b{padding:10px 16px;border-radius:8px;border:0;background:var(--btn);color:#fff;font-size:15px;cursor:pointer}
+button.sec{background:#c9d3e3;color:#14213d}button.go{background:var(--yes)}button:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}.grid a{width:30px;height:26px;display:grid;place-items:center;font-size:12px;border-radius:5px;border:1px solid var(--line);color:var(--ink);text-decoration:none;cursor:pointer}
+.grid a.done{background:var(--yes);color:#fff;border-color:var(--yes)}.grid a.part{background:var(--hl)}.grid a.cur{outline:2px solid var(--acc)}
+.start{max-width:720px;margin:40px auto;padding:0 16px}.start h1{font-size:26px;margin:0 0 6px}
+.start label{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:16px}
+.hint{color:var(--soft);font-size:14px}.warn{color:var(--no);font-weight:600}.ok{color:var(--yes);font-weight:600}
+.rule{background:var(--hl);border-radius:8px;padding:10px 12px;font-size:14px;margin:12px 0}
+</style></head><body>
+<div id="app"></div>
+<script>
+const AXES = __AXES__;
+const DEFS = __DEFS__;
+const CHOICES = {correctness: ["yes", "no", "n/a"], grounding: ["yes", "no", "n/a"], abstention: ["yes", "no"]};
+const FS = "showOpenFilePicker" in window;
+const S = {grader: null, rows: [], text: "", name: "", handle: null, grades: {}, i: 0, status: ""};
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const key = () => `judge-spot-${S.name}-${S.grader}`;
+function save() { try { localStorage.setItem(key(), JSON.stringify({grades: S.grades, i: S.i})); } catch (e) {} }
+function load() { try { return JSON.parse(localStorage.getItem(key()) || "null"); } catch (e) { return null; } }
+const filled = id => AXES.filter(a => S.grades[id] && S.grades[id][a]).length;
+const complete = () => S.rows.every(r => filled(r.id) === AXES.length);
+
+function parseFile(text) {
+  const rows = text.split("\n").filter(l => l.trim()).map(l => JSON.parse(l));
+  if (!rows.length || !rows.every(r => r.id && "grader_1" in r && "grader_2" in r)) throw new Error("this is not a judge_spot_check.jsonl");
+  return rows;
+}
+
+async function openFile() {
+  try {
+    if (FS) {
+      [S.handle] = await showOpenFilePicker({types: [{description: "judge_spot_check.jsonl", accept: {"text/plain": [".jsonl"]}}]});
+      const f = await S.handle.getFile(); S.name = f.name; S.text = await f.text();
+    } else {
+      const f = await new Promise(res => { const inp = Object.assign(document.createElement("input"), {type: "file", accept: ".jsonl"}); inp.onchange = () => res(inp.files[0]); inp.click(); });
+      if (!f) return; S.name = f.name; S.text = await f.text();
+    }
+    S.rows = parseFile(S.text);
+  } catch (e) { if (e.name !== "AbortError") { S.status = `<span class="warn">${esc(e.message)}</span>`; render(); } return; }
+  S.name = S.name + "-" + S.rows.length + "-" + S.rows[0].id;   // progress key: this file, this sample
+  const g = `grader_${S.grader}`, stored = load();
+  S.grades = {};
+  for (const r of S.rows) S.grades[r.id] = Object.fromEntries(AXES.map(a => [a, (r[g] || {})[a] || null]));
+  if (stored) { for (const id in stored.grades) if (id in S.grades) for (const a of AXES) S.grades[id][a] = stored.grades[id][a] ?? S.grades[id][a]; S.i = Math.min(stored.i || 0, S.rows.length - 1); }
+  else { const first = S.rows.findIndex(r => filled(r.id) < AXES.length); S.i = first < 0 ? 0 : first; }
+  S.status = ""; render();
+}
+
+function tableHTML(t) {
+  const lines = t.split("\n"), at = lines.findIndex(l => l.trim().startsWith("|"));
+  if (at < 0) return `<pre>${esc(t)}</pre>`;
+  const meta = lines.slice(0, at).join("\n").replace(/\nTable:\s*$/, "").replace(/^Table:\s*$/m, "");
+  const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+  const rows = lines.slice(at).filter(l => l.trim().startsWith("|") && !/^\|[\s|:-]+\|$/.test(l.trim())).map(cells);
+  const isNum = c => /^-?[\d,.]+%?$/.test(c);
+  const head = rows.shift() || [];
+  return `<div class="meta">${esc(meta.trim())}</div><div class="tw"><table><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>`
+    + rows.map(r => `<tr>${r.map(c => `<td class="${isNum(c) ? "num" : ""}">${esc(c)}</td>`).join("")}</tr>`).join("") + "</tbody></table></div>";
+}
+
+function outputHTML(raw) {
+  let o = null; try { o = JSON.parse(raw); } catch (e) {
+    const m = String(raw).match(/\{[\s\S]*\}/); try { o = m ? JSON.parse(m[0]) : null; } catch (e2) {} }
+  if (!o || typeof o !== "object") return `<p class="warn">Output is not readable JSON.</p><pre>${esc(raw)}</pre>`;
+  const ans = o.answer === null || o.answer === undefined ? `<span class="null">null (declined)</span>` : esc(JSON.stringify(o.answer));
+  const ev = Array.isArray(o.evidence) && o.evidence.length ? `<ul>${o.evidence.map(e => `<li>${esc(typeof e === "string" ? e : JSON.stringify(e))}</li>`).join("")}</ul>` : `<span class="null">none cited</span>`;
+  return `<dl><dt>answer</dt><dd>${ans}</dd><dt>answer_type</dt><dd>${esc(o.answer_type)}</dd><dt>unit</dt><dd>${esc(o.unit ?? "null")}</dd>`
+    + `<dt>evidence</dt><dd>${ev}</dd><dt>rationale</dt><dd style="font-weight:400">${esc(o.rationale)}</dd></dl>`
+    + `<details><summary>raw output</summary><pre>${esc(raw)}</pre></details>`;
+}
+
+function set(a, v) { S.grades[S.rows[S.i].id][a] = v; save(); render(); }
+function go(i) { S.i = Math.max(0, Math.min(S.rows.length - 1, i)); save(); render(); window.scrollTo(0, 0); }
+function nextOpen() { for (let k = 1; k <= S.rows.length; k++) { const j = (S.i + k) % S.rows.length; if (filled(S.rows[j].id) < AXES.length) return go(j); } go(S.i + 1); }
+
+function pydumps(obj) {   // Python json.dumps(obj, ensure_ascii=False) for this flat object: same bytes as the file
+  return "{" + Object.entries(obj).map(([k, v]) => JSON.stringify(k) + ": " + JSON.stringify(v)).join(", ") + "}";
+}
+
+async function submit() {
+  if (!complete()) { S.status = `<span class="warn">Every row needs all three axes before submitting.</span>`; return render(); }
+  try {
+    let text = S.text;
+    if (S.handle) text = await (await S.handle.getFile()).text();    // re-read: the other grader may have submitted since
+    const lines = text.split("\n"), g = `grader_${S.grader}`, seen = new Set();
+    const re = new RegExp(`"${g}": \\{[^{}]*\\}`);
+    const out = lines.map(l => {
+      if (!l.trim()) return l;
+      const r = JSON.parse(l);
+      if (!(r.id in S.grades)) throw new Error(`row ${r.id} is not in the sample you graded: was the file regenerated?`);
+      seen.add(r.id);
+      const obj = Object.fromEntries(AXES.map(a => [a, S.grades[r.id][a]]));
+      if (!re.test(l)) throw new Error(`row ${r.id} has no ${g} object to fill`);
+      return l.replace(re, `"${g}": ${pydumps(obj)}`);
+    });
+    if (seen.size !== S.rows.length) throw new Error("the file on disk has a different set of rows from the one you graded");
+    const updated = out.join("\n");
+    if (S.handle) {
+      if ((await S.handle.requestPermission({mode: "readwrite"})) !== "granted") throw new Error("write permission was not granted");
+      const w = await S.handle.createWritable(); await w.write(updated); await w.close();
+      S.text = updated;
+      S.status = `<span class="ok">Saved: grader ${S.grader}'s ${S.rows.length} rows written to ${esc(S.name.split("-")[0])}.</span> Commit the file; when both graders have submitted, run <code>python scripts/judge.py agree --name run_a_r16</code>.`;
+    } else {
+      const a = Object.assign(document.createElement("a"), {href: URL.createObjectURL(new Blob([updated], {type: "text/plain"})), download: "judge_spot_check.jsonl"});
+      a.click();
+      S.status = `<span class="ok">Downloaded the updated judge_spot_check.jsonl.</span> Save it over results/judge/run_a_r16/judge_spot_check.jsonl (this browser cannot write the file directly; Chrome or Edge can).`;
+    }
+  } catch (e) { S.status = `<span class="warn">Not saved: ${esc(e.message)}</span>`; }
+  render();
+}
+
+function render() {
+  const app = document.getElementById("app");
+  if (!S.rows.length) {
+    app.innerHTML = `<div class="start"><h1>Judge spot-check</h1>
+      <p class="hint">Task 3.7. You grade a sample of the model's answers on the same three axes as the LLM judge. Your verdicts and the other grader's are compared with the judge's (Cohen's κ), so <b>grade on your own</b>: don't look at or discuss the other grader's answers until you've both submitted.</p>
+      <div class="rule">You see exactly what the judge saw: the question, the gold answer, the chart's data table and the model's output. There is no chart image, on purpose. Judge each axis <b>independently</b>: a right decision to answer is still "yes" on abstention even if the answer is wrong.</div>
+      <p><b>1. Who are you?</b></p>
+      <label><input type="radio" name="g" value="1" ${S.grader === 1 ? "checked" : ""}> Grader 1</label>
+      <label><input type="radio" name="g" value="2" ${S.grader === 2 ? "checked" : ""}> Grader 2</label>
+      <p><b>2. Open the file</b> <span class="hint">results/judge/run_a_r16/judge_spot_check.jsonl in the repo</span></p>
+      <button class="b" id="open" ${S.grader ? "" : "disabled"}>Open judge_spot_check.jsonl</button>
+      <p class="hint">${FS ? "Submit will write your grades straight back into this file (the browser asks for permission)." : "This browser can't write files directly: Submit will download the updated file for you to save over the original. Chrome or Edge can write it in place."} Your progress is kept in this browser if you close the page.</p>
+      <p>${S.status}</p></div>`;
+    app.querySelectorAll("input[name=g]").forEach(r => r.onchange = () => { S.grader = +r.value; render(); });
+    app.querySelector("#open").onclick = openFile;
+    return;
+  }
+  const r = S.rows[S.i], g = S.grades[r.id], done = S.rows.filter(x => filled(x.id) === AXES.length).length;
+  const gold = r.gold === null ? `<span class="null">null: unanswerable from this chart</span>` : esc(JSON.stringify(r.gold));
+  app.innerHTML = `<header><b>Judge spot-check</b><span class="pill">Grader ${S.grader}</span><span>Row ${S.i + 1} / ${S.rows.length}</span>
+      <div class="bar"><i style="width:${100 * done / S.rows.length}%"></i></div><span>${done} complete</span></header>
+    <main><section class="card">
+      <div class="lbl">Question</div><div class="qtext">${esc(r.question)}</div>
+      <div class="lbl">Gold answer</div><div class="gold">${gold}</div>
+      <div class="lbl">The chart's data table</div>${tableHTML(r.table)}
+      <div class="lbl">Model output</div><div class="out">${outputHTML(r.raw)}</div>
+      <p class="hint" style="margin-top:12px">${esc(r.id)}</p>
+    </section>
+    <section class="card">
+      ${AXES.map((a, k) => `<div class="ax"><h3>${a}</h3><p>${esc(DEFS[a])}</p><div class="opts">${CHOICES[a].map((v, n) =>
+        `<button data-a="${a}" data-v="${v}" class="${g[a] === v ? "on" : ""}">${v}<kbd>${"qwe asd zx".split(" ")[k][n] || ""}</kbd></button>`).join("")}</div></div>`).join("")}
+      <nav><button class="b sec" id="prev" ${S.i ? "" : "disabled"}>← Previous</button><button class="b" id="next">${filled(r.id) === AXES.length ? "Next →" : "Next unfinished →"}</button></nav>
+      <div class="lbl">All rows</div><div class="grid">${S.rows.map((x, j) => `<a data-j="${j}" class="${filled(x.id) === AXES.length ? "done" : filled(x.id) ? "part" : ""} ${j === S.i ? "cur" : ""}">${j + 1}</a>`).join("")}</div>
+      <p class="hint">Keys: correctness Q W E · grounding A S D · abstention Z X · ← → to move.</p>
+      <nav><button class="b go" id="submit" ${complete() ? "" : "disabled"}>Submit grades to judge_spot_check.jsonl</button></nav>
+      <p>${S.status || (complete() ? "" : `<span class="hint">${S.rows.length - done} row(s) still need all three axes.</span>`)}</p>
+    </section></main>`;
+  app.querySelectorAll(".opts button").forEach(b => b.onclick = () => set(b.dataset.a, b.dataset.v));
+  app.querySelectorAll(".grid a").forEach(a => a.onclick = () => go(+a.dataset.j));
+  app.querySelector("#prev").onclick = () => go(S.i - 1);
+  app.querySelector("#next").onclick = () => filled(r.id) === AXES.length ? go(S.i + 1) : nextOpen();
+  app.querySelector("#submit").onclick = submit;
+}
+
+document.addEventListener("keydown", e => {
+  if (!S.rows.length || e.target.tagName === "INPUT") return;
+  const map = {q: ["correctness", 0], w: ["correctness", 1], e: ["correctness", 2], a: ["grounding", 0], s: ["grounding", 1], d: ["grounding", 2], z: ["abstention", 0], x: ["abstention", 1]};
+  const k = e.key.toLowerCase();
+  if (map[k]) { const [a, n] = map[k]; set(a, CHOICES[a][n]); }
+  else if (e.key === "ArrowRight") go(S.i + 1);
+  else if (e.key === "ArrowLeft") go(S.i - 1);
+});
+window.addEventListener("beforeunload", save);
+render();
+</script></body></html>
+"""
+
+
+def build():
+    return (PAGE.replace("__AXES__", json.dumps(list(judge.AXES)))
+                .replace("__DEFS__", json.dumps(axis_definitions(), ensure_ascii=False)))
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--out", type=Path, default=OUT)
+    args = ap.parse_args()
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(build(), encoding="utf-8", newline="\n")
+    print(f"wrote {args.out}")
+
+
+if __name__ == "__main__":
+    main()
