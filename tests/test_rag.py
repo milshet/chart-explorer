@@ -197,8 +197,12 @@ def test_selection_set_is_drawn_from_train_only():
 
 
 def test_committed_retrieval_results_reproduce():
+    """The lexical rows, the choice and the headline reproduce without the embedding stack (VM03 only, task 3.3)."""
     committed = json.loads((REPO / "results/rag/retrieval.json").read_text(encoding="utf-8"))
-    assert rmetrics.run(["tfidf", "bm25"], write=False) == committed
+    lexical = [x for x in committed["selection"]["results"] if x["retriever"] in ("tfidf", "bm25")]
+    expected = {**committed, "selection": {**committed["selection"], "results": lexical}}
+    assert committed["chosen"]["retriever"] in ("tfidf", "bm25")  # else the headline needs the embedding model
+    assert rmetrics.run(["tfidf", "bm25"], write=False) == expected
 
 
 # --- RAG prompt sets (tasks 3.5, 3.6) --------------------------------------------------------------
