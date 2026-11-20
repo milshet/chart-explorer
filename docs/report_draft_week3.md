@@ -47,7 +47,7 @@ Embedding retriever against the lexical floor: measured.
 | test/question_only | 0.2398 | 0.3509 | 0.4211 | 0.3271 | 171 | 9 |
 | test/chart_metadata | 0.9006 | 0.9708 | 0.9825 | 0.9338 | 171 | 9 |
 
-Every chunking, query-plan, embedding and reranking decision, with its rule and outcome: `docs/RAG.md`. Not yet measured: `embed:minilm`, `embed:bge-small`, `embed:e5-small`, `embed:bge-base`, `bm25>rerank:ms-marco-minilm`, `bm25>rerank:bge-reranker-base`.
+Every chunking, query-plan, embedding and reranking decision, with its rule and outcome: `docs/RAG.md`. Not yet measured: none.
 
 ## Required comparison (3.5) and retrieval failure (3.6)
 
@@ -74,7 +74,6 @@ Served latency: NOT MEASURED.
 
 ## What Week 3 has not yet established
 
-- 6 embedding/reranking candidates not measured (tasks 3.10, 3.11)
 - LLM-as-judge rubric not run (3.7, 3.13)
 - served latency for run_a_r16 not measured (3.8, 3.14)
 - served latency for ablation_answer_only not measured (3.8, 3.14)

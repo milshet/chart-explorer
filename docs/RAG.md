@@ -29,7 +29,7 @@ Whole-table vs row-group (every row-group chunk repeats the title, axis, series 
 
 ## 3. Query plan
 
-`chart_metadata` (title, axis and legend text read off the chart the user sees) against `question_only`. Both are reported as a bracket on val and test. Best recall@1 on the selection set: 0.9333 vs 0.2, a gap of 0.73. The widest recall@1 spread between any two configurations within one plan is 0.08, so **the query plan matters more than every other choice in this record**.
+`chart_metadata` (title, axis and legend text read off the chart the user sees) against `question_only`. Both are reported as a bracket on val and test. Best recall@1 on the selection set: 0.9333 vs 0.2083, a gap of 0.72. The widest recall@1 spread between any two configurations within one plan is 0.09, so **the query plan matters more than every other choice in this record**.
 
 ## 4. Embedding model
 
@@ -38,15 +38,15 @@ Rule (task 3.10): adopt only if it beats BM25 on recall@1, then MRR, on the sele
 | Model | Plan | recall@1 | recall@3 | recall@5 | MRR | Passages truncated | Revision | Outcome |
 |---|---|---|---|---|---|---|---|---|
 | BM25 (floor) | chart_metadata | 0.9333 | 0.9667 | 0.9667 | 0.9522 | – | – | floor |
-| `sentence-transformers/all-MiniLM-L6-v2` | chart_metadata | 0.9167 | 0.95 | 0.975 | 0.9379 | not recorded | not recorded | rejected: does not beat BM25 |
-| `BAAI/bge-small-en-v1.5` | chart_metadata | NOT MEASURED | | | | | | NOT MEASURED |
-| `intfloat/e5-small-v2` | chart_metadata | NOT MEASURED | | | | | | NOT MEASURED |
-| `BAAI/bge-base-en-v1.5` | chart_metadata | NOT MEASURED | | | | | | NOT MEASURED |
+| `sentence-transformers/all-MiniLM-L6-v2` | chart_metadata | 0.9167 | 0.95 | 0.975 | 0.9379 | 19/1168 | `1110a243fd` | rejected: does not beat BM25 |
+| `BAAI/bge-small-en-v1.5` | chart_metadata | 0.9167 | 0.9667 | 0.9667 | 0.944 | 0/1168 | `5c38ec7c40` | rejected: does not beat BM25 |
+| `intfloat/e5-small-v2` | chart_metadata | 0.9 | 0.9667 | 0.975 | 0.9363 | 0/1168 | `ffb93f3bd4` | rejected: does not beat BM25 |
+| `BAAI/bge-base-en-v1.5` | chart_metadata | 0.925 | 0.9583 | 0.9667 | 0.9416 | 0/1168 | `a5beb1e3e6` | rejected: does not beat BM25 |
 | BM25 (floor) | question_only | 0.2 | 0.3 | 0.3417 | 0.2686 | – | – | floor |
-| `sentence-transformers/all-MiniLM-L6-v2` | question_only | 0.125 | 0.1833 | 0.225 | 0.1831 | not recorded | not recorded | does not beat BM25 |
-| `BAAI/bge-small-en-v1.5` | question_only | NOT MEASURED | | | | | | NOT MEASURED |
-| `intfloat/e5-small-v2` | question_only | NOT MEASURED | | | | | | NOT MEASURED |
-| `BAAI/bge-base-en-v1.5` | question_only | NOT MEASURED | | | | | | NOT MEASURED |
+| `sentence-transformers/all-MiniLM-L6-v2` | question_only | 0.125 | 0.1833 | 0.225 | 0.1831 | 19/1168 | `1110a243fd` | does not beat BM25 |
+| `BAAI/bge-small-en-v1.5` | question_only | 0.15 | 0.2333 | 0.25 | 0.2123 | 0/1168 | `5c38ec7c40` | does not beat BM25 |
+| `intfloat/e5-small-v2` | question_only | 0.1667 | 0.2417 | 0.25 | 0.2189 | 0/1168 | `ffb93f3bd4` | does not beat BM25 |
+| `BAAI/bge-base-en-v1.5` | question_only | 0.1917 | 0.25 | 0.2833 | 0.2355 | 0/1168 | `a5beb1e3e6` | does not beat BM25 |
 
 ## 5. Reranker
 
@@ -54,10 +54,10 @@ A cross-encoder reorders BM25's top tables. It can only reorder what BM25 hands 
 
 | Reranker | Plan | Depth | Ceiling | recall@1 | recall@3 | recall@5 | MRR | Pairs truncated | Outcome |
 |---|---|---|---|---|---|---|---|---|---|
-| `cross-encoder/ms-marco-MiniLM-L-6-v2` | chart_metadata | 10 | NOT MEASURED | | | | | | NOT MEASURED |
-| `BAAI/bge-reranker-base` | chart_metadata | 10 | NOT MEASURED | | | | | | NOT MEASURED |
-| `cross-encoder/ms-marco-MiniLM-L-6-v2` | question_only | 50 | NOT MEASURED | | | | | | NOT MEASURED |
-| `BAAI/bge-reranker-base` | question_only | 50 | NOT MEASURED | | | | | | NOT MEASURED |
+| `cross-encoder/ms-marco-MiniLM-L-6-v2` | chart_metadata | 10 | 0.9833 | 0.8667 | 0.9417 | 0.975 | 0.9093 | 3/1200 | rejected: does not beat BM25 |
+| `BAAI/bge-reranker-base` | chart_metadata | 10 | 0.9833 | 0.8917 | 0.9583 | 0.9583 | 0.9266 | 0/1200 | rejected: does not beat BM25 |
+| `cross-encoder/ms-marco-MiniLM-L-6-v2` | question_only | 50 | 0.5167 | 0.2 | 0.3167 | 0.3583 | 0.2753 | 2/4836 | beats BM25 on this plan (not the selection plan) |
+| `BAAI/bge-reranker-base` | question_only | 50 | 0.5167 | 0.2083 | 0.3167 | 0.375 | 0.2846 | 0/4836 | beats BM25 on this plan (not the selection plan) |
 
 `cross-encoder/ms-marco-MiniLM-L-6-v2` is trained on MS MARCO, whose licence is non-commercial research only; the model card says so.
 
