@@ -96,12 +96,22 @@ def redteam():
     return redteam_charts, redteam_charts.build()
 
 
-def test_redteam_files_regenerate_byte_identical(redteam):
+def test_redteam_files_regenerate_identical(redteam):
+    """The committed files match MANIFEST byte for byte; a rebuild reproduces their pixels, tables and specs.
+
+    PNG bytes are not compared across machines: with the same Pillow (13.0.0) the Windows wheel compresses with
+    zlib-ng and the Linux wheel with zlib 1.3, so identical pixels encode to different bytes (checked on VM03,
+    2026-11-20: the bytes differ, 21/21 charts are pixel-identical)."""
     import hashlib
+    import io
+    from PIL import Image
     rc, built = redteam
     manifest = dict(reversed(l.split()) for l in (rc.OUT / "MANIFEST.txt").read_text().splitlines() if l)
     for s, png, rows in built:
-        assert hashlib.sha256(png).hexdigest() == manifest[s["image"]], s["id"]
+        committed = (rc.OUT / s["image"]).read_bytes()
+        assert hashlib.sha256(committed).hexdigest() == manifest[s["image"]], s["id"]
+        new, old = Image.open(io.BytesIO(png)), Image.open(io.BytesIO(committed))
+        assert new.size == old.size and new.convert("RGB").tobytes() == old.convert("RGB").tobytes(), s["id"]
         assert hashlib.sha256(rc.csv_text(rows).encode()).hexdigest() == manifest[s["table_csv"]]
     specs = "".join(json.dumps(s, ensure_ascii=False) + "\n" for s, _, _ in built).encode()
     assert hashlib.sha256(specs).hexdigest() == manifest["specs.jsonl"]
