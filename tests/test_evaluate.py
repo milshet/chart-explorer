@@ -521,3 +521,23 @@ def test_judge_review_page_is_generated_and_uses_the_judges_rubric():
         assert set(json.loads(line)) == {"id", "question", "gold", "table", "raw", "grader_1", "grader_2"}  # ...nor has them
     images = page.chart_images()   # every spot-check row has its chart, and the path resolves from audit/
     assert images and all((REPO / "audit" / p).resolve().is_file() for p in images.values())
+
+
+def test_week3_wandb_report_is_generated_from_the_committed_results():
+    import compare
+    import report_week3
+    import wandb_report_week3 as w3
+    md = w3.markdown()
+    # the Week 3 sections are the generated draft's, verbatim, so the dashboard and the draft cannot disagree
+    draft = report_week3.build()
+    assert md["draft"] and all(f"## {h}\n\n{b}" in draft for h, b in md["draft"])
+    assert [h for h, _ in md["draft"]][-1] == "What Week 3 has not yet established"
+    # every Week 3 run is in the tables, under its label rather than a folder name
+    assert "Run A + vision LoRA" in md["test"] and "Run A + vision LoRA" in md["eval_c"]
+    assert "Run A, table-trained (image + gold table)" in md["val"]
+    assert "run_a_r16_vision-adapter" not in md["test"] + md["val"] + md["eval_c"]
+    # the summary's headline figure is the committed one
+    test = compare.load(compare.REPO / "results/evals", "test")
+    acc = test[w3.RUN_A["test"]][0]["overall"]["relaxed_accuracy"]
+    assert f"Run A vs few-shot base on test: {compare.pct(acc)}" in md["summary"]
+    assert set(w3.RUNS) >= {"run_a_r16", "run_b_r64", "ablation_answer_only", "run_a_r16_table", "run_a_r16_vision"}

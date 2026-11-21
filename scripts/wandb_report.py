@@ -29,6 +29,10 @@ LABELS = {  # evaluation folder prefix -> table label
     "run_a_r16-adapter": "QLoRA Run A, r16 (final)", "run_a_r16-epoch-1": "Run A, r16, epoch 1",
     "run_b_r64-adapter": "QLoRA Run B, r64", "run_b_r64-epoch-1": "Run B, r64, epoch 1",
     "ablation_answer_only-adapter": "Ablation, answer only",
+    # Week 3 (task 3.16); prefixes are distinct from Run A's, so the order above is unaffected
+    "run_a_r16_table-adapter_val_image_table": "Run A, table-trained (image + gold table)",
+    "run_a_r16_table-adapter": "Run A, table-trained", "run_a_r16_vision-adapter": "Run A + vision LoRA",
+    "base_eval_c_image_only_answer_only_2shot": "Base, few-shot (2)",
 }
 
 
