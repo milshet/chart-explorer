@@ -1,6 +1,6 @@
 # Week 4 handoff
 
-Written 2026-11-20, at the end of Week 3; updated 2026-11-21 with the results of tasks 3.10–3.16. Week 4 is in `docs/Capstone_Project_4WeekPlan.md` (§6, Week 4, tasks
+Written 2026-11-20, at the end of Week 3; updated 2026-11-21 with the results of tasks 3.10–3.16 and 2026-11-22 with the judge spot-check κ (3.7). Week 4 is in `docs/Capstone_Project_4WeekPlan.md` (§6, Week 4, tasks
 4.1–4.8). This note covers what that plan does not: where things stand, what has already been decided, and
 what VM03 will do to you.
 
@@ -34,13 +34,10 @@ and their results are committed:
 | 3.15 | The Week 3 draft and this handoff regenerated and updated |
 | 3.16 | W&B report covering Weeks 2–3, generated from the committed results (`scripts/wandb_report_week3.py`) |
 
+**3.7, judge spot-check: done 2026-11-22.** Two graders, 30 rows each, independently, on `audit/judge_review.html`; κ in `results/judge/run_a_r16/agreement.json` and the draft. One disclosure for the report: the grading guide (`docs/judge_spotcheck_grading_guide.pdf`) used spot-check row 2 as its worked example, so that row's correctness and grounding grades were not independent. The W&B report is regenerated with the κ by rerunning `scripts/wandb_report_week3.py` on VM03; it makes a new report, so the README link is updated with it.
+
 Still open, all of it **human** work, owned by the Week 3 team:
 
-- **3.7, judge spot-check κ.** Grader 1's grades are committed in
-  `results/judge/run_a_r16/judge_spot_check.jsonl`; grader 2 is pending. Graders use `audit/judge_review.html`,
-  which writes their grades into that file. Then `python scripts/judge.py agree --name run_a_r16`, then
-  `python scripts/report_week3.py --write`, then rerun `scripts/wandb_report_week3.py` so the dashboard shows the κ
-  (it makes a new report; update the README link).
 - **3.0i, audit κ:** two or three reviewers fill in `audit/audit_v2.xlsx`, then run `scripts/audit_kappa.py`. The
   model card's data-provenance section needs this, and renders `NOT MEASURED` without it.
 - **3.0h, member training runs: unconfirmed.** `docs/RUNS.md` assigns two seed reruns (`run_a_seed1_<name>`,
@@ -75,9 +72,13 @@ Quote them as such, never as differences of percentages.
   chart-metadata queries. Four embedding models and two rerankers were measured against it on a train selection
   set, with the adoption rule fixed in advance; none beat it (`docs/RAG.md`).
 - **LLM judge:** Llama-3.1-8B 8-bit, three axes on 80 rows (correctness 47/58, grounding 57/72, abstention
-  57/80). Quote it with its measured reliability: 63/80 against the exact abstention answer, it graded
-  correctness on 7 rows where the rubric says n/a, and the human κ once 3.7 lands. Don't quote its axis counts
-  alone.
+  57/80). Quote it with its measured reliability, never its axis counts alone. Human spot-check, 30 rows, two
+  independent graders (Cohen's κ):
+  - **Correctness: usable.** Graders agree perfectly (κ 1.0); the judge agrees with each at κ 0.94.
+  - **Grounding: not reliable.** Graders κ 0.87; judge 0.55 and 0.42. Report grounding from the scorer's
+    programmatic `evidence_grounded`, not the judge.
+  - **Abstention: not reliable.** Graders κ 1.0 (the rule is mechanical); judge 0.54 with both. It also matches
+    the exact answer on only 63/80 rows. Report abstention from the exact check.
 - **Served latency:** Run A p50 1.256 s, p95 1.81 s; the answer-only ablation p50 0.442 s, p95 0.538 s. First
   token (0.086 s) and decode rate (~60 tok/s) are the same for both, so the 2.8× gap is entirely Run A's evidence
   and rationale (72.4 vs 21.8 tokens per answer). Both 98% schema-valid on these 50 requests.

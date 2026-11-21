@@ -111,8 +111,13 @@ def build():
         agree = p.parent / "agreement.json"
         if agree.is_file():
             a = json.loads(agree.read_text(encoding="utf-8"))
-            out += ["| Axis | human vs human (n, raw, κ) | judge vs grader 1 | judge vs grader 2 |", "|---|---|---|---|"]
-            out += [f"| {k} | {v['human_vs_human']} | {v['judge_vs_grader_1']} | {v['judge_vs_grader_2']} |"
+            def k_(t):   # judge.cohen's (n, raw agreement, kappa); kappa is None when only one category occurs
+                n, raw, kappa = t
+                return f"κ {kappa} (raw {raw})" if kappa is not None else f"κ undefined, one category (raw {raw})"
+            n = next(iter(a.values()))["human_vs_human"][0]
+            out += [f"**Human spot-check** ({n} rows, two graders working independently): Cohen's κ, raw agreement in "
+                    "brackets.", "", "| Axis | human vs human | judge vs grader 1 | judge vs grader 2 |", "|---|---|---|---|"]
+            out += [f"| {k} | {k_(v['human_vs_human'])} | {k_(v['judge_vs_grader_1'])} | {k_(v['judge_vs_grader_2'])} |"
                     for k, v in a.items()]
             out.append("")
         else:
