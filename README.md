@@ -36,3 +36,11 @@ scored on test once. Paired test: exact McNemar against few-shot on the same ite
 - Base models were evaluated in 4-bit (as in Week 1), fine-tuned models in bf16 with the adapter. Margin of error for one score at n = 180: about +/-7 points.
 
 Details, val results and raw predictions: [`results/evals/`](results/evals/README.md). Training runs: [`docs/RUNS.md`](docs/RUNS.md).
+
+## Experiment tracking
+
+All training runs log to the Weights & Biases project `chartqa-week2`. The **[Weeks 2–3 report](https://forge.coreweave.com/learner01-iit-iit-kharagpur/chartqa-week2/reports/Weeks-2-3:-fine-tuning,-retrieval-and-evaluation-of-Qwen2.5-VL-3B-on-ChartAudit-Fin-v2.0--VmlldzoxODM0NTM5OA==)** shows the
+training curves of all five runs (Run A, Run B, the answer-only ablation, the table-trained Run A and the vision LoRA),
+the val, test and Eval-C tables, and the Week 3 results: retrieval, the base / +RAG / fine-tuned / +RAG comparison, the
+LLM judge and served latency. It is generated from the committed results by `scripts/wandb_report_week3.py`, so it
+matches [`docs/report_draft_week3.md`](docs/report_draft_week3.md); rerun the script after new results are committed.

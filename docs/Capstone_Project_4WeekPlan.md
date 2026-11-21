@@ -423,7 +423,7 @@ Checked against template items 5 (RAG layer) and 6 (Evaluation) once the Week 3 
 ## 7. Deliverables Checklist (per template)
 
 - [ ] Git repository with reproducible training and serving code: tasks 4.1–4.4, checked from a clean clone in 4.7
-- [ ] Experiment tracking dashboard (Weights & Biases or MLflow): W&B project `chartqa-week2`; Week 2 report built by `scripts/wandb_report.py`; Week 3 runs and results added by task **3.16**
+- [x] Experiment tracking dashboard (Weights & Biases or MLflow): W&B project `chartqa-week2`; [Weeks 2–3 report](https://forge.coreweave.com/learner01-iit-iit-kharagpur/chartqa-week2/reports/Weeks-2-3:-fine-tuning,-retrieval-and-evaluation-of-Qwen2.5-VL-3B-on-ChartAudit-Fin-v2.0--VmlldzoxODM0NTM5OA==) (2026-11-21); Week 2 report built by `scripts/wandb_report.py`; Week 3 runs and results added by task **3.16**
 - [ ] Model card: intended use, data provenance, failure modes, refusals: task 4.6, with the 4.5 red-team log
 - [ ] 12-page technical report: task 4.7, from the generated Week 3 and Week 4 drafts
 - [ ] 10-minute demo of the deployed endpoint: task 4.8 (served with `transformers.generate`, not vLLM: 4.3)
