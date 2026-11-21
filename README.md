@@ -39,7 +39,7 @@ Details, val results and raw predictions: [`results/evals/`](results/evals/READM
 
 ## Experiment tracking
 
-All training runs log to the Weights & Biases project `chartqa-week2`. The **[Weeks 2–3 report](https://forge.coreweave.com/learner01-iit-iit-kharagpur/chartqa-week2/reports/Weeks-2-3:-fine-tuning,-retrieval-and-evaluation-of-Qwen2.5-VL-3B-on-ChartAudit-Fin-v2.0--VmlldzoxODM0NTM5OA==)** shows the
+All training runs log to the Weights & Biases project `chartqa-week2`. The **[Weeks 2–3 report](https://forge.coreweave.com/wandb/learner01-iit-iit-kharagpur/chartqa-week2/reports/Weeks-2-3-fine-tuning-retrieval-and-evaluation-of-Qwen2-5-VL-3B-on-ChartAudit-Fin-v2-0--VmlldzoxODM0NTM5OA?accessToken=x6s5vpnsngjjlsxj8222ooqb1v1hv9hd0ckdg4anuh4sqzqqjhhyq5aq7y5d1123)** shows the
 training curves of all five runs (Run A, Run B, the answer-only ablation, the table-trained Run A and the vision LoRA),
 the val, test and Eval-C tables, and the Week 3 results: retrieval, the base / +RAG / fine-tuned / +RAG comparison, the
 LLM judge and served latency. It is generated from the committed results by `scripts/wandb_report_week3.py`, so it
