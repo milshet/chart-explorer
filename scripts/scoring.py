@@ -106,6 +106,45 @@ def score(item, raw, style):
     return res
 
 
+def contract_errors(out, style):
+    """Every way a parsed output breaks the answer contract; [] means it is a valid answer object.
+
+    The serving check (task 4.3): stricter than schema_valid, which score() keeps unchanged so no reported number
+    moves. On top of schema_valid it requires exactly the contract's fields, string evidence and rationale, a
+    string-or-null unit and rationale, an answer that is a string, a number or null, and the cross-field rule both ways: the
+    answer is null if and only if answer_type is "unanswerable". Every gold answer in the dataset satisfies it.
+    Messages are written to be quoted back to the model in a retry.
+    """
+    if not isinstance(out, dict):
+        return ["the reply is not a JSON object"]
+    errors, need = [], fields_for(style)
+    missing, extra = sorted(need - set(out)), sorted(set(out) - need)
+    if missing:
+        errors.append(f"missing field(s): {', '.join(missing)}")
+    if extra:
+        errors.append(f"unexpected field(s): {', '.join(extra)}")
+    kind = out.get("answer_type")
+    if "answer_type" in out and kind not in TYPES:
+        errors.append(f'"answer_type" must be one of {", ".join(sorted(TYPES))}, not {kind!r}')
+    if "unit" in out and out["unit"] is not None and not isinstance(out["unit"], str):
+        errors.append('"unit" must be a string or null')
+    answer = out.get("answer")
+    if "answer" in out and (isinstance(answer, bool) or not isinstance(answer, (str, int, float, type(None)))):
+        errors.append('"answer" must be a string, a number or null')
+    if "answer" in out and kind in TYPES:
+        if kind == "unanswerable" and answer is not None:
+            errors.append('"answer_type" is "unanswerable", so "answer" must be null')
+        if kind != "unanswerable" and answer is None:
+            errors.append(f'"answer" is null, so "answer_type" must be "unanswerable", not "{kind}"')
+    if style == "cot":
+        ev = out.get("evidence")
+        if "evidence" in out and not (isinstance(ev, list) and all(isinstance(e, str) for e in ev)):
+            errors.append('"evidence" must be a list of strings')
+        if "rationale" in out and not isinstance(out["rationale"], (str, type(None))):
+            errors.append('"rationale" must be a string')  # null allowed: Eval-C's gold probes carry it
+    return errors
+
+
 def _mean(xs):
     xs = list(xs)
     return sum(xs) / len(xs) if xs else None

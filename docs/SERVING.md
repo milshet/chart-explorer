@@ -82,6 +82,73 @@ The report also shows how often the batch-1 reference matches the committed batc
 adapter (`reference_vs_committed_eval`). That figure is for information only: batching and padding change greedy
 decoding slightly, so it is not a gate.
 
+## The endpoint (task 4.3)
+
+FastAPI in front of `transformers.generate`, serving the verified merge (`~/merged/run_a_r16`). vLLM is not used
+(decision 12 above); the latency quoted is the measured one.
+
+| Piece | File | Role |
+|---|---|---|
+| Request path | `scripts/serve/service.py` | parsing, image limits, refusals, prompt, counters, `/health`; no web framework |
+| Validation and retry | `scripts/serve/decoding.py` | `scoring.contract_errors()`, re-ask with the errors quoted, fallback |
+| Engine | `scripts/serve/generation.py` | the one generation path (4.1 verified it) |
+| HTTP | `scripts/serve/app.py` | FastAPI routes only |
+| Client, bench | `scripts/serve/client.py`, `scripts/serve/http_bench.py` | standard-library client; the 3.14 requests over HTTP |
+
+**API.** `POST /v1/answer` with `{"question": str, "image_base64": str}` returns an envelope:
+
+```json
+{"result": {"evidence": [...], "rationale": "...", "answer_type": "number", "unit": null, "answer": 38},
+ "degraded": false, "attempts": 1, "retry_errors": [],
+ "model": {"run": "run_a_r16", "status": "VERIFIED", "adapter_sha256": "..."},
+ "usage": {"prompt_tokens": 702, "new_tokens": 70}, "timing": {"generate_s": 1.18, "total_s": 1.22}}
+```
+
+- **Contract.** `scoring.contract_errors()` is stricter than `schema_valid`, which stays unchanged so no
+  reported number moves. It requires exactly the contract's fields, and the cross-field rule both ways: the
+  answer is null if and only if `answer_type` is `unanswerable`. Every gold answer in the repo and every
+  schema-valid Run A output satisfies it.
+- **Retry.** A reply that fails the contract goes back as the assistant turn, the errors are quoted in a new user
+  turn, and the model answers again, up to 3 attempts in all.
+- **Fallback.** After 3 failures the caller gets a contract-valid abstention with `"degraded": true` in the
+  envelope, never inside `result`, so it can't be mistaken for the model's own refusal.
+- **Counters.** `GET /metrics` reports requests, first-attempt-valid, retried, recovered, degraded, the model's own
+  abstentions, refusals by code and engine errors. The report quotes them.
+- **Refused, not ignored.** Any field that would put caller text into the prompt (`context`, `table`, `messages`,
+  `system`, `prompt`, ...) returns 400 `caller_text_refused`. Unknown fields are refused too. Images must be
+  PNG/JPEG/WebP, at most 8 MB and 40 MP (checked from the header before decoding), and at least 28 px a side.
+  They're resized exactly as in training. Line breaks in the question become spaces.
+- **Health.** `GET /health` reports the merge manifest: status, adapter and weight hashes, base revision. The app
+  refuses to start on a checkpoint whose manifest isn't `VERIFIED`.
+
+**Install FastAPI and uvicorn once, without moving the locked stack.** The lockfile is passed as a constraints
+file, so pip either keeps every pinned package at its pinned version or fails. It never upgrades one:
+
+```bash
+source ~/.tracka_environment && source ~/venv/bin/activate && cd ~/chart-explorer
+pip install --dry-run fastapi uvicorn -c requirements-vm03.lock     # read the "Would install" line
+pip install fastapi uvicorn -c requirements-vm03.lock
+python scripts/evaluate.py --split val --targets answer_only --dry-run | grep -i warning   # must print nothing
+pip freeze | grep -iE "^(fastapi|uvicorn|starlette)=="              # these get added to the lockfile
+```
+
+**Measure served latency through HTTP** (the same 50 requests as 3.14):
+
+```bash
+python scripts/serve/http_bench.py --dry-run
+sbatch slurm/serve_http_bench.sbatch          # -> results/serve/run_a_r16_http.json; ends HTTP_BENCH_OK
+```
+
+**Run the endpoint** (for the demo; it holds the GPU, so `scancel` it when done):
+
+```bash
+sbatch slurm/serve.sbatch
+grep -m1 "Uvicorn running" logs/chartqa-serve-<JOB_ID>.out
+curl -s localhost:8000/health
+python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
+ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>     # from a laptop: http://localhost:8000/docs
+```
+
 ## Decision record
 
 | Date | Engine | Environment | Smoke log | Decision |

@@ -120,7 +120,9 @@ def build():
             gaps.append(f"human spot-check of the judge on {p.parent.name}: two graders, Cohen's κ (3.7)")
 
     out += ["## Served latency (3.8, 3.14)", ""]
-    serve = sorted((REPO / "results/serve").glob("*.json"))
+    # Only the 3.14 in-process benches: Week 4 writes other reports here (4.1 merge check, 4.3 HTTP bench).
+    serve = [p for p in sorted((REPO / "results/serve").glob("*.json"))
+             if json.loads(p.read_text(encoding="utf-8")).get("task") == "3.14"]
     if serve:
         out += ["Merged bf16, `transformers.generate`, batch 1, one request at a time, the same 50 val requests for "
                 "every adapter. Latency is end to end minus HTTP.", "",
