@@ -2,6 +2,7 @@
 # Generated with: python -m pip freeze   (Python 3.12.3, CUDA 12.6, NVIDIA L40S)
 # scripts/train.py compares the installed versions with this file before a GPU run.
 # After an intentional upgrade, regenerate it and commit it in the same change.
+# fastapi, starlette, uvicorn added 2026-11-23 for the endpoint (task 4.3), installed with -c this file.
 accelerate==1.15.0
 annotated-doc==0.0.5
 annotated-types==0.8.0
@@ -18,6 +19,7 @@ cwevals==0.0.1b1
 datasets==5.2.0
 dill==0.4.1
 distro==1.9.0
+fastapi==0.165.0
 filelock==4.2.4
 fsspec==2026.9.0
 googleapis-common-protos==1.76.0
@@ -81,6 +83,7 @@ safetensors==0.8.0
 setuptools==78.1.0
 shellingham==1.5.4
 sniffio==1.3.1
+starlette==1.10.0
 sympy==1.14.0
 tokenizers==0.23.3
 torch==2.14.1+cu126
@@ -95,5 +98,6 @@ typing-inspection==0.4.5
 typing_extensions==4.16.0
 tzdata==2026.6
 urllib3==2.8.0
+uvicorn==0.54.0
 wandb==0.31.0
 xxhash==4.1.0
