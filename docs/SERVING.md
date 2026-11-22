@@ -149,6 +149,47 @@ python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is t
 ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>     # from a laptop: http://localhost:8000/docs
 ```
 
+## Quantisation (task 4.2)
+
+GPTQ, 4-bit, groups of 128, on the 252 decoder projections only. The vision tower, merger and `lm_head` are
+not quantised. `scripts/serve/quantise.py` decides by a measured delta, with the tolerance fixed in code before
+the run:
+- **ACCEPT** if test accuracy drops by at most 2 points (at most 3 more wrong answers of 180) and at most 1
+  contract-valid answer is lost against the bf16 merge, both scored through `serve/generation.py` in the same job.
+- **REJECT** otherwise, and bf16 is served.
+- **A backend failure** is recorded as `DOWNGRADE_BACKEND_FAILED` with its exception, and bf16 is served.
+
+**Backend: GPTQModel, chosen 2026-11-23 by probing VM03.**
+- GPTQModel 7.10.0 installs against `requirements-vm03.lock` without moving any locked package.
+- llm-compressor does not: `ResolutionImpossible` against the locked `pyyaml` and `numpy`.
+- transformers needs `optimum` (2.3.0, also clean against the lock) to load the GPTQ export.
+- VM03 has no `nvcc`, so GPTQModel's compiled CUDA kernels are unavailable and it runs on its Triton or PyTorch
+  kernels. That may make the quantised model slower than bf16; the report records both timings.
+
+Both go into a separate venv that sees the locked stack through `.pth` files and never touches `~/venv`:
+
+```bash
+source ~/.tracka_environment && cd ~/chart-explorer
+~/venv/bin/python -m venv ~/venv-quant
+SP=lib/python3.12/site-packages
+cp ~/venv/$SP/tracka_shared_runtime.pth ~/venv-quant/$SP/
+echo "$HOME/venv/$SP" > ~/venv-quant/$SP/learner_venv.pth
+source ~/venv-quant/bin/activate
+pip install gptqmodel optimum -c requirements-vm03.lock
+python scripts/evaluate.py --split val --targets answer_only --dry-run 2>&1 | grep -i "warning: a gpu"   # nothing
+```
+
+Run it (the export adds ~3 GB to the quota):
+
+```bash
+python scripts/serve/quantise.py --dry-run     # in ~/venv-quant: targets, calibration, backend settings
+sbatch slurm/quantise.sbatch                   # -> ~/merged/run_a_r16_w4 + results/serve/quantise_run_a_r16.json
+```
+
+The last log line is `QUANTISE_MEASURED_ACCEPT`, `QUANTISE_MEASURED_REJECT`, `QUANTISE_DOWNGRADE_BACKEND_FAILED_REJECT`
+or `QUANTISE_REFUSED: ...`. A refusal means the targets or the export were wrong, and it is never recorded as a
+downgrade.
+
 ## Decision record
 
 | Date | Engine | Environment | Smoke log | Decision |

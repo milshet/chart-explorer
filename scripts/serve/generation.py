@@ -6,7 +6,7 @@ quantisation delta (4.2) and the endpoint (4.3) all call it:
 
   HFEngine        transformers.generate, bf16, batch 1, greedy (decision 12: no vLLM). Loads either a merged
                   checkpoint directory, or the base model plus an adapter (the unmerged reference 4.1 compares
-                  against). Refuses a quantised checkpoint: 4.1 compares bf16 weights only.
+                  against). Refuses a quantised checkpoint unless allow_quantized (task 4.2 scores one on purpose).
   answer_items    runs items through an engine and scores each answer with scripts/scoring.py.
   parsed_answer   the answer an output commits to, normalised: what "the same answer" means when two models are
   same_answer     compared. Parsed, not raw: two outputs that differ in whitespace or rationale wording but commit
@@ -45,7 +45,7 @@ class Generation:
 class HFEngine:
     """bf16 transformers.generate, batch 1, greedy: a merged checkpoint, or base + adapter (never both)."""
 
-    def __init__(self, model_dir=None, adapter=None, device=0):
+    def __init__(self, model_dir=None, adapter=None, device=0, allow_quantized=False):
         if model_dir and adapter:
             raise ValueError("give a merged checkpoint or an adapter, not both")
         import torch
@@ -55,14 +55,18 @@ class HFEngine:
         self.processor = AutoProcessor.from_pretrained(src, local_files_only=True)
         model = AutoModelForImageTextToText.from_pretrained(src, dtype=torch.bfloat16, device_map={"": device},
                                                             local_files_only=True)
-        if getattr(model.config, "quantization_config", None):
-            raise RuntimeError(f"{src} is a quantised checkpoint; this engine compares bf16 weights only")
+        quant = getattr(model.config, "quantization_config", None)
+        if quant and not allow_quantized:
+            raise RuntimeError(f"{src} is a quantised checkpoint; pass allow_quantized=True to score one on purpose")
         if adapter:
             from peft import PeftModel
             model = PeftModel.from_pretrained(model, str(adapter), local_files_only=True)
         self.model = model.eval()
         self.stops = ev.stop_ids(self.model, self.processor.tokenizer)
-        self.description = {"engine": "transformers.generate", "precision": "bf16", "batch_size": 1,
+        if quant is not None and not isinstance(quant, dict):
+            quant = quant.to_dict() if hasattr(quant, "to_dict") else str(quant)
+        self.description = {"engine": "transformers.generate", "precision": "bf16", "quantization": quant,
+                            "batch_size": 1,
                             "decoding": "greedy", "model": src, "adapter": str(adapter) if adapter else None}
 
     def generate(self, messages, images, max_new_tokens=MAX_NEW_TOKENS):
