@@ -110,6 +110,39 @@ def test_a_correct_export_passes():
     assert got["quantised_modules"] == 252 and got["vision_weight_dtypes"] == ["BF16"] and got["tensor_bytes"] > 0
 
 
+def newer_layout(h):
+    """The same header in the layout GPTQModel saves: model.language_model.layers..., model.visual..."""
+    out = {}
+    for n, v in h.items():
+        n = n.replace("model.language_model.", "model.").replace("model.layers.", "model.language_model.layers.")
+        n = n.replace("model.visual.", "visual.").replace("visual.", "model.visual.", 1) if "visual." in n else n
+        out[n] = v
+    return out
+
+
+def test_an_export_in_the_newer_layout_matches_a_plan_from_the_older_one():
+    """Job 148: the merge said model.layers.0..., the GPTQ export model.language_model.layers.0..."""
+    older = {n.replace("model.language_model.", "model.").replace("model.visual.", "visual."): v
+             for n, v in header().items()}
+    plan = Q.plan_targets(Q.linear_modules(older))
+    assert plan["quantise"][0].startswith("model.layers.")
+    export = newer_layout(header(quantised=DEC))
+    assert any(n.startswith("model.language_model.layers.0.") for n in export)
+    assert Q.inspect_export(export, plan)["quantised_modules"] == 252
+
+
+def test_canonical_names():
+    assert Q.canonical("model.layers.3.mlp.up_proj") == Q.canonical("model.language_model.layers.3.mlp.up_proj")
+    assert Q.canonical("visual.blocks.0.attn.qkv") == Q.canonical("model.visual.blocks.0.attn.qkv")
+    assert Q.canonical("lm_head") == "lm_head"
+
+
+def test_a_quantised_module_outside_the_plan_raises():
+    plan = Q.plan_targets(Q.linear_modules(header()))
+    with pytest.raises(Q.QuantError, match="did not target"):
+        Q.inspect_export(header(quantised=DEC + ["model.language_model.embed_tokens"]), plan)
+
+
 def test_a_decoder_projection_left_unquantised_raises():
     plan = Q.plan_targets(Q.linear_modules(header()))
     with pytest.raises(Q.QuantError, match="1 decoder projection"):

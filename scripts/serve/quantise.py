@@ -136,15 +136,28 @@ def plan_targets(modules, keep=KEEP, expected=EXPECTED_DECODER_PROJ, tied_lm_hea
             "tied_lm_head": tied_lm_head}
 
 
+def canonical(module):
+    """A module name with the container prefixes removed, so the two layouts of one model compare equal.
+
+    transformers saves the merge in the older layout (model.layers.N..., visual.blocks.N...), GPTQModel saves its
+    export in the newer one (model.language_model.layers.N..., model.visual.blocks.N...): found on VM03, job 148.
+    """
+    return re.sub(r"^(model\.)?(language_model\.)?", "", module)
+
+
 def inspect_export(tensors, plan):
-    """Read back the export: decoder projections quantised, vision tower and merger untouched in bf16."""
+    """Read back the export: decoder projections quantised, vision tower, merger and lm_head not."""
     by_module = {}
     for name, h in tensors.items():
         mod, _, suffix = name.rpartition(".")
         by_module.setdefault(mod, {})[suffix] = h
     quantised = {m for m, parts in by_module.items() if any(s in parts for s in QUANT_SUFFIXES)}
+    quantised_canon = {canonical(m) for m in quantised}
     problems = []
-    missing = [m for m in plan["quantise"] if m not in quantised]
+    missing = [m for m in plan["quantise"] if canonical(m) not in quantised_canon]
+    extra = sorted(quantised_canon - {canonical(m) for m in plan["quantise"]})
+    if extra:
+        problems.append(f"{len(extra)} module(s) quantised that the plan did not target, e.g. {extra[:2]}")
     if missing:
         problems.append(f"{len(missing)} decoder projection(s) were not quantised, e.g. {missing[:2]}")
     vision_q = sorted(m for m in quantised if ".visual." in f".{m}" or re.search(KEEP["lm_head"], m))
