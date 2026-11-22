@@ -159,7 +159,8 @@ def test_calibration_conversation_is_the_training_conversation_with_training_pix
 
 
 def test_gptq_settings_are_fixed():
-    assert Q.quantize_config_kwargs() == {"bits": 4, "group_size": 128, "sym": True, "desc_act": False}
+    assert Q.quantize_config_kwargs() == {"bits": 4, "group_size": 128, "sym": True, "desc_act": False,
+                                        "offload_to_disk": False}
     assert set(Q.BACKENDS) == {"gptqmodel"}
 
 

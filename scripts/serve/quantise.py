@@ -267,8 +267,12 @@ def backend_versions(names=("gptqmodel", "llmcompressor", "compressed-tensors", 
 
 
 def quantize_config_kwargs():
-    """GPTQ settings: 4-bit, groups of 128, symmetric, no act-order (the kernels without nvcc support it best)."""
-    return {"bits": BITS, "group_size": GROUP_SIZE, "sym": True, "desc_act": False}
+    """GPTQ settings: 4-bit, groups of 128, symmetric, no act-order (the kernels without nvcc support it best).
+
+    offload_to_disk is off: GPTQModel defaults to spilling layers into ~/tmp, which counts against the 35 GB quota
+    beside the merge and the export, and a 3B model fits in GPU and CPU memory without it.
+    """
+    return {"bits": BITS, "group_size": GROUP_SIZE, "sym": True, "desc_act": False, "offload_to_disk": False}
 
 
 def calibration_conversation(row, data_dir=REPO / "data/v2.0"):
