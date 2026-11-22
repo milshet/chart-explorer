@@ -1,0 +1,5987 @@
+{
+ "task": "4.1",
+ "run": "run_a_r16",
+ "adapter": "/storage/tracka/users/learner01/runs/run_a_r16/adapter",
+ "merged": "/storage/tracka/users/learner01/merged/run_a_r16",
+ "status": "VERIFIED",
+ "adapter_sha256": "9d9b3d3a5f8d9f1e3d6cc00a5b2e860f8b18831208b2b25db70bd23450bc858a",
+ "base_check": {
+  "base": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "base_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "revision_verified": true,
+  "recorded_revisions": {
+   "adapter_config.revision": null,
+   "base_model_name_or_path": null,
+   "run_summary.model_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3"
+  },
+  "r": 16,
+  "alpha": 32,
+  "use_rslora": false,
+  "scaling": 2.0
+ },
+ "targets": {
+  "targets_json": false,
+  "modules": 252
+ },
+ "max_new_tokens": 512,
+ "git_commit": "12a40bb76222675ab725d7f608c231322f1d82a3",
+ "created": "2026-11-22T18:17:38+00:00",
+ "merged_files_sha256": {
+  "model.safetensors": "db8c23f94a9d159045b11d8ed173d70f8c2f55fc7b6d8473b94df4ef353ee86c"
+ },
+ "weight_check": {
+  "modules_checked": 252,
+  "tensors_unchanged": 573,
+  "dtype": "bfloat16",
+  "elements_in_modules": 2774532096,
+  "elements_changed_by_merge": 2084328516,
+  "elements_rounded_differently": 0,
+  "coefficient_min": 0.9614,
+  "coefficient_max": 1.0001,
+  "per_module": {
+   "model.language_model.layers.0.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 2973734,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9923
+   },
+   "model.language_model.layers.0.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 316574,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9678
+   },
+   "model.language_model.layers.0.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 440238,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9998
+   },
+   "model.language_model.layers.0.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3376684,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9985
+   },
+   "model.language_model.layers.0.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17385491,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.0.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17962003,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.0.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13749323,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9743
+   },
+   "model.language_model.layers.1.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3138903,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.995
+   },
+   "model.language_model.layers.1.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 336309,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9701
+   },
+   "model.language_model.layers.1.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 433694,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 1.0
+   },
+   "model.language_model.layers.1.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3203083,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9979
+   },
+   "model.language_model.layers.1.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 21078217,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9965
+   },
+   "model.language_model.layers.1.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 21293533,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9964
+   },
+   "model.language_model.layers.1.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 20343460,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9963
+   },
+   "model.language_model.layers.2.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3158903,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9955
+   },
+   "model.language_model.layers.2.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 354543,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9823
+   },
+   "model.language_model.layers.2.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 425141,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.2.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3326067,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.2.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 20907643,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.2.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 20841892,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.2.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 17996457,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9964
+   },
+   "model.language_model.layers.3.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3137536,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9956
+   },
+   "model.language_model.layers.3.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 377389,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9915
+   },
+   "model.language_model.layers.3.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 434389,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9998
+   },
+   "model.language_model.layers.3.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3332271,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.3.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 19793188,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9982
+   },
+   "model.language_model.layers.3.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 19666795,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.3.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 17573294,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.986
+   },
+   "model.language_model.layers.4.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3198894,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.996
+   },
+   "model.language_model.layers.4.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 370520,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9888
+   },
+   "model.language_model.layers.4.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 415215,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.4.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3334875,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.4.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 19379998,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.4.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 19368642,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.4.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 16825134,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9809
+   },
+   "model.language_model.layers.5.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3274420,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9969
+   },
+   "model.language_model.layers.5.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 388965,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9924
+   },
+   "model.language_model.layers.5.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 415739,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.5.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3374578,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.5.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17841532,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9974
+   },
+   "model.language_model.layers.5.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17428295,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9967
+   },
+   "model.language_model.layers.5.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14559131,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.969
+   },
+   "model.language_model.layers.6.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3162632,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9962
+   },
+   "model.language_model.layers.6.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 384301,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9941
+   },
+   "model.language_model.layers.6.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 417515,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9981
+   },
+   "model.language_model.layers.6.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3308801,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.6.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17495988,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.6.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17277870,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9958
+   },
+   "model.language_model.layers.6.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13647767,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9614
+   },
+   "model.language_model.layers.7.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3259911,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9977
+   },
+   "model.language_model.layers.7.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 409326,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.7.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 405585,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.7.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3293780,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.7.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17197151,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9974
+   },
+   "model.language_model.layers.7.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17473584,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9966
+   },
+   "model.language_model.layers.7.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13779872,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9645
+   },
+   "model.language_model.layers.8.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3118786,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.996
+   },
+   "model.language_model.layers.8.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 380049,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9925
+   },
+   "model.language_model.layers.8.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 403231,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.8.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3214755,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9981
+   },
+   "model.language_model.layers.8.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 16766026,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9973
+   },
+   "model.language_model.layers.8.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17099570,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9975
+   },
+   "model.language_model.layers.8.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13118951,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.967
+   },
+   "model.language_model.layers.9.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3092810,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9953
+   },
+   "model.language_model.layers.9.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 374865,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9916
+   },
+   "model.language_model.layers.9.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 398988,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9973
+   },
+   "model.language_model.layers.9.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3242073,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9981
+   },
+   "model.language_model.layers.9.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 16568162,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9966
+   },
+   "model.language_model.layers.9.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 16985879,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9973
+   },
+   "model.language_model.layers.9.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13525556,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9706
+   },
+   "model.language_model.layers.10.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3214605,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9969
+   },
+   "model.language_model.layers.10.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 396448,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9956
+   },
+   "model.language_model.layers.10.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 391609,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9966
+   },
+   "model.language_model.layers.10.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3255660,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.10.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 16896909,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.10.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17311181,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.10.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13484436,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9693
+   },
+   "model.language_model.layers.11.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3201643,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9972
+   },
+   "model.language_model.layers.11.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 387823,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9954
+   },
+   "model.language_model.layers.11.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 395153,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9968
+   },
+   "model.language_model.layers.11.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3222332,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9974
+   },
+   "model.language_model.layers.11.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17069725,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9975
+   },
+   "model.language_model.layers.11.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17244958,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.11.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13184238,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9677
+   },
+   "model.language_model.layers.12.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3095958,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.995
+   },
+   "model.language_model.layers.12.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 377142,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9904
+   },
+   "model.language_model.layers.12.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 392998,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.997
+   },
+   "model.language_model.layers.12.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3195075,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9975
+   },
+   "model.language_model.layers.12.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 16604580,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9965
+   },
+   "model.language_model.layers.12.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17210691,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.12.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13557928,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9742
+   },
+   "model.language_model.layers.13.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3161503,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9953
+   },
+   "model.language_model.layers.13.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 370910,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9876
+   },
+   "model.language_model.layers.13.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 418697,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.13.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3369111,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.13.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17256285,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9982
+   },
+   "model.language_model.layers.13.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17144538,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9979
+   },
+   "model.language_model.layers.13.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13155301,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9721
+   },
+   "model.language_model.layers.14.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3180579,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9967
+   },
+   "model.language_model.layers.14.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 386144,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9944
+   },
+   "model.language_model.layers.14.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 413214,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.14.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3243862,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.14.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17153312,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9977
+   },
+   "model.language_model.layers.14.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17250319,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.14.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13638515,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9771
+   },
+   "model.language_model.layers.15.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3142901,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.995
+   },
+   "model.language_model.layers.15.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 384662,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9933
+   },
+   "model.language_model.layers.15.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 415501,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.15.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3343756,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.15.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17411049,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.15.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17403164,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9982
+   },
+   "model.language_model.layers.15.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13714122,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9752
+   },
+   "model.language_model.layers.16.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3232533,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.16.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 388882,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9951
+   },
+   "model.language_model.layers.16.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 406685,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.16.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3305159,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9985
+   },
+   "model.language_model.layers.16.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17366192,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9981
+   },
+   "model.language_model.layers.16.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17559453,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9985
+   },
+   "model.language_model.layers.16.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14078932,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9841
+   },
+   "model.language_model.layers.17.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3245321,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9967
+   },
+   "model.language_model.layers.17.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 405233,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9957
+   },
+   "model.language_model.layers.17.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 422944,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.17.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3341220,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9987
+   },
+   "model.language_model.layers.17.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17839161,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.17.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17684310,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.17.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13896681,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9844
+   },
+   "model.language_model.layers.18.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3247666,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9976
+   },
+   "model.language_model.layers.18.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 387460,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.994
+   },
+   "model.language_model.layers.18.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 413720,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9985
+   },
+   "model.language_model.layers.18.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3320411,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.18.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17887740,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.18.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17280923,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9981
+   },
+   "model.language_model.layers.18.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13965634,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9832
+   },
+   "model.language_model.layers.19.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3234698,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9965
+   },
+   "model.language_model.layers.19.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 392951,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9937
+   },
+   "model.language_model.layers.19.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 430112,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.19.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3407074,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.19.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17694863,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.19.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17487557,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9983
+   },
+   "model.language_model.layers.19.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14020500,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9822
+   },
+   "model.language_model.layers.20.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3288555,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9972
+   },
+   "model.language_model.layers.20.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 408831,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9951
+   },
+   "model.language_model.layers.20.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 412844,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.20.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3338178,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9979
+   },
+   "model.language_model.layers.20.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18042097,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.20.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17514572,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.20.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14178699,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9826
+   },
+   "model.language_model.layers.21.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3276147,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9978
+   },
+   "model.language_model.layers.21.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 411050,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9962
+   },
+   "model.language_model.layers.21.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 419500,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.21.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3343549,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9987
+   },
+   "model.language_model.layers.21.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 17893869,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.21.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17566883,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.21.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14282206,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9879
+   },
+   "model.language_model.layers.22.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3263055,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9975
+   },
+   "model.language_model.layers.22.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 418138,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9967
+   },
+   "model.language_model.layers.22.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 415435,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.22.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3344156,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.22.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18045761,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.22.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17632202,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.22.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14685176,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9915
+   },
+   "model.language_model.layers.23.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3365787,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9982
+   },
+   "model.language_model.layers.23.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 404689,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9962
+   },
+   "model.language_model.layers.23.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 440566,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.23.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3389972,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.23.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18306412,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9993
+   },
+   "model.language_model.layers.23.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17890650,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.23.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14311942,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9857
+   },
+   "model.language_model.layers.24.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3319829,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.24.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 407704,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9973
+   },
+   "model.language_model.layers.24.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 414768,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9987
+   },
+   "model.language_model.layers.24.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3394944,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.24.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18454418,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9995
+   },
+   "model.language_model.layers.24.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18035707,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9993
+   },
+   "model.language_model.layers.24.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14520425,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9875
+   },
+   "model.language_model.layers.25.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3390377,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.25.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 432391,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.25.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 418473,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.25.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3410827,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.25.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18690873,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.25.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18100004,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9993
+   },
+   "model.language_model.layers.25.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14769414,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9895
+   },
+   "model.language_model.layers.26.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3395477,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.26.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 420317,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.26.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 405961,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9975
+   },
+   "model.language_model.layers.26.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3405395,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.26.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18705943,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.26.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18008594,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.26.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14557587,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9868
+   },
+   "model.language_model.layers.27.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3374756,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.27.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 439652,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9999
+   },
+   "model.language_model.layers.27.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 412245,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9982
+   },
+   "model.language_model.layers.27.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3336474,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.27.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18637802,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.27.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17778111,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.27.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14293271,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9852
+   },
+   "model.language_model.layers.28.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3385139,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9988
+   },
+   "model.language_model.layers.28.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 424504,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9987
+   },
+   "model.language_model.layers.28.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 404271,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.997
+   },
+   "model.language_model.layers.28.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3347568,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.28.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18635275,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.28.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17964805,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.28.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14359769,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9836
+   },
+   "model.language_model.layers.29.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3389190,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.29.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 431783,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9995
+   },
+   "model.language_model.layers.29.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 405740,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9979
+   },
+   "model.language_model.layers.29.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3382807,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.29.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18706691,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.29.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17900577,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.29.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14598571,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9853
+   },
+   "model.language_model.layers.30.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3429437,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.30.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 438249,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9999
+   },
+   "model.language_model.layers.30.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 407020,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9967
+   },
+   "model.language_model.layers.30.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3341710,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.30.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18858892,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.30.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18013280,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9991
+   },
+   "model.language_model.layers.30.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14793974,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9869
+   },
+   "model.language_model.layers.31.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3405392,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.31.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 440858,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.31.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 420915,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.31.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3314501,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.31.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18955652,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9998
+   },
+   "model.language_model.layers.31.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18040389,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.31.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14322191,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9841
+   },
+   "model.language_model.layers.32.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3433679,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.32.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 446535,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9995
+   },
+   "model.language_model.layers.32.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 412084,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9971
+   },
+   "model.language_model.layers.32.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3308157,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.32.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18857915,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9998
+   },
+   "model.language_model.layers.32.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 18152325,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9994
+   },
+   "model.language_model.layers.32.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14138756,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9865
+   },
+   "model.language_model.layers.33.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3445166,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.999
+   },
+   "model.language_model.layers.33.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 449348,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9995
+   },
+   "model.language_model.layers.33.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 364719,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9875
+   },
+   "model.language_model.layers.33.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3260092,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9986
+   },
+   "model.language_model.layers.33.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18926150,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9998
+   },
+   "model.language_model.layers.33.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17993268,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9992
+   },
+   "model.language_model.layers.33.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 14078679,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9868
+   },
+   "model.language_model.layers.34.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3476154,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9997
+   },
+   "model.language_model.layers.34.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 450543,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 1.0001
+   },
+   "model.language_model.layers.34.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 383561,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9966
+   },
+   "model.language_model.layers.34.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3245641,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.34.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18404894,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.34.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17573451,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9989
+   },
+   "model.language_model.layers.34.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 13666793,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9814
+   },
+   "model.language_model.layers.35.self_attn.q_proj": {
+    "elements": 4194304,
+    "should_change": 3431575,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9995
+   },
+   "model.language_model.layers.35.self_attn.k_proj": {
+    "elements": 524288,
+    "should_change": 444892,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9996
+   },
+   "model.language_model.layers.35.self_attn.v_proj": {
+    "elements": 524288,
+    "should_change": 379998,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9949
+   },
+   "model.language_model.layers.35.self_attn.o_proj": {
+    "elements": 4194304,
+    "should_change": 3276630,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9984
+   },
+   "model.language_model.layers.35.mlp.gate_proj": {
+    "elements": 22544384,
+    "should_change": 18010082,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9993
+   },
+   "model.language_model.layers.35.mlp.up_proj": {
+    "elements": 22544384,
+    "should_change": 17211138,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.998
+   },
+   "model.language_model.layers.35.mlp.down_proj": {
+    "elements": 22544384,
+    "should_change": 12635453,
+    "mismatched": 0,
+    "beyond_one_ulp": 0,
+    "coefficient": 0.9634
+   }
+  }
+ },
+ "answer_check": {
+  "n": 100,
+  "tolerance": {
+   "max_disagree": 3,
+   "max_schema_drop": 1
+  },
+  "disagree": 2,
+  "disagree_ids": [
+   "val-multi_col_60050-853",
+   "val-two_col_83529-543"
+  ],
+  "raw_identical": 83,
+  "correct": {
+   "reference": 84,
+   "merged": 84
+  },
+  "schema_valid": {
+   "reference": 99,
+   "merged": 99
+  },
+  "fixed_by_merge": 0,
+  "broken_by_merge": 0,
+  "passed": true
+ },
+ "reportable": true,
+ "engine": {
+  "engine": "transformers.generate",
+  "precision": "bf16",
+  "batch_size": 1,
+  "decoding": "greedy",
+  "model": "/storage/tracka/users/learner01/merged/run_a_r16",
+  "adapter": null
+ },
+ "settings": {
+  "split": "val",
+  "seed": 41001,
+  "items": [
+   "val-15943492005560-82",
+   "val-8126-39",
+   "val-multi_col_1020-743",
+   "val-multi_col_21042-824",
+   "val-two_col_20869-614",
+   "val-15239782005017-180",
+   "val-two_col_101081-536",
+   "val-two_col_60141-691",
+   "val-OECD_NATIONAL_INSURANCE_MARKET_SHARE_ISL_NLD_TUR_000066-446",
+   "val-multi_col_60132-856",
+   "val-two_col_41834-664",
+   "val-two_col_41834-665",
+   "val-two_col_43526-688",
+   "val-91588531013672-416-unans",
+   "val-two_col_83211-504",
+   "val-9812-361",
+   "val-multi_col_40930-846",
+   "val-11832048004610-178",
+   "val-OECD_GOVERNMENT_PRODUCTION_COSTS_EST_FRA_LTU_LVA_POL_000018-437",
+   "val-two_col_6115-633",
+   "val-two_col_6115-632",
+   "val-86672159001758-413",
+   "val-multi_col_80016-910",
+   "val-7940-37",
+   "val-multi_col_60854-900",
+   "val-two_col_3809-586",
+   "val-two_col_4465-595",
+   "val-17081-17",
+   "val-multi_col_20034-782-unans",
+   "val-42096136022189-124",
+   "val-95472313001783-422",
+   "val-2969-293",
+   "val-two_col_100412-521",
+   "val-multi_col_80914-950-unans",
+   "val-multi_col_40651-836",
+   "val-two_col_62006-472",
+   "val-multi_col_1344-757",
+   "val-multi_col_20578-809",
+   "val-two_col_83441-508",
+   "val-two_col_24100-650",
+   "val-OECD_SELF-EMPLOYMENT_BY_ACTIVITY_CAN_DNK_POL_000033-452-unans",
+   "val-59896688006025-231",
+   "val-multi_col_60811-895",
+   "val-two_col_5618-601",
+   "val-multi_col_40743-838",
+   "val-two_col_3853-574",
+   "val-multi_col_80183-914",
+   "val-62127896000657-143",
+   "val-59896688006025-230",
+   "val-OECD_SHORT-TERM_INTEREST_RATES_BEL_CZE_IRL_KOR_RUS_000026-399",
+   "val-two_col_81854-499",
+   "val-70101677022779-235",
+   "val-24259131001104-95",
+   "val-11124-409",
+   "val-two_col_100197-514",
+   "val-two_col_102450-551",
+   "val-multi_col_20001-781",
+   "val-96134789000993-425",
+   "val-11832048004610-179",
+   "val-11711749024597-176",
+   "val-OECD_PRIVATE_SPENDING_ON_EDUCATION_ARG_RUS_000004-390",
+   "val-multi_col_1411-760",
+   "val-two_col_100223-517",
+   "val-12784129003060-77",
+   "val-OECD_TAX_ON_PAYROLL_AUS_CZE_ESP_FRA_JPN_000124-458",
+   "val-two_col_83479-510",
+   "val-two_col_5866-610",
+   "val-multi_col_1086-745",
+   "val-two_col_104092-552",
+   "val-10219-401",
+   "val-multi_col_60050-853",
+   "val-two_col_83529-543",
+   "val-multi_col_1411-761",
+   "val-39727570004541-120",
+   "val-10688218006528-68",
+   "val-OECD_CRUDE_OIL_IMPORT_PRICES_PRT_000090-254",
+   "val-2215-278",
+   "val-00006834003066-162",
+   "val-two_col_63588-487",
+   "val-15943492005560-83",
+   "val-two_col_20869-615",
+   "val-two_col_24100-651",
+   "val-two_col_100854-530",
+   "val-two_col_23297-640",
+   "val-two_col_61107-469",
+   "val-multi_col_953-773",
+   "val-16718-10",
+   "val-two_col_100197-515",
+   "val-multi_col_60616-885",
+   "val-two_col_62006-473",
+   "val-two_col_100412-520",
+   "val-OECD_TOURISM_RECEIPTS_AND_SPENDING_CHL_NLD_SVK_000021-462",
+   "val-multi_col_40930-847",
+   "val-3408-298",
+   "val-multi_col_101221-736",
+   "val-multi_col_20034-783",
+   "val-2595-284-unans",
+   "val-75598618006874-152",
+   "val-OECD_PENSION_FUNDS'_ASSETS_BEL_POL_000013-451",
+   "val-multi_col_100304-935"
+  ]
+ },
+ "reference_vs_committed_eval": {
+  "file": "results/evals/run_a_r16-adapter_val_image_only_cot_0shot_bf16/predictions.jsonl",
+  "n": 100,
+  "agree": 97
+ },
+ "timings": {
+  "merge_s": 25.5,
+  "weight_check_s": 46.5,
+  "answer_check_s": 418.5,
+  "total_min": 8.3
+ },
+ "gpu": "NVIDIA L40S",
+ "peak_gpu_memory_mib": 7491,
+ "slurm_job_id": "145",
+ "provenance": {
+  "git_commit": "12a40bb76222675ab725d7f608c231322f1d82a3",
+  "git_dirty": [],
+  "versions": {
+   "python": "3.12.3",
+   "torch": "2.14.1+cu126",
+   "transformers": "5.22.1",
+   "peft": "0.21.2",
+   "bitsandbytes": "0.50.2",
+   "accelerate": "1.15.0",
+   "safetensors": "0.8.0",
+   "pillow": "13.0.0",
+   "qwen-vl-utils": "0.0.14",
+   "wandb": "0.31.0"
+  },
+  "env_drift": {},
+  "data": {
+   "data_dir": "data/v2.0",
+   "val_file": "data/v2.0/image_only/val.jsonl",
+   "val_sha256": "f82e12663d7f1abbc0e4ce04ef4a2637e5b27820d7050cb69471378424372df4",
+   "images": 106,
+   "images_sha256": "cc4e5fa7a8fe61d4e0b1100cfa2044cc1a42c28416ab99817b62925596570df9"
+  },
+  "clean": true,
+  "adapter_sha256": "9d9b3d3a5f8d9f1e3d6cc00a5b2e860f8b18831208b2b25db70bd23450bc858a",
+  "trained_at_commit": "4cc71496ab38d4f209ad07fb83930a8f19296851",
+  "trained_data": {
+   "data_dir": "data/v2.0",
+   "train_file": "data/v2.0/image_only/train.jsonl",
+   "train_sha256": "c0df429f4a5c833f3f208b323e414e12c2237687cb563c7bdc0006d698e3489b",
+   "val_file": "data/v2.0/image_only/val.jsonl",
+   "val_sha256": "f82e12663d7f1abbc0e4ce04ef4a2637e5b27820d7050cb69471378424372df4",
+   "images": 941,
+   "images_sha256": "3c0743290e2e718287c6481a891935e49e935adc67845dcb61e5c2df48d18d63"
+  }
+ },
+ "rows": [
+  {
+   "id": "val-15943492005560-82",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-15943492005560-82",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Madagascar\", \"Central Europe\"], \"rationale\": \"The chart lists Madagascar and Central Europe.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"[Madagascar, Central Europe]\"}",
+    "answer": [
+     "text",
+     "[madagascar, central europe]"
+    ],
+    "pred": "[Madagascar, Central Europe]",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 764,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 2.6173
+   },
+   "merged": {
+    "id": "val-15943492005560-82",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Madagascar\", \"Central Europe\"], \"rationale\": \"The chart lists Madagascar and Central Europe.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"[Madagascar, Central Europe]\"}",
+    "answer": [
+     "text",
+     "[madagascar, central europe]"
+    ],
+    "pred": "[Madagascar, Central Europe]",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 764,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 0.8824
+   }
+  },
+  {
+   "id": "val-8126-39",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-8126-39",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Green bars: 73, 71, 66\", \"Shortest green = 66\"], \"rationale\": \"Green bars are Support; longest is 73, shortest 66. Difference 73-66=7.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 7}",
+    "answer": [
+     "num",
+     7.0
+    ],
+    "pred": 7,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 260,
+    "new_tokens": 78,
+    "truncated": false,
+    "seconds": 3.0687
+   },
+   "merged": {
+    "id": "val-8126-39",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Green bars: 73, 71, 66\", \"Shortest green = 66\"], \"rationale\": \"Green bars are Support; longest is 73, shortest is 66. Difference 73 - 66 = 7.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 7}",
+    "answer": [
+     "num",
+     7.0
+    ],
+    "pred": 7,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 260,
+    "new_tokens": 81,
+    "truncated": false,
+    "seconds": 1.3761
+   }
+  },
+  {
+   "id": "val-multi_col_1020-743",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_1020-743",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Pharmacy services max 2017 (70.7%)\", \"Pharmacy services min 2025 (60.6%)\"], \"rationale\": \"Highest pharmacy service is 70.7% in 2017; lowest is 60.6% in 2025. Difference = 10.1.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 10.1}",
+    "answer": [
+     "num",
+     10.1
+    ],
+    "pred": 10.1,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 104,
+    "truncated": false,
+    "seconds": 4.1291
+   },
+   "merged": {
+    "id": "val-multi_col_1020-743",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Pharmacy services max 70.7% (2017)\", \"Pharmacy services min 60.6% (2025)\"], \"rationale\": \"Highest pharmacy service is 70.7% in 2017; lowest is 60.6% in 2025. Difference = 10.1.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 10.1}",
+    "answer": [
+     "num",
+     10.1
+    ],
+    "pred": 10.1,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 105,
+    "truncated": false,
+    "seconds": 1.8188
+   }
+  },
+  {
+   "id": "val-multi_col_21042-824",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-multi_col_21042-824",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Legend: light blue = Beer*\"], \"rationale\": \"The light blue bars correspond to Beer*.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Beer*\"}",
+    "answer": [
+     "text",
+     "beer"
+    ],
+    "pred": "Beer*",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 714,
+    "new_tokens": 46,
+    "truncated": false,
+    "seconds": 1.8828
+   },
+   "merged": {
+    "id": "val-multi_col_21042-824",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Legend: light blue = Beer*\"], \"rationale\": \"The light blue bars correspond to Beer*.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Beer*\"}",
+    "answer": [
+     "text",
+     "beer"
+    ],
+    "pred": "Beer*",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 714,
+    "new_tokens": 46,
+    "truncated": false,
+    "seconds": 0.8406
+   }
+  },
+  {
+   "id": "val-two_col_20869-614",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_20869-614",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Europe 37%\"], \"rationale\": \"Europe slice is labelled 37%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 37}",
+    "answer": [
+     "num",
+     37.0
+    ],
+    "pred": 37,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 44,
+    "truncated": false,
+    "seconds": 1.765
+   },
+   "merged": {
+    "id": "val-two_col_20869-614",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Europe 37%\"], \"rationale\": \"Europe slice is labelled 37%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 37}",
+    "answer": [
+     "num",
+     37.0
+    ],
+    "pred": 37,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 44,
+    "truncated": false,
+    "seconds": 0.8077
+   }
+  },
+  {
+   "id": "val-15239782005017-180",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-15239782005017-180",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red line labelled 15-17 years\"], \"rationale\": \"The red/orange line is labelled 15-17 years.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"15-17 years\"}",
+    "answer": [
+     "text",
+     "15-17 years"
+    ],
+    "pred": "15-17 years",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 768,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 2.3413
+   },
+   "merged": {
+    "id": "val-15239782005017-180",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red line labelled 15-17 years\"], \"rationale\": \"The red/orange line is labelled 15-17 years.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"15-17 years\"}",
+    "answer": [
+     "text",
+     "15-17 years"
+    ],
+    "pred": "15-17 years",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 768,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 1.0652
+   }
+  },
+  {
+   "id": "val-two_col_101081-536",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_101081-536",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Patient spends = 408\"], \"rationale\": \"The chart shows payments; patient spending is 408.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 408}",
+    "answer": [
+     "num",
+     408.0
+    ],
+    "pred": 408,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 737,
+    "new_tokens": 55,
+    "truncated": false,
+    "seconds": 2.2272
+   },
+   "merged": {
+    "id": "val-two_col_101081-536",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Patient spends = 408\"], \"rationale\": \"The chart shows payments; patient spending is 408.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 408}",
+    "answer": [
+     "num",
+     408.0
+    ],
+    "pred": 408,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 737,
+    "new_tokens": 55,
+    "truncated": false,
+    "seconds": 0.9901
+   }
+  },
+  {
+   "id": "val-two_col_60141-691",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_60141-691",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Agricultural products 10.3%\", \"Fuels and mining products 14.3%\"], \"rationale\": \"10.3 + 14.3 = 24.6.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 24.6}",
+    "answer": [
+     "num",
+     24.6
+    ],
+    "pred": 24.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 722,
+    "new_tokens": 71,
+    "truncated": false,
+    "seconds": 2.8407
+   },
+   "merged": {
+    "id": "val-two_col_60141-691",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Agricultural products 10.3%\", \"Fuels and mining products 14.3%\"], \"rationale\": \"10.3 + 14.3 = 24.6.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 24.6}",
+    "answer": [
+     "num",
+     24.6
+    ],
+    "pred": 24.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 722,
+    "new_tokens": 71,
+    "truncated": false,
+    "seconds": 1.2515
+   }
+  },
+  {
+   "id": "val-OECD_NATIONAL_INSURANCE_MARKET_SHARE_ISL_NLD_TUR_000066-446",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-OECD_NATIONAL_INSURANCE_MARKET_SHARE_ISL_NLD_TUR_000066-446",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Turkey ~0.17\", \"Iceland ~0.05\"], \"rationale\": \"Turkey's line is lowest at about 0.17; Iceland is much lower at about 0.05.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Turkey\"}",
+    "answer": [
+     "text",
+     "turkey"
+    ],
+    "pred": "Turkey",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 696,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 2.7771
+   },
+   "merged": {
+    "id": "val-OECD_NATIONAL_INSURANCE_MARKET_SHARE_ISL_NLD_TUR_000066-446",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Turkey ~0.15\", \"Iceland ~0.06\"], \"rationale\": \"Turkey's line is lowest at about 0.15, below Iceland's 0.06.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Turkey\"}",
+    "answer": [
+     "text",
+     "turkey"
+    ],
+    "pred": "Turkey",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 696,
+    "new_tokens": 66,
+    "truncated": false,
+    "seconds": 1.1658
+   }
+  },
+  {
+   "id": "val-multi_col_60132-856",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_60132-856",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Smallest blue (Don't shop here) 17%\", \"Smallest dark (Typically shop here) 15%\"], \"rationale\": \"Two smallest bars are 17 and 15; sum = 32.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 32}",
+    "answer": [
+     "num",
+     32.0
+    ],
+    "pred": 32,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 3.0351
+   },
+   "merged": {
+    "id": "val-multi_col_60132-856",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Smallest blue (Don't shop here) 17%\", \"Smallest dark (Typically shop here) 15%\"], \"rationale\": \"Two smallest bars are 17 and 15; sum = 32.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 32}",
+    "answer": [
+     "num",
+     32.0
+    ],
+    "pred": 32,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 1.3194
+   }
+  },
+  {
+   "id": "val-two_col_41834-664",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_41834-664",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Blue slice labelled Gucci 59%\"], \"rationale\": \"The only blue slice is Gucci.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Gucci\"}",
+    "answer": [
+     "text",
+     "gucci"
+    ],
+    "pred": "Gucci",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 1.9232
+   },
+   "merged": {
+    "id": "val-two_col_41834-664",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Blue slice labelled Gucci 59%\"], \"rationale\": \"The only blue slice is Gucci.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Gucci\"}",
+    "answer": [
+     "text",
+     "gucci"
+    ],
+    "pred": "Gucci",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 0.8594
+   }
+  },
+  {
+   "id": "val-two_col_41834-665",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_41834-665",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Gucci 59%\", \"Saint Laurent 14%\"], \"rationale\": \"59 + 14 = 73.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 73}",
+    "answer": [
+     "num",
+     73.0
+    ],
+    "pred": 73,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 720,
+    "new_tokens": 54,
+    "truncated": false,
+    "seconds": 2.2107
+   },
+   "merged": {
+    "id": "val-two_col_41834-665",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Gucci 59%\", \"Saint Laurent 14%\"], \"rationale\": \"59 + 14 = 73.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 73}",
+    "answer": [
+     "num",
+     73.0
+    ],
+    "pred": 73,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 720,
+    "new_tokens": 54,
+    "truncated": false,
+    "seconds": 0.9767
+   }
+  },
+  {
+   "id": "val-two_col_43526-688",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_43526-688",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Discretionary mandate asset (dark) ~50%\", \"Investment fund (light blue) ~50%\"], \"rationale\": \"Two pie slices are equal at about 50%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"[Discretionary mandate asset, Investment fund]\"}",
+    "answer": [
+     "text",
+     "[discretionary mandate asset, investment fund]"
+    ],
+    "pred": "[Discretionary mandate asset, Investment fund]",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 714,
+    "new_tokens": 73,
+    "truncated": false,
+    "seconds": 2.9364
+   },
+   "merged": {
+    "id": "val-two_col_43526-688",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Discretionary mandate asset (dark) ~50%\", \"Investment fund (light blue) ~50%\"], \"rationale\": \"Two pie slices are equal at about 50%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"[Discretionary mandate asset, Investment fund]\"}",
+    "answer": [
+     "text",
+     "[discretionary mandate asset, investment fund]"
+    ],
+    "pred": "[Discretionary mandate asset, Investment fund]",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 714,
+    "new_tokens": 73,
+    "truncated": false,
+    "seconds": 1.2847
+   }
+  },
+  {
+   "id": "val-91588531013672-416-unans",
+   "answer_type": "unanswerable",
+   "reference": {
+    "id": "val-91588531013672-416-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows usage of Facebook Messenger and WhatsApp by age group; it has no countries or vaccine opinions.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 719,
+    "new_tokens": 50,
+    "truncated": false,
+    "seconds": 2.0345
+   },
+   "merged": {
+    "id": "val-91588531013672-416-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows usage of Facebook Messenger and WhatsApp by age group; it has no countries or vaccine opinions.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 719,
+    "new_tokens": 50,
+    "truncated": false,
+    "seconds": 0.9097
+   }
+  },
+  {
+   "id": "val-two_col_83211-504",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_83211-504",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Japan (23.6%)\"], \"rationale\": \"Japan's bar is labelled 23.6%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 23.6}",
+    "answer": [
+     "num",
+     23.6
+    ],
+    "pred": 23.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 2.0698
+   },
+   "merged": {
+    "id": "val-two_col_83211-504",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Japan (23.6%)\"], \"rationale\": \"Japan's bar is labelled 23.6%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 23.6}",
+    "answer": [
+     "num",
+     23.6
+    ],
+    "pred": 23.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 0.9281
+   }
+  },
+  {
+   "id": "val-9812-361",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-9812-361",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Health care 38\", \"Poor-quality schools 41\"], \"rationale\": \"(38+41)/2 = 39.5.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 39.5}",
+    "answer": [
+     "num",
+     39.5
+    ],
+    "pred": 39.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 290,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 2.3415
+   },
+   "merged": {
+    "id": "val-9812-361",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Health care 38\", \"Poor-quality schools 41\"], \"rationale\": \"(38+41)/2 = 39.5.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 39.5}",
+    "answer": [
+     "num",
+     39.5
+    ],
+    "pred": 39.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 290,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 1.0152
+   }
+  },
+  {
+   "id": "val-multi_col_40930-846",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_40930-846",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2020 Online (5.76)\", \"2018 Online (3.48)\"], \"rationale\": \"Only the blue Online bar exceeds 5 in 2020; others are below.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2020}",
+    "answer": [
+     "num",
+     2020.0
+    ],
+    "pred": 2020,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 74,
+    "truncated": false,
+    "seconds": 2.9634
+   },
+   "merged": {
+    "id": "val-multi_col_40930-846",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2020 Online (5.76)\", \"2018 Online (3.48)\"], \"rationale\": \"Only the blue Online bar exceeds 5 in 2020; others are below.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2020}",
+    "answer": [
+     "num",
+     2020.0
+    ],
+    "pred": 2020,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 74,
+    "truncated": false,
+    "seconds": 1.3002
+   }
+  },
+  {
+   "id": "val-11832048004610-178",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-11832048004610-178",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Senegal line 2009 (about 3.5)\"], \"rationale\": \"The Senegal line is highest at its last point, 2009.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2009}",
+    "answer": [
+     "num",
+     2009.0
+    ],
+    "pred": 2009,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 769,
+    "new_tokens": 64,
+    "truncated": false,
+    "seconds": 2.5698
+   },
+   "merged": {
+    "id": "val-11832048004610-178",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Senegal line 2009 (about 3.5)\"], \"rationale\": \"The Senegal line is highest at its last point, 2009.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2009}",
+    "answer": [
+     "num",
+     2009.0
+    ],
+    "pred": 2009,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 769,
+    "new_tokens": 64,
+    "truncated": false,
+    "seconds": 1.1509
+   }
+  },
+  {
+   "id": "val-OECD_GOVERNMENT_PRODUCTION_COSTS_EST_FRA_LTU_LVA_POL_000018-437",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-OECD_GOVERNMENT_PRODUCTION_COSTS_EST_FRA_LTU_LVA_POL_000018-437",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"France line ~27.5\", \"Estonia ~21.8\", \"Latvia ~21.3\", \"Poland ~21.0\", \"Lithuania ~20.0\"], \"rationale\": \"France's line is highest at 27.49, above all others.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"France\"}",
+    "answer": [
+     "text",
+     "france"
+    ],
+    "pred": "France",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 696,
+    "new_tokens": 91,
+    "truncated": false,
+    "seconds": 3.6214
+   },
+   "merged": {
+    "id": "val-OECD_GOVERNMENT_PRODUCTION_COSTS_EST_FRA_LTU_LVA_POL_000018-437",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"France line ~27.5\", \"Estonia line ~21.8\", \"Latvia line ~21.3\", \"Poland line ~21.0\", \"Lithuania line ~20\"], \"rationale\": \"France's line is highest at 27.49 in 2014.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"France\"}",
+    "answer": [
+     "text",
+     "france"
+    ],
+    "pred": "France",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 696,
+    "new_tokens": 95,
+    "truncated": false,
+    "seconds": 1.6435
+   }
+  },
+  {
+   "id": "val-two_col_6115-633",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_6115-633",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2019 max 44689\", \"2001 min 38460\"], \"rationale\": \"Maximum 44689 in 2019; minimum 38460 in 2001. Difference = 44689 - 38460 = 6229.\", \"answer_type\": \"number\", \"unit\": \"euros\", \"answer\": 6229}",
+    "answer": [
+     "num",
+     6229.0
+    ],
+    "pred": 6229,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 721,
+    "new_tokens": 108,
+    "truncated": false,
+    "seconds": 4.3026
+   },
+   "merged": {
+    "id": "val-two_col_6115-633",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2019 max 44689\", \"2001 min 38460\"], \"rationale\": \"Maximum 44689 in 2019; minimum 38460 in 2001. Difference = 44689 - 38460 = 6229.\", \"answer_type\": \"number\", \"unit\": \"euros\", \"answer\": 6229}",
+    "answer": [
+     "num",
+     6229.0
+    ],
+    "pred": 6229,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 721,
+    "new_tokens": 108,
+    "truncated": false,
+    "seconds": 1.874
+   }
+  },
+  {
+   "id": "val-two_col_6115-632",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_6115-632",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Point=2019 (44 689)\", \"Line rises to ~45k at 2019\"], \"rationale\": \"The highest labelled point on the line is 2019 at 44,689 euros.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2019}",
+    "answer": [
+     "num",
+     2019.0
+    ],
+    "pred": 2019,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 83,
+    "truncated": false,
+    "seconds": 3.2942
+   },
+   "merged": {
+    "id": "val-two_col_6115-632",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Point=2019 (44 689)\", \"Line rises to ~45k at 2019\"], \"rationale\": \"The highest labelled point on the line is 2019 at 44,689 euros.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2019}",
+    "answer": [
+     "num",
+     2019.0
+    ],
+    "pred": 2019,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 83,
+    "truncated": false,
+    "seconds": 1.4489
+   }
+  },
+  {
+   "id": "val-86672159001758-413",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-86672159001758-413",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Congo 0.72 t\", \"Cameroon 0.3 t\"], \"rationale\": \"(0.72 + 0.3) / 2 = 0.51.\", \"answer_type\": \"number\", \"unit\": \"tonnes per hectare per year\", \"answer\": 0.51}",
+    "answer": [
+     "num",
+     0.51
+    ],
+    "pred": 0.51,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 768,
+    "new_tokens": 76,
+    "truncated": false,
+    "seconds": 3.0429
+   },
+   "merged": {
+    "id": "val-86672159001758-413",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Congo 0.72 t\", \"Cameroon 0.3 t\"], \"rationale\": \"(0.72 + 0.3) / 2 = 0.51.\", \"answer_type\": \"number\", \"unit\": \"tonnes per hectare per year\", \"answer\": 0.51}",
+    "answer": [
+     "num",
+     0.51
+    ],
+    "pred": 0.51,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 768,
+    "new_tokens": 76,
+    "truncated": false,
+    "seconds": 1.3407
+   }
+  },
+  {
+   "id": "val-multi_col_80016-910",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-multi_col_80016-910",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"2021: Devices & systems 19\", \"TLC network systems 19.4\", \"ICT services 12.8\", \"Digital advertisement & content 12.8\"], \"rationale\": \"In 2021 devices & systems (19) is largest.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Devices & systems\"}",
+    "answer": [
+     "text",
+     "devices & systems"
+    ],
+    "pred": "Devices & systems",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 89,
+    "truncated": false,
+    "seconds": 3.537
+   },
+   "merged": {
+    "id": "val-multi_col_80016-910",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"2021: Devices & systems 19\", \"TLC network systems 19.4\", \"ICT services 12.8\", \"Digital advertisement & content 12.8\"], \"rationale\": \"In 2021 devices & systems (19) is largest.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Devices & systems\"}",
+    "answer": [
+     "text",
+     "devices & systems"
+    ],
+    "pred": "Devices & systems",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 89,
+    "truncated": false,
+    "seconds": 1.5493
+   }
+  },
+  {
+   "id": "val-7940-37",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-7940-37",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Dark blue (Very important) values: 72, 71, 61, 47\"], \"rationale\": \"(72+71+61+47)/4 = 251/4 = 62.75.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 62.75}",
+    "answer": [
+     "num",
+     62.75
+    ],
+    "pred": 62.75,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 332,
+    "new_tokens": 84,
+    "truncated": false,
+    "seconds": 3.3039
+   },
+   "merged": {
+    "id": "val-7940-37",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Dark blue (Very important) values: 72, 71, 61, 47\"], \"rationale\": \"(72+71+61+47)/4 = 251/4 = 62.75.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 62.75}",
+    "answer": [
+     "num",
+     62.75
+    ],
+    "pred": 62.75,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 332,
+    "new_tokens": 84,
+    "truncated": false,
+    "seconds": 1.4291
+   }
+  },
+  {
+   "id": "val-multi_col_60854-900",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_60854-900",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"10-49 employees, 2019 (35.6)\"], \"rationale\": \"The 10-49 employees segment has the 2019 purple bar labelled 35.6.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 35.6}",
+    "answer": [
+     "num",
+     35.6
+    ],
+    "pred": 35.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 727,
+    "new_tokens": 78,
+    "truncated": false,
+    "seconds": 3.0928
+   },
+   "merged": {
+    "id": "val-multi_col_60854-900",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"10-49 employees, 2019 (35.6)\"], \"rationale\": \"The 10-49 employees segment is the bottom one; its 2019 bar is labelled 35.6.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 35.6}",
+    "answer": [
+     "num",
+     35.6
+    ],
+    "pred": 35.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 727,
+    "new_tokens": 82,
+    "truncated": false,
+    "seconds": 1.4317
+   }
+  },
+  {
+   "id": "val-two_col_3809-586",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_3809-586",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bar=2018 (15 740)\"], \"rationale\": \"The 2018 bar is labelled 15 740.\", \"answer_type\": \"number\", \"unit\": \"million U.S. dollars\", \"answer\": 15740}",
+    "answer": [
+     "num",
+     15740.0
+    ],
+    "pred": 15740,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 2.7972
+   },
+   "merged": {
+    "id": "val-two_col_3809-586",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bar=2018 (15 740)\"], \"rationale\": \"The 2018 bar is labelled 15 740.\", \"answer_type\": \"number\", \"unit\": \"million U.S. dollars\", \"answer\": 15740}",
+    "answer": [
+     "num",
+     15740.0
+    ],
+    "pred": 15740,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 1.2172
+   }
+  },
+  {
+   "id": "val-two_col_4465-595",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_4465-595",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Asia*** 34%\", \"Japan 7%\"], \"rationale\": \"34 + 7 = 41.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 41}",
+    "answer": [
+     "num",
+     41.0
+    ],
+    "pred": 41,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 731,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 2.0143
+   },
+   "merged": {
+    "id": "val-two_col_4465-595",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Asia*** 34%\", \"Japan 7%\"], \"rationale\": \"34 + 7 = 41.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 41}",
+    "answer": [
+     "num",
+     41.0
+    ],
+    "pred": 41,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 731,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 0.9232
+   }
+  },
+  {
+   "id": "val-17081-17",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-17081-17",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Red (mostly bad news) highest Dec 2008 = 80\", \"Green (mostly good news) lowest May 2011 = 1\"], \"rationale\": \"Highest red is 80; lowest green is 1. 80 - 1 = 79.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 79}",
+    "answer": [
+     "num",
+     79.0
+    ],
+    "pred": 79,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 313,
+    "new_tokens": 89,
+    "truncated": false,
+    "seconds": 3.4164
+   },
+   "merged": {
+    "id": "val-17081-17",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Red (mostly bad news) highest Dec 2008 = 80\", \"Green (mostly good news) lowest May 2011 = 1\"], \"rationale\": \"Highest red is 80; lowest green is 1. 80 - 1 = 79.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 79}",
+    "answer": [
+     "num",
+     79.0
+    ],
+    "pred": 79,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 313,
+    "new_tokens": 89,
+    "truncated": false,
+    "seconds": 1.506
+   }
+  },
+  {
+   "id": "val-multi_col_20034-782-unans",
+   "answer_type": "unanswerable",
+   "reference": {
+    "id": "val-multi_col_20034-782-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows income by employment status; there is no 2015 data or agriculture employment.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 721,
+    "new_tokens": 50,
+    "truncated": false,
+    "seconds": 1.988
+   },
+   "merged": {
+    "id": "val-multi_col_20034-782-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows income by employment status; there is no 2015 data or agriculture employment.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 721,
+    "new_tokens": 50,
+    "truncated": false,
+    "seconds": 0.9091
+   }
+  },
+  {
+   "id": "val-42096136022189-124",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-42096136022189-124",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bar=Southern Asia (264.5 million)\"], \"rationale\": \"The Southern Asia bar is labelled 264.5 million.\", \"answer_type\": \"number\", \"unit\": \"million\", \"answer\": 264.5}",
+    "answer": [
+     "num",
+     264.5
+    ],
+    "pred": 264.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 780,
+    "new_tokens": 60,
+    "truncated": false,
+    "seconds": 2.3821
+   },
+   "merged": {
+    "id": "val-42096136022189-124",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bar=Southern Asia (264.5 million)\"], \"rationale\": \"The Southern Asia bar is labelled 264.5 million.\", \"answer_type\": \"number\", \"unit\": \"million\", \"answer\": 264.5}",
+    "answer": [
+     "num",
+     264.5
+    ],
+    "pred": 264.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 780,
+    "new_tokens": 60,
+    "truncated": false,
+    "seconds": 1.0829
+   }
+  },
+  {
+   "id": "val-95472313001783-422",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-95472313001783-422",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Cyprus (blue), Jamaica (orange), Brazil (pink), Philippines (green), Sierra Leone (dark brown)\", \"Legend: blue=37.54%, orange=24.07%, pink=15.24%, green=12.1%, dark brown=8.24%\"], \"rationale\": \"Five bars each have a different colour.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 5}",
+    "answer": [
+     "num",
+     5.0
+    ],
+    "pred": 5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 103,
+    "truncated": false,
+    "seconds": 3.9968
+   },
+   "merged": {
+    "id": "val-95472313001783-422",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Cyprus (blue), Jamaica (orange-brown), Brazil (pink), Philippines (green), Sierra Leone (dark brown)\", \"Legend: blue=37.54%, orange-brown=24.07%, pink=15.24%, green=12.1%, dark brown=8.24%\"], \"rationale\": \"Five bars each have a different colour.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 5}",
+    "answer": [
+     "num",
+     5.0
+    ],
+    "pred": 5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 107,
+    "truncated": false,
+    "seconds": 1.8593
+   }
+  },
+  {
+   "id": "val-2969-293",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-2969-293",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"18-29 Good thing (56)\", \"30-49 Good thing (51)\"], \"rationale\": \"(56+51)/2 = 53.5.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 53.5}",
+    "answer": [
+     "num",
+     53.5
+    ],
+    "pred": 53.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 306,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 2.6465
+   },
+   "merged": {
+    "id": "val-2969-293",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"18-29 Good thing (56)\", \"30-49 Good thing (51)\"], \"rationale\": \"(56+51)/2 = 53.5.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 53.5}",
+    "answer": [
+     "num",
+     53.5
+    ],
+    "pred": 53.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 306,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 1.1799
+   }
+  },
+  {
+   "id": "val-two_col_100412-521",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_100412-521",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Logic (5.5)\", \"Foundry (21.7)\"], \"rationale\": \"5.5 + 21.7 = 27.2.\", \"answer_type\": \"number\", \"unit\": \"billion U.S. dollars\", \"answer\": 27.2}",
+    "answer": [
+     "num",
+     27.2
+    ],
+    "pred": 27.2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 2.6834
+   },
+   "merged": {
+    "id": "val-two_col_100412-521",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Logic (5.5)\", \"Foundry (21.7)\"], \"rationale\": \"Logic 5.5 plus Foundry 21.7 equals 27.2.\", \"answer_type\": \"number\", \"unit\": \"billion U.S. dollars\", \"answer\": 27.2}",
+    "answer": [
+     "num",
+     27.2
+    ],
+    "pred": 27.2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 73,
+    "truncated": false,
+    "seconds": 1.2812
+   }
+  },
+  {
+   "id": "val-multi_col_80914-950-unans",
+   "answer_type": "unanswerable",
+   "reference": {
+    "id": "val-multi_col_80914-950-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows party affiliation by education level; there are no years or data lines to compare.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 717,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 1.9026
+   },
+   "merged": {
+    "id": "val-multi_col_80914-950-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows party affiliation by education level; there are no years or data lines to compare.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 717,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 0.8729
+   }
+  },
+  {
+   "id": "val-multi_col_40651-836",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_40651-836",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2013 (dark) values: 56%, 63%, 57.5%, 62.6%, 75.9%, 52.9%, 45.7%\"], \"rationale\": \"Dark 2013 values range from 45.7 to 75.9; the highest is 75.9 for Accident, health and medical insurers.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 75.9}",
+    "answer": [
+     "num",
+     75.9
+    ],
+    "pred": 75.9,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 116,
+    "truncated": false,
+    "seconds": 4.4763
+   },
+   "merged": {
+    "id": "val-multi_col_40651-836",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2013 (dark) values: 56%, 63%, 57.5%, 62.6%, 75.9%, 52.9%, 45.7%\"], \"rationale\": \"Dark 2013 values range from 45.7 to 75.9; the highest is 75.9 for Accident, health and medical insurers.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 75.9}",
+    "answer": [
+     "num",
+     75.9
+    ],
+    "pred": 75.9,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 116,
+    "truncated": false,
+    "seconds": 1.9865
+   }
+  },
+  {
+   "id": "val-two_col_62006-472",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_62006-472",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Australia 27%\"], \"rationale\": \"Australia has the largest slice at 27%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Australia\"}",
+    "answer": [
+     "text",
+     "australia"
+    ],
+    "pred": "Australia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 722,
+    "new_tokens": 45,
+    "truncated": false,
+    "seconds": 1.8008
+   },
+   "merged": {
+    "id": "val-two_col_62006-472",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Australia 27%\"], \"rationale\": \"Australia has the largest slice at 27%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Australia\"}",
+    "answer": [
+     "text",
+     "australia"
+    ],
+    "pred": "Australia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 722,
+    "new_tokens": 45,
+    "truncated": false,
+    "seconds": 0.8237
+   }
+  },
+  {
+   "id": "val-multi_col_1344-757",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_1344-757",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2010/11 Beer (5)\", \"2012/13 Beer (5)\"], \"rationale\": \"Blue bars are Beer; 5 + 5 = 10.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 72,
+    "truncated": false,
+    "seconds": 2.801
+   },
+   "merged": {
+    "id": "val-multi_col_1344-757",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2010/11 Beer (5)\", \"2012/13 Beer (5)\"], \"rationale\": \"Blue bars are Beer; 5 + 5 = 10.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 72,
+    "truncated": false,
+    "seconds": 1.2675
+   }
+  },
+  {
+   "id": "val-multi_col_20578-809",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_20578-809",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Advertising 2018 (2330)\", \"Advertising 2019 (4566)\"], \"rationale\": \"Advertising values are 2330 and 4566; sum is 6906.\", \"answer_type\": \"number\", \"unit\": \"million U.S. dollars\", \"answer\": 6906}",
+    "answer": [
+     "num",
+     6906.0
+    ],
+    "pred": 6906,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 733,
+    "new_tokens": 85,
+    "truncated": false,
+    "seconds": 3.3031
+   },
+   "merged": {
+    "id": "val-multi_col_20578-809",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Advertising 2018 (2330)\", \"Advertising 2019 (4566)\"], \"rationale\": \"Advertising values are 2330 and 4566; sum is 6906.\", \"answer_type\": \"number\", \"unit\": \"million U.S. dollars\", \"answer\": 6906}",
+    "answer": [
+     "num",
+     6906.0
+    ],
+    "pred": 6906,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 733,
+    "new_tokens": 85,
+    "truncated": false,
+    "seconds": 1.4863
+   }
+  },
+  {
+   "id": "val-two_col_83441-508",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_83441-508",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"White\", \"Black\", \"Color\", \"Additive\"], \"rationale\": \"Four categories appear on the x-axis.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 4}",
+    "answer": [
+     "num",
+     4.0
+    ],
+    "pred": 4,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 1.9081
+   },
+   "merged": {
+    "id": "val-two_col_83441-508",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"White\", \"Black\", \"Color\", \"Additive\"], \"rationale\": \"Four categories appear on the x-axis.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 4}",
+    "answer": [
+     "num",
+     4.0
+    ],
+    "pred": 4,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 0.8738
+   }
+  },
+  {
+   "id": "val-two_col_24100-650",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_24100-650",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"United States (30)\"], \"rationale\": \"The tallest blue bar is United States at 30 TTV.\", \"answer_type\": \"number\", \"unit\": \"million TTV\", \"answer\": 30}",
+    "answer": [
+     "num",
+     30.0
+    ],
+    "pred": 30,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 2.0911
+   },
+   "merged": {
+    "id": "val-two_col_24100-650",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"United States (30)\"], \"rationale\": \"The tallest blue bar is United States at 30 TTV.\", \"answer_type\": \"number\", \"unit\": \"million TTV\", \"answer\": 30}",
+    "answer": [
+     "num",
+     30.0
+    ],
+    "pred": 30,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 0.961
+   }
+  },
+  {
+   "id": "val-OECD_SELF-EMPLOYMENT_BY_ACTIVITY_CAN_DNK_POL_000033-452-unans",
+   "answer_type": "unanswerable",
+   "reference": {
+    "id": "val-OECD_SELF-EMPLOYMENT_BY_ACTIVITY_CAN_DNK_POL_000033-452-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart has no blue line; it is a table of age/ideology groups.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 310,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 1.8169
+   },
+   "merged": {
+    "id": "val-OECD_SELF-EMPLOYMENT_BY_ACTIVITY_CAN_DNK_POL_000033-452-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart has no blue line; it is a table of age/ideology groups.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 310,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 0.8193
+   }
+  },
+  {
+   "id": "val-59896688006025-231",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-59896688006025-231",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Low income 2014 ~20.5%, 2018 ~26.5%\", \"Least Developed Countries 2014 ~18.7%, 2018 ~23.1%\"], \"rationale\": \"Low income and Least Developed Countries lines have the smallest changes (about 6 percentage points each), World is about 1.2.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Low income\"}",
+    "answer": [
+     "text",
+     "low income"
+    ],
+    "pred": "Low income",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 773,
+    "new_tokens": 107,
+    "truncated": false,
+    "seconds": 4.1469
+   },
+   "merged": {
+    "id": "val-59896688006025-231",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Low income 2014 ~20.5%, 2018 ~26.5%\", \"Least Developed Countries 2014 ~18.7%, 2018 ~23.1%\"], \"rationale\": \"Low income and Least Developed Countries have the smallest changes (about 6 percentage points each), while Southern Asia rises by about 3 percentage points.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Low income\"}",
+    "answer": [
+     "text",
+     "low income"
+    ],
+    "pred": "Low income",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 773,
+    "new_tokens": 109,
+    "truncated": false,
+    "seconds": 1.8857
+   }
+  },
+  {
+   "id": "val-multi_col_60811-895",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_60811-895",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Vegetables Fresh (10%)\", \"Vegetables Shelf-stable (32%)\"], \"rationale\": \"Fresh 10% plus Shelf-stable 32% = 42.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 42}",
+    "answer": [
+     "num",
+     42.0
+    ],
+    "pred": 42,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 68,
+    "truncated": false,
+    "seconds": 2.666
+   },
+   "merged": {
+    "id": "val-multi_col_60811-895",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Vegetables Fresh (10%)\", \"Vegetables Shelf-stable (32%)\"], \"rationale\": \"Fresh 10% plus Shelf-stable 32% = 42.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 42}",
+    "answer": [
+     "num",
+     42.0
+    ],
+    "pred": 42,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 68,
+    "truncated": false,
+    "seconds": 1.2001
+   }
+  },
+  {
+   "id": "val-two_col_5618-601",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_5618-601",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2014 (8.74%)\", \"2015 (9.34%)\"], \"rationale\": \"9.34 - 8.74 = 0.6.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 0.6}",
+    "answer": [
+     "num",
+     0.6
+    ],
+    "pred": 0.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 742,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 2.7054
+   },
+   "merged": {
+    "id": "val-two_col_5618-601",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2014 (8.74%)\", \"2015 (9.34%)\"], \"rationale\": \"9.34 - 8.74 = 0.6.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 0.6}",
+    "answer": [
+     "num",
+     0.6
+    ],
+    "pred": 0.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 742,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 1.2193
+   }
+  },
+  {
+   "id": "val-multi_col_40743-838",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_40743-838",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Blue bars: 1990 High income (75), 1990 Upper middle income (68), 1990 Lower middle income (59), 1990 Low income (53)\"], \"rationale\": \"Sorted blue values: 75, 68, 59, 53. Second lowest is 59.\", \"answer_type\": \"number\", \"unit\": \"years\", \"answer\": 59}",
+    "answer": [
+     "num",
+     59.0
+    ],
+    "pred": 59,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 107,
+    "truncated": false,
+    "seconds": 4.1307
+   },
+   "merged": {
+    "id": "val-multi_col_40743-838",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Blue bars: 1990 High income (75), 1990 Upper middle income (68), 1990 Lower middle income (59), 1990 Low income (53)\"], \"rationale\": \"Sorted blue values: 75, 68, 59, 53. Second lowest is 59.\", \"answer_type\": \"number\", \"unit\": \"years\", \"answer\": 59}",
+    "answer": [
+     "num",
+     59.0
+    ],
+    "pred": 59,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 107,
+    "truncated": false,
+    "seconds": 1.8447
+   }
+  },
+  {
+   "id": "val-two_col_3853-574",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_3853-574",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Transport 44\"], \"rationale\": \"The Transport slice is labelled 44.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 44}",
+    "answer": [
+     "num",
+     44.0
+    ],
+    "pred": 44,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 728,
+    "new_tokens": 46,
+    "truncated": false,
+    "seconds": 1.8324
+   },
+   "merged": {
+    "id": "val-two_col_3853-574",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Transport 44\"], \"rationale\": \"The Transport slice is labelled 44.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 44}",
+    "answer": [
+     "num",
+     44.0
+    ],
+    "pred": 44,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 728,
+    "new_tokens": 46,
+    "truncated": false,
+    "seconds": 0.8399
+   }
+  },
+  {
+   "id": "val-multi_col_80183-914",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-multi_col_80183-914",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"2014 Hardware (61%)\", \"2020 Hardware (55%)\"], \"rationale\": \"The two 61% and 55% values correspond to the Hardware segments in 2014 and 2020.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Hardware\"}",
+    "answer": [
+     "text",
+     "hardware"
+    ],
+    "pred": "Hardware",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 721,
+    "new_tokens": 79,
+    "truncated": false,
+    "seconds": 3.0792
+   },
+   "merged": {
+    "id": "val-multi_col_80183-914",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"2014 Hardware (61%)\", \"2020 Hardware (55%)\"], \"rationale\": \"The 61% and 55% values correspond to the Hardware segments in both years.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Hardware\"}",
+    "answer": [
+     "text",
+     "hardware"
+    ],
+    "pred": "Hardware",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 721,
+    "new_tokens": 69,
+    "truncated": false,
+    "seconds": 1.2165
+   }
+  },
+  {
+   "id": "val-62127896000657-143",
+   "answer_type": "yes_no",
+   "reference": {
+    "id": "val-62127896000657-143",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"IDA only 2.36%\", \"Upper middle income 1.87%\", \"Nepal 0.96%\"], \"rationale\": \"2.36 - 1.87 = 0.49, which is not equal to 0.96.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"No\"}",
+    "answer": [
+     "text",
+     "no"
+    ],
+    "pred": "No",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 776,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 3.353
+   },
+   "merged": {
+    "id": "val-62127896000657-143",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"IDA only 2.36%\", \"Upper middle income 1.87%\", \"Nepal 0.96%\"], \"rationale\": \"2.36 - 1.87 = 0.49, which is not equal to 0.96.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"No\"}",
+    "answer": [
+     "text",
+     "no"
+    ],
+    "pred": "No",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 776,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 1.5095
+   }
+  },
+  {
+   "id": "val-59896688006025-230",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-59896688006025-230",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Low income 2017 ~26.5%\", \"Sub-Saharan Africa 2017 ~25.8%\"], \"rationale\": \"Low income and Sub-Saharan Africa both reach their highest values at 2017 (about 26.5% and 25.8%, respectively), above the others.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Low income\"}",
+    "answer": [
+     "text",
+     "low income"
+    ],
+    "pred": "Low income",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 776,
+    "new_tokens": 96,
+    "truncated": false,
+    "seconds": 3.7218
+   },
+   "merged": {
+    "id": "val-59896688006025-230",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Low income 2017 ~26.5%\", \"Sub-Saharan Africa 2017 ~25.8%\"], \"rationale\": \"Low income and Sub-Saharan Africa both reach their highest values at 2017 (about 26.5% and 25.8%, respectively), above the others.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Low income\"}",
+    "answer": [
+     "text",
+     "low income"
+    ],
+    "pred": "Low income",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 776,
+    "new_tokens": 96,
+    "truncated": false,
+    "seconds": 1.6758
+   }
+  },
+  {
+   "id": "val-OECD_SHORT-TERM_INTEREST_RATES_BEL_CZE_IRL_KOR_RUS_000026-399",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-OECD_SHORT-TERM_INTEREST_RATES_BEL_CZE_IRL_KOR_RUS_000026-399",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Belgium 5.7\", \"Ireland 5.9\"], \"rationale\": \"Only Belgium and Ireland are below 6; Czech Republic is 9.1 and Korea is 13.3.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2}",
+    "answer": [
+     "num",
+     2.0
+    ],
+    "pred": 2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 693,
+    "new_tokens": 68,
+    "truncated": false,
+    "seconds": 2.6392
+   },
+   "merged": {
+    "id": "val-OECD_SHORT-TERM_INTEREST_RATES_BEL_CZE_IRL_KOR_RUS_000026-399",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Belgium 5.7\", \"Ireland 5.9\"], \"rationale\": \"Only Belgium and Ireland are below 6; Czech Republic is 9.1 and Korea is 13.3.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2}",
+    "answer": [
+     "num",
+     2.0
+    ],
+    "pred": 2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 693,
+    "new_tokens": 68,
+    "truncated": false,
+    "seconds": 1.2003
+   }
+  },
+  {
+   "id": "val-two_col_81854-499",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_81854-499",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2010 (23)\", \"2011 (39)\", \"2012 (28)\"], \"rationale\": \"Change from 2010 to 2011 is 16; from 2011 to 2012 is 11. The biggest change is 2011.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2011}",
+    "answer": [
+     "num",
+     2011.0
+    ],
+    "pred": 2011,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 103,
+    "truncated": false,
+    "seconds": 3.9868
+   },
+   "merged": {
+    "id": "val-two_col_81854-499",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2010 (23)\", \"2011 (39)\", \"2012 (28)\"], \"rationale\": \"Change from 2010 to 2011 is 16; from 2011 to 2012 is 11. The biggest change is 2011.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2011}",
+    "answer": [
+     "num",
+     2011.0
+    ],
+    "pred": 2011,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 103,
+    "truncated": false,
+    "seconds": 1.7796
+   }
+  },
+  {
+   "id": "val-70101677022779-235",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-70101677022779-235",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Guatemala line peaks at ~$4.5 in 2006\"], \"rationale\": \"The line is highest at its maximum point, which is 2006.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2006}",
+    "answer": [
+     "num",
+     2006.0
+    ],
+    "pred": 2006,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 763,
+    "new_tokens": 65,
+    "truncated": false,
+    "seconds": 2.5693
+   },
+   "merged": {
+    "id": "val-70101677022779-235",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Line peak at 2006 (~$4.5)\"], \"rationale\": \"The line peaks at its highest point, 2006.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2006}",
+    "answer": [
+     "num",
+     2006.0
+    ],
+    "pred": 2006,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 763,
+    "new_tokens": 60,
+    "truncated": false,
+    "seconds": 1.0784
+   }
+  },
+  {
+   "id": "val-24259131001104-95",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-24259131001104-95",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Iran 34.5%\", \"Kenya 8.12%\"], \"rationale\": \"34.5 - 8.12 = 26.38.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 26.38}",
+    "answer": [
+     "num",
+     26.38
+    ],
+    "pred": 26.38,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 769,
+    "new_tokens": 67,
+    "truncated": false,
+    "seconds": 2.6348
+   },
+   "merged": {
+    "id": "val-24259131001104-95",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Iran 34.5%\", \"Kenya 8.12%\"], \"rationale\": \"34.5 - 8.12 = 26.38.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 26.38}",
+    "answer": [
+     "num",
+     26.38
+    ],
+    "pred": 26.38,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 769,
+    "new_tokens": 67,
+    "truncated": false,
+    "seconds": 1.1991
+   }
+  },
+  {
+   "id": "val-11124-409",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-11124-409",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Democrat Feb 2015 Mostly good (29)\", \"Democrat Feb 2015 Mostly bad (9)\"], \"rationale\": \"Ratio of Mostly good to Mostly bad for Democrat Feb 2015 = 29 / 9 = 3.22.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3.222222222222222}",
+    "answer": [
+     "num",
+     3.222222222222222
+    ],
+    "pred": 3.222222222222222,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 289,
+    "new_tokens": 102,
+    "truncated": false,
+    "seconds": 3.8833
+   },
+   "merged": {
+    "id": "val-11124-409",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Democrat Feb 2015 Mostly good (29)\", \"Democrat Feb 2015 Mostly bad (9)\"], \"rationale\": \"Ratio of Mostly good to Mostly bad for Democrat Feb 2015 = 29 / 9 = 3.22.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3.222222222222222}",
+    "answer": [
+     "num",
+     3.222222222222222
+    ],
+    "pred": 3.222222222222222,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 289,
+    "new_tokens": 102,
+    "truncated": false,
+    "seconds": 1.719
+   }
+  },
+  {
+   "id": "val-two_col_100197-514",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_100197-514",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Grey bar labelled All households (32 043)\"], \"rationale\": \"The only grey bar is 'All households' at 32 043 euros.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"All households\"}",
+    "answer": [
+     "text",
+     "all households"
+    ],
+    "pred": "All households",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 62,
+    "truncated": false,
+    "seconds": 2.4295
+   },
+   "merged": {
+    "id": "val-two_col_100197-514",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Grey bar labelled All households (32 043)\"], \"rationale\": \"The only grey bar is 'All households' at 32 043 euros.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"All households\"}",
+    "answer": [
+     "text",
+     "all households"
+    ],
+    "pred": "All households",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 62,
+    "truncated": false,
+    "seconds": 1.108
+   }
+  },
+  {
+   "id": "val-two_col_102450-551",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_102450-551",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2013 (3.24)\", \"2014 (3.16)\", \"2015 (3.11)\", \"2016 (3.16)\"], \"rationale\": \"Bars above 3: 2013, 2014, 2015, 2016; 2017 is 2.77.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 4}",
+    "answer": [
+     "num",
+     4.0
+    ],
+    "pred": 4,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 113,
+    "truncated": false,
+    "seconds": 4.3547
+   },
+   "merged": {
+    "id": "val-two_col_102450-551",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2013 (3.24)\", \"2014 (3.16)\", \"2015 (3.11)\", \"2016 (3.16)\"], \"rationale\": \"Bars above 3: 2013, 2014, 2015, 2016; 2017 is 2.77.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 4}",
+    "answer": [
+     "num",
+     4.0
+    ],
+    "pred": 4,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 113,
+    "truncated": false,
+    "seconds": 1.9418
+   }
+  },
+  {
+   "id": "val-multi_col_20001-781",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-multi_col_20001-781",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Advanced degree: Men 1268, Women 1426; other degrees have smaller gaps\"], \"rationale\": \"Advanced degree has the largest difference between men's and women's wages.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Advanced degree\"}",
+    "answer": [
+     "text",
+     "advanced degree"
+    ],
+    "pred": "Advanced degree",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 738,
+    "new_tokens": 66,
+    "truncated": false,
+    "seconds": 2.5768
+   },
+   "merged": {
+    "id": "val-multi_col_20001-781",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Advanced degree: Men 1268, Women 1426 (gap 158)\", \"Total: 1144 vs 929 (215)\"], \"rationale\": \"Gap for Advanced degree is largest at 158, compared to Total 215.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Advanced degree\"}",
+    "answer": [
+     "text",
+     "advanced degree"
+    ],
+    "pred": "Advanced degree",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 738,
+    "new_tokens": 91,
+    "truncated": false,
+    "seconds": 1.5893
+   }
+  },
+  {
+   "id": "val-96134789000993-425",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-96134789000993-425",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Japan coking coal import cif price $229.12\", \"Japan steam spot cif price $126.13\"], \"rationale\": \"(229.12 + 126.13) / 2 = 177.625.\", \"answer_type\": \"number\", \"unit\": \"US dollars per tonne\", \"answer\": 177.63}",
+    "answer": [
+     "num",
+     177.63
+    ],
+    "pred": 177.63,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 774,
+    "new_tokens": 95,
+    "truncated": false,
+    "seconds": 3.6716
+   },
+   "merged": {
+    "id": "val-96134789000993-425",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Japan coking coal import cif price $229.12\", \"Japan steam spot cif price $126.13\"], \"rationale\": \"(229.12 + 126.13) / 2 = 177.625.\", \"answer_type\": \"number\", \"unit\": \"US dollars per tonne\", \"answer\": 177.63}",
+    "answer": [
+     "num",
+     177.63
+    ],
+    "pred": 177.63,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 774,
+    "new_tokens": 95,
+    "truncated": false,
+    "seconds": 1.6642
+   }
+  },
+  {
+   "id": "val-11832048004610-179",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-11832048004610-179",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Montenegro line starts ~21 in 2004, rises to ~43 in 2009\"], \"rationale\": \"Montenegro's purple line is above 30 from 2007 to 2009; it is not above 30 in 2006 or 2005.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3}",
+    "answer": [
+     "num",
+     3.0
+    ],
+    "pred": 3,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 777,
+    "new_tokens": 97,
+    "truncated": false,
+    "seconds": 3.7575
+   },
+   "merged": {
+    "id": "val-11832048004610-179",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Montenegro line starts ~21 in 2004, rises to ~43 in 2009\"], \"rationale\": \"Montenegro's purple line is above 30 from 2007 to 2009; it is not above 30 in 2006 or 2005.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3}",
+    "answer": [
+     "num",
+     3.0
+    ],
+    "pred": 3,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 777,
+    "new_tokens": 97,
+    "truncated": false,
+    "seconds": 1.6897
+   }
+  },
+  {
+   "id": "val-11711749024597-176",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-11711749024597-176",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Line=Laos, 2017 ~40%\"], \"rationale\": \"The line rises each year; its highest labelled value is 40% at 2017.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2017}",
+    "answer": [
+     "num",
+     2017.0
+    ],
+    "pred": 2017,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 772,
+    "new_tokens": 68,
+    "truncated": false,
+    "seconds": 2.6783
+   },
+   "merged": {
+    "id": "val-11711749024597-176",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Laos line 2017 ~40%\"], \"rationale\": \"The line rises each year; its highest labelled value is 40% at 2017.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2017}",
+    "answer": [
+     "num",
+     2017.0
+    ],
+    "pred": 2017,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 772,
+    "new_tokens": 66,
+    "truncated": false,
+    "seconds": 1.1803
+   }
+  },
+  {
+   "id": "val-OECD_PRIVATE_SPENDING_ON_EDUCATION_ARG_RUS_000004-390",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-OECD_PRIVATE_SPENDING_ON_EDUCATION_ARG_RUS_000004-390",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red bar labelled 0.082 (Russia)\"], \"rationale\": \"The red bar is labelled 0.082, which is Russia's share.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Russia\"}",
+    "answer": [
+     "text",
+     "russia"
+    ],
+    "pred": "Russia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 691,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 2.3114
+   },
+   "merged": {
+    "id": "val-OECD_PRIVATE_SPENDING_ON_EDUCATION_ARG_RUS_000004-390",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red bar labelled 0.082 (Russia)\"], \"rationale\": \"The red bar is labelled 0.082, which is Russia's share.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Russia\"}",
+    "answer": [
+     "text",
+     "russia"
+    ],
+    "pred": "Russia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 691,
+    "new_tokens": 59,
+    "truncated": false,
+    "seconds": 1.049
+   }
+  },
+  {
+   "id": "val-multi_col_1411-760",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-multi_col_1411-760",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Beer 2010/11 (7)\", \"Beer 2011/12 (8)\"], \"rationale\": \"Beer values rise each year; lowest is 2010/11 at 7.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2010/11}",
+    "answer": [
+     "invalid"
+    ],
+    "pred": null,
+    "json_valid": false,
+    "schema_valid": false,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 80,
+    "truncated": false,
+    "seconds": 3.102
+   },
+   "merged": {
+    "id": "val-multi_col_1411-760",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Beer 2010/11 (7)\", \"Beer 2011/12 (8)\"], \"rationale\": \"Beer values rise each year; lowest is 2010/11 at 7.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2010/11}",
+    "answer": [
+     "invalid"
+    ],
+    "pred": null,
+    "json_valid": false,
+    "schema_valid": false,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 80,
+    "truncated": false,
+    "seconds": 1.3991
+   }
+  },
+  {
+   "id": "val-two_col_100223-517",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_100223-517",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Bar=Legislators, senior officials and managers (1)\"], \"rationale\": \"The only bar labelled 1 is the last one.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Legislators, senior officials and managers\"}",
+    "answer": [
+     "text",
+     "legislators, senior officials and managers"
+    ],
+    "pred": "Legislators, senior officials and managers",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 60,
+    "truncated": false,
+    "seconds": 2.3576
+   },
+   "merged": {
+    "id": "val-two_col_100223-517",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Bar=Legislators, senior officials and managers (1)\"], \"rationale\": \"The only bar labelled 1 is the last one.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Legislators, senior officials and managers\"}",
+    "answer": [
+     "text",
+     "legislators, senior officials and managers"
+    ],
+    "pred": "Legislators, senior officials and managers",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 60,
+    "truncated": false,
+    "seconds": 1.0697
+   }
+  },
+  {
+   "id": "val-12784129003060-77",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-12784129003060-77",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Argentina 30.22%\", \"Egypt 40.34%\", \"Australia 43.68%\"], \"rationale\": \"(30.22+40.34+43.68)/3 = 114.24/3 = 38.08.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 38.08}",
+    "answer": [
+     "num",
+     38.08
+    ],
+    "pred": 38.08,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 96,
+    "truncated": false,
+    "seconds": 3.7024
+   },
+   "merged": {
+    "id": "val-12784129003060-77",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Argentina 30.22%\", \"Egypt 40.34%\", \"Australia 43.68%\"], \"rationale\": \"(30.22+40.34+43.68)/3 = 114.24/3 = 38.08.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 38.08}",
+    "answer": [
+     "num",
+     38.08
+    ],
+    "pred": 38.08,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 96,
+    "truncated": false,
+    "seconds": 1.666
+   }
+  },
+  {
+   "id": "val-OECD_TAX_ON_PAYROLL_AUS_CZE_ESP_FRA_JPN_000124-458",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-OECD_TAX_ON_PAYROLL_AUS_CZE_ESP_FRA_JPN_000124-458",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Blue line labelled France\"], \"rationale\": \"The blue line is labelled France.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"France\"}",
+    "answer": [
+     "text",
+     "france"
+    ],
+    "pred": "France",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 693,
+    "new_tokens": 40,
+    "truncated": false,
+    "seconds": 1.6055
+   },
+   "merged": {
+    "id": "val-OECD_TAX_ON_PAYROLL_AUS_CZE_ESP_FRA_JPN_000124-458",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Blue line labelled France\"], \"rationale\": \"The blue line is labelled France.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"France\"}",
+    "answer": [
+     "text",
+     "france"
+    ],
+    "pred": "France",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 693,
+    "new_tokens": 40,
+    "truncated": false,
+    "seconds": 0.7421
+   }
+  },
+  {
+   "id": "val-two_col_83479-510",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_83479-510",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Max Bahr 0.7\", \"Praktiker* 1.4\", \"Hagebau market 1.5\", \"OBI 1.7\", \"Hornbach 2\"], \"rationale\": \"Lowest bar is Max Bahr at 0.7 billion euros.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Max Bahr\"}",
+    "answer": [
+     "text",
+     "max bahr"
+    ],
+    "pred": "Max Bahr",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 727,
+    "new_tokens": 88,
+    "truncated": false,
+    "seconds": 3.4184
+   },
+   "merged": {
+    "id": "val-two_col_83479-510",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Max Bahr 0.7\", \"Praktiker* 1.4\", \"Hagebau market 1.5\", \"OBI 1.7\", \"Hornbach 2\"], \"rationale\": \"Lowest bar is Max Bahr at 0.7 billion euros.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Max Bahr\"}",
+    "answer": [
+     "text",
+     "max bahr"
+    ],
+    "pred": "Max Bahr",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 727,
+    "new_tokens": 88,
+    "truncated": false,
+    "seconds": 1.5311
+   }
+  },
+  {
+   "id": "val-two_col_5866-610",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_5866-610",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Ingenico Group S.A. \u2013 Worldline SA (9.2)\"], \"rationale\": \"The bar for Ingenico Group S.A. is labelled 9.2.\", \"answer_type\": \"number\", \"unit\": \"billion euros\", \"answer\": 9.2}",
+    "answer": [
+     "num",
+     9.2
+    ],
+    "pred": 9.2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 730,
+    "new_tokens": 66,
+    "truncated": false,
+    "seconds": 2.584
+   },
+   "merged": {
+    "id": "val-two_col_5866-610",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Ingenico Group S.A. \u2013 Worldline SA (9.2)\"], \"rationale\": \"The bar for Ingenico Group S.A. is labelled 9.2.\", \"answer_type\": \"number\", \"unit\": \"billion euros\", \"answer\": 9.2}",
+    "answer": [
+     "num",
+     9.2
+    ],
+    "pred": 9.2,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 730,
+    "new_tokens": 66,
+    "truncated": false,
+    "seconds": 1.1694
+   }
+  },
+  {
+   "id": "val-multi_col_1086-745",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_1086-745",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Agriculture 2018 (4.03%)\", \"Industry 2018 (16.79%)\"], \"rationale\": \"Agriculture plus Industry is 20.82% in 2018; it is lowest in 2018.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2018}",
+    "answer": [
+     "num",
+     2018.0
+    ],
+    "pred": 2018,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 91,
+    "truncated": false,
+    "seconds": 3.5424
+   },
+   "merged": {
+    "id": "val-multi_col_1086-745",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Agriculture 2018 (4.03%)\", \"Industry 2018 (16.79%)\"], \"rationale\": \"Agriculture plus Industry is 20.82% in 2018; it is lowest in 2018.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2018}",
+    "answer": [
+     "num",
+     2018.0
+    ],
+    "pred": 2018,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 91,
+    "truncated": false,
+    "seconds": 1.5875
+   }
+  },
+  {
+   "id": "val-two_col_104092-552",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_104092-552",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Accessories 52.8%\"], \"rationale\": \"The largest slice is Accessories at 52.8%, which exceeds half the pie.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Accessories\"}",
+    "answer": [
+     "text",
+     "accessories"
+    ],
+    "pred": "Accessories",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 56,
+    "truncated": false,
+    "seconds": 2.2053
+   },
+   "merged": {
+    "id": "val-two_col_104092-552",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Accessories 52.8%\"], \"rationale\": \"The largest slice is Accessories at 52.8%, which exceeds half of the pie.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Accessories\"}",
+    "answer": [
+     "text",
+     "accessories"
+    ],
+    "pred": "Accessories",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 717,
+    "new_tokens": 57,
+    "truncated": false,
+    "seconds": 1.0222
+   }
+  },
+  {
+   "id": "val-10219-401",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-10219-401",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"School (83%)\", \"Someone's house (58%)\", \"Online (55%)\"], \"rationale\": \"Bars above 50: School, Someone's house, Online. Others are 42, 23, 21, 6, 5.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3}",
+    "answer": [
+     "num",
+     3.0
+    ],
+    "pred": 3,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 425,
+    "new_tokens": 84,
+    "truncated": false,
+    "seconds": 3.2334
+   },
+   "merged": {
+    "id": "val-10219-401",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"School (83%)\", \"Someone's house (58%)\", \"Online (55%)\"], \"rationale\": \"Bars above 50: School, Someone's house, Online. Others are 42, 23, 21, 6, 5.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 3}",
+    "answer": [
+     "num",
+     3.0
+    ],
+    "pred": 3,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 425,
+    "new_tokens": 84,
+    "truncated": false,
+    "seconds": 1.4366
+   }
+  },
+  {
+   "id": "val-multi_col_60050-853",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_60050-853",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2019 blue (742.99)\", \"2020 blue (716.55)\"], \"rationale\": \"(742.99 + 716.55) / 2 = 729.77.\", \"answer_type\": \"number\", \"unit\": \"million Canadian dollars\", \"answer\": 729.77}",
+    "answer": [
+     "num",
+     729.77
+    ],
+    "pred": 729.77,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 91,
+    "truncated": false,
+    "seconds": 3.5107
+   },
+   "merged": {
+    "id": "val-multi_col_60050-853",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2019 blue (Imported beer) = 707.29\", \"2020 blue (Imported beer) = 716.55\"], \"rationale\": \"(707.29 + 716.55) / 2 = 711.97.\", \"answer_type\": \"number\", \"unit\": \"million Canadian dollars\", \"answer\": 711.97}",
+    "answer": [
+     "num",
+     711.97
+    ],
+    "pred": 711.97,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 102,
+    "truncated": false,
+    "seconds": 1.7713
+   }
+  },
+  {
+   "id": "val-two_col_83529-543",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_83529-543",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2014 (2.58)\", \"2015 (2.63)\", \"2016 (2.03)\", \"2017 (1.86)\", \"2018 (1.75)\", \"2019 (1.6)\"], \"rationale\": \"(2.58+2.63+2.03+1.86+1.75+1.6)/6 = 13.41/6 = 2.235.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 2.235}",
+    "answer": [
+     "num",
+     2.235
+    ],
+    "pred": 2.235,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 144,
+    "truncated": false,
+    "seconds": 5.5146
+   },
+   "merged": {
+    "id": "val-two_col_83529-543",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"2014 (2.58)\", \"2015 (2.63)\", \"2016 (2.03)\", \"2017 (1.86)\", \"2018 (1.75)\", \"2019 (1.6)\"], \"rationale\": \"(2.58+2.63+2.03+1.86+1.75+1.6)/6 = 13.46/6 = 2.243.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 2.2433333333333333}",
+    "answer": [
+     "num",
+     2.243333333333333
+    ],
+    "pred": 2.243333333333333,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 157,
+    "truncated": false,
+    "seconds": 2.6646
+   }
+  },
+  {
+   "id": "val-multi_col_1411-761",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_1411-761",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Beer 2013/14 (8.5)\", \"Beer 2011/12 (8)\"], \"rationale\": \"8.5 - 8 = 0.5.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 0.5}",
+    "answer": [
+     "num",
+     0.5
+    ],
+    "pred": 0.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 74,
+    "truncated": false,
+    "seconds": 2.8773
+   },
+   "merged": {
+    "id": "val-multi_col_1411-761",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Beer 2013/14 (8.5)\", \"Beer 2011/12 (8)\"], \"rationale\": \"8.5 - 8 = 0.5.\", \"answer_type\": \"number\", \"unit\": \"U.S. dollars\", \"answer\": 0.5}",
+    "answer": [
+     "num",
+     0.5
+    ],
+    "pred": 0.5,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 729,
+    "new_tokens": 74,
+    "truncated": false,
+    "seconds": 1.3
+   }
+  },
+  {
+   "id": "val-39727570004541-120",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-39727570004541-120",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Northern America, Europe, World, South America, Asia, Caribbean, Africa\"], \"rationale\": \"Seven regions are listed.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 7}",
+    "answer": [
+     "num",
+     7.0
+    ],
+    "pred": 7,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 2.0365
+   },
+   "merged": {
+    "id": "val-39727570004541-120",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Northern America, Europe, World, South America, Asia, Caribbean, Africa\"], \"rationale\": \"Seven regions are shown.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 7}",
+    "answer": [
+     "num",
+     7.0
+    ],
+    "pred": 7,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 0.9279
+   }
+  },
+  {
+   "id": "val-10688218006528-68",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-10688218006528-68",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Pink bar = Ethiopia (80.22%)\"], \"rationale\": \"The only pink bar is Ethiopia.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Ethiopia\"}",
+    "answer": [
+     "text",
+     "ethiopia"
+    ],
+    "pred": "Ethiopia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 763,
+    "new_tokens": 49,
+    "truncated": false,
+    "seconds": 1.968
+   },
+   "merged": {
+    "id": "val-10688218006528-68",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Pink bar = Ethiopia (80.22%)\"], \"rationale\": \"The only pink bar is Ethiopia.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Ethiopia\"}",
+    "answer": [
+     "text",
+     "ethiopia"
+    ],
+    "pred": "Ethiopia",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 763,
+    "new_tokens": 49,
+    "truncated": false,
+    "seconds": 0.8951
+   }
+  },
+  {
+   "id": "val-OECD_CRUDE_OIL_IMPORT_PRICES_PRT_000090-254",
+   "answer_type": "yes_no",
+   "reference": {
+    "id": "val-OECD_CRUDE_OIL_IMPORT_PRICES_PRT_000090-254",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"1984 point ~30\"], \"rationale\": \"The 1984 point is above 25.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"Yes\"}",
+    "answer": [
+     "text",
+     "yes"
+    ],
+    "pred": "Yes",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 705,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 2.0232
+   },
+   "merged": {
+    "id": "val-OECD_CRUDE_OIL_IMPORT_PRICES_PRT_000090-254",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"1984 point ~30\"], \"rationale\": \"The 1984 point is above 25.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"Yes\"}",
+    "answer": [
+     "text",
+     "yes"
+    ],
+    "pred": "Yes",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 705,
+    "new_tokens": 51,
+    "truncated": false,
+    "seconds": 0.918
+   }
+  },
+  {
+   "id": "val-2215-278",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-2215-278",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"As column (14%, 23%, 20%, 21%, 18%)\", \"As segment is light grey\"], \"rationale\": \"The As column is light grey; the other segments are olive green and dark blue.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"grey\"}",
+    "answer": [
+     "text",
+     "grey"
+    ],
+    "pred": "grey",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 944,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 2.9573
+   },
+   "merged": {
+    "id": "val-2215-278",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"As column (14%, 23%, 20%, 21%, 18%)\", \"As segment is light grey\"], \"rationale\": \"The As column is light grey; the other segments are olive green and dark blue.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"grey\"}",
+    "answer": [
+     "text",
+     "grey"
+    ],
+    "pred": "grey",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 944,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 1.3387
+   }
+  },
+  {
+   "id": "val-00006834003066-162",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-00006834003066-162",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Nigeria\", \"Extreme fragility\", \"Africa\", \"Fragile\", \"World\", \"India\"], \"rationale\": \"Six lines are drawn in the chart.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 6}",
+    "answer": [
+     "num",
+     6.0
+    ],
+    "pred": 6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 58,
+    "truncated": false,
+    "seconds": 2.287
+   },
+   "merged": {
+    "id": "val-00006834003066-162",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Nigeria\", \"Extreme fragility\", \"Africa\", \"Fragile\", \"World\", \"India\"], \"rationale\": \"Six lines are drawn in the chart.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 6}",
+    "answer": [
+     "num",
+     6.0
+    ],
+    "pred": 6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 765,
+    "new_tokens": 58,
+    "truncated": false,
+    "seconds": 1.0431
+   }
+  },
+  {
+   "id": "val-two_col_63588-487",
+   "answer_type": "yes_no",
+   "reference": {
+    "id": "val-two_col_63588-487",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"Yellow (Shoes 12%)\", \"Green (Children's 9%)\", \"Ladies 23%\"], \"rationale\": \"Yellow + green = 21, which is less than Ladies 23.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"No\"}",
+    "answer": [
+     "text",
+     "no"
+    ],
+    "pred": "No",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 72,
+    "truncated": false,
+    "seconds": 2.8214
+   },
+   "merged": {
+    "id": "val-two_col_63588-487",
+    "answer_type": "yes_no",
+    "raw": "{\"evidence\": [\"Yellow (Shoes 12%)\", \"Green (Children's 9%)\", \"Ladies 23%\"], \"rationale\": \"Yellow + green = 21, which is less than Ladies 23.\", \"answer_type\": \"yes_no\", \"unit\": null, \"answer\": \"No\"}",
+    "answer": [
+     "text",
+     "no"
+    ],
+    "pred": "No",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 72,
+    "truncated": false,
+    "seconds": 1.2678
+   }
+  },
+  {
+   "id": "val-15943492005560-83",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-15943492005560-83",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Madagascar 0.96\", \"Central Europe 0.03\"], \"rationale\": \"0.96 / 0.03 = 32.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 32}",
+    "answer": [
+     "num",
+     32.0
+    ],
+    "pred": 32,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 766,
+    "new_tokens": 61,
+    "truncated": false,
+    "seconds": 2.4075
+   },
+   "merged": {
+    "id": "val-15943492005560-83",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Madagascar 0.96\", \"Central Europe 0.03\"], \"rationale\": \"0.96 / 0.03 = 32.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 32}",
+    "answer": [
+     "num",
+     32.0
+    ],
+    "pred": 32,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 766,
+    "new_tokens": 61,
+    "truncated": false,
+    "seconds": 1.0964
+   }
+  },
+  {
+   "id": "val-two_col_20869-615",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_20869-615",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"South America 42%\", \"North America 21%\"], \"rationale\": \"Maximum 42%, minimum 21%; 42 - 21 = 21.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 21}",
+    "answer": [
+     "num",
+     21.0
+    ],
+    "pred": 21,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 65,
+    "truncated": false,
+    "seconds": 2.5333
+   },
+   "merged": {
+    "id": "val-two_col_20869-615",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"South America 42%\", \"North America 21%\"], \"rationale\": \"Maximum 42%, minimum 21%; 42 - 21 = 21.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 21}",
+    "answer": [
+     "num",
+     21.0
+    ],
+    "pred": 21,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 719,
+    "new_tokens": 65,
+    "truncated": false,
+    "seconds": 1.1559
+   }
+  },
+  {
+   "id": "val-two_col_24100-651",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_24100-651",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"United States 30\", \"Papua New Guinea 7\", \"Japan 1\"], \"rationale\": \"30 + 7 + 1 = 38.\", \"answer_type\": \"number\", \"unit\": \"million TTV\", \"answer\": 38}",
+    "answer": [
+     "num",
+     38.0
+    ],
+    "pred": 38,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 65,
+    "truncated": false,
+    "seconds": 2.5399
+   },
+   "merged": {
+    "id": "val-two_col_24100-651",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"United States 30\", \"Papua New Guinea 7\", \"Japan 1\"], \"rationale\": \"30 + 7 + 1 = 38.\", \"answer_type\": \"number\", \"unit\": \"million TTV\", \"answer\": 38}",
+    "answer": [
+     "num",
+     38.0
+    ],
+    "pred": 38,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 65,
+    "truncated": false,
+    "seconds": 1.1528
+   }
+  },
+  {
+   "id": "val-two_col_100854-530",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_100854-530",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Stockings 55%\"], \"rationale\": \"Stockings has the tallest bar at 55%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Stockings\"}",
+    "answer": [
+     "text",
+     "stockings"
+    ],
+    "pred": "Stockings",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 1.9051
+   },
+   "merged": {
+    "id": "val-two_col_100854-530",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Stockings 55%\"], \"rationale\": \"Stockings has the tallest bar at 55%.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Stockings\"}",
+    "answer": [
+     "text",
+     "stockings"
+    ],
+    "pred": "Stockings",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 716,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 0.8736
+   }
+  },
+  {
+   "id": "val-two_col_23297-640",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_23297-640",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Chief executives and senior officials, Marketing and sales directors, etc.\", \"Ten bars\"], \"rationale\": \"Counting the labelled bars gives 10.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 58,
+    "truncated": false,
+    "seconds": 2.2909
+   },
+   "merged": {
+    "id": "val-two_col_23297-640",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Bars: Chief executives and senior officials, Marketing and sales directors, etc.\", \"Ten bars\"], \"rationale\": \"Counting the labelled bars gives 10.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 58,
+    "truncated": false,
+    "seconds": 1.0364
+   }
+  },
+  {
+   "id": "val-two_col_61107-469",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_61107-469",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Very important 12%\", \"Important 50%\"], \"rationale\": \"12 + 50 = 62.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 62}",
+    "answer": [
+     "num",
+     62.0
+    ],
+    "pred": 62,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 733,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 2.0887
+   },
+   "merged": {
+    "id": "val-two_col_61107-469",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Very important 12%\", \"Important 50%\"], \"rationale\": \"12 + 50 = 62.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 62}",
+    "answer": [
+     "num",
+     62.0
+    ],
+    "pred": 62,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 733,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 0.9554
+   }
+  },
+  {
+   "id": "val-multi_col_953-773",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_953-773",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Aviation 2012 (13%)\", \"Aviation 2013 (13%)\"], \"rationale\": \"Aviation shares are identical in 2012 and 2013; the average is 13%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 13}",
+    "answer": [
+     "num",
+     13.0
+    ],
+    "pred": 13,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 726,
+    "new_tokens": 80,
+    "truncated": false,
+    "seconds": 3.1042
+   },
+   "merged": {
+    "id": "val-multi_col_953-773",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Aviation 2012 (13%)\", \"Aviation 2013 (13%)\"], \"rationale\": \"Aviation shares are identical in 2012 and 2013; the average is 13%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 13}",
+    "answer": [
+     "num",
+     13.0
+    ],
+    "pred": 13,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 726,
+    "new_tokens": 80,
+    "truncated": false,
+    "seconds": 1.397
+   }
+  },
+  {
+   "id": "val-16718-10",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-16718-10",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Mostly good news (green) Dec 2008 ~19\", \"Mostly bad news (red) Dec 2008 ~80\"], \"rationale\": \"The green line is lowest at its start point, 19, and stays below the red line throughout.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 19}",
+    "answer": [
+     "num",
+     19.0
+    ],
+    "pred": 19,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 344,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 3.2781
+   },
+   "merged": {
+    "id": "val-16718-10",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Mostly good news (green) Dec 2008 ~19\", \"Mostly bad news (red) Dec 2008 ~80\"], \"rationale\": \"The green line is lowest at its start point, 19, and stays below the red line throughout.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 19}",
+    "answer": [
+     "num",
+     19.0
+    ],
+    "pred": 19,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 344,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 1.4573
+   }
+  },
+  {
+   "id": "val-two_col_100197-515",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_100197-515",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Pensioners 21 948\", \"Long-term unemployed 15 268\"], \"rationale\": \"21948 - 15268 = 6680.\", \"answer_type\": \"number\", \"unit\": \"euros\", \"answer\": 6680}",
+    "answer": [
+     "num",
+     6680.0
+    ],
+    "pred": 6680,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 2.922
+   },
+   "merged": {
+    "id": "val-two_col_100197-515",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Pensioners 21 948\", \"Long-term unemployed 15 268\"], \"rationale\": \"21948 - 15268 = 6680.\", \"answer_type\": \"number\", \"unit\": \"euros\", \"answer\": 6680}",
+    "answer": [
+     "num",
+     6680.0
+    ],
+    "pred": 6680,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 718,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 1.3157
+   }
+  },
+  {
+   "id": "val-multi_col_60616-885",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_60616-885",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Blue (Import value) 2008 = 44 742\", \"Blue 2015 = 112 331\"], \"rationale\": \"44742 + 112331 = 157073.\", \"answer_type\": \"number\", \"unit\": \"thousand euros\", \"answer\": 157073}",
+    "answer": [
+     "num",
+     157073.0
+    ],
+    "pred": 157073,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 726,
+    "new_tokens": 94,
+    "truncated": false,
+    "seconds": 3.6212
+   },
+   "merged": {
+    "id": "val-multi_col_60616-885",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Blue (Import value) 2008 = 44 742\", \"Blue 2015 = 112 331\"], \"rationale\": \"44742 + 112331 = 157073.\", \"answer_type\": \"number\", \"unit\": \"thousand euros\", \"answer\": 157073}",
+    "answer": [
+     "num",
+     157073.0
+    ],
+    "pred": 157073,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 726,
+    "new_tokens": 94,
+    "truncated": false,
+    "seconds": 1.6283
+   }
+  },
+  {
+   "id": "val-two_col_62006-473",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-two_col_62006-473",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Canada 3%\", \"U.S. 7%\"], \"rationale\": \"Canada 3 plus U.S. 7 equals 10.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 55,
+    "truncated": false,
+    "seconds": 2.1796
+   },
+   "merged": {
+    "id": "val-two_col_62006-473",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Canada 3%\", \"U.S. 7%\"], \"rationale\": \"Canada 3 plus U.S. 7 equals 10.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 10}",
+    "answer": [
+     "num",
+     10.0
+    ],
+    "pred": 10,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 55,
+    "truncated": false,
+    "seconds": 0.9874
+   }
+  },
+  {
+   "id": "val-two_col_100412-520",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-two_col_100412-520",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Flash/NV 31.1\"], \"rationale\": \"The longest bar is Flash/NV at 31.1.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Flash/NV\"}",
+    "answer": [
+     "text",
+     "flash/nv"
+    ],
+    "pred": "Flash/NV",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 2.1079
+   },
+   "merged": {
+    "id": "val-two_col_100412-520",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Flash/NV 31.1\"], \"rationale\": \"The longest bar is Flash/NV at 31.1.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Flash/NV\"}",
+    "answer": [
+     "text",
+     "flash/nv"
+    ],
+    "pred": "Flash/NV",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 713,
+    "new_tokens": 53,
+    "truncated": false,
+    "seconds": 0.9568
+   }
+  },
+  {
+   "id": "val-OECD_TOURISM_RECEIPTS_AND_SPENDING_CHL_NLD_SVK_000021-462",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-OECD_TOURISM_RECEIPTS_AND_SPENDING_CHL_NLD_SVK_000021-462",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red line labelled Netherlands\"], \"rationale\": \"The red line is labelled Netherlands.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Netherlands\"}",
+    "answer": [
+     "text",
+     "netherlands"
+    ],
+    "pred": "Netherlands",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 692,
+    "new_tokens": 41,
+    "truncated": false,
+    "seconds": 1.6452
+   },
+   "merged": {
+    "id": "val-OECD_TOURISM_RECEIPTS_AND_SPENDING_CHL_NLD_SVK_000021-462",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Red line labelled Netherlands\"], \"rationale\": \"The red line is labelled Netherlands.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Netherlands\"}",
+    "answer": [
+     "text",
+     "netherlands"
+    ],
+    "pred": "Netherlands",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 692,
+    "new_tokens": 41,
+    "truncated": false,
+    "seconds": 0.7543
+   }
+  },
+  {
+   "id": "val-multi_col_40930-847",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_40930-847",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Online 2016 (2.79)\", \"Online 2017 (3.13)\", \"Online 2018 (3.48)\", \"Online 2019 (3.77)\", \"Online 2020 (5.76)\"], \"rationale\": \"Blue Online values sum to 20.35.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 20.35}",
+    "answer": [
+     "num",
+     20.35
+    ],
+    "pred": 20.35,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 112,
+    "truncated": false,
+    "seconds": 4.2961
+   },
+   "merged": {
+    "id": "val-multi_col_40930-847",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Online 2016 (2.79)\", \"Online 2017 (3.13)\", \"Online 2018 (3.48)\", \"Online 2019 (3.77)\", \"Online 2020 (5.76)\"], \"rationale\": \"Blue Online values sum to 20.35.\", \"answer_type\": \"number\", \"unit\": \"billion GBP\", \"answer\": 20.35}",
+    "answer": [
+     "num",
+     20.35
+    ],
+    "pred": 20.35,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": false,
+    "abstained": false,
+    "prompt_tokens": 715,
+    "new_tokens": 112,
+    "truncated": false,
+    "seconds": 1.9249
+   }
+  },
+  {
+   "id": "val-3408-298",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-3408-298",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Greece, Worse (87%)\"], \"rationale\": \"The blue (Worse) bar for Greece is labelled 87%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 87}",
+    "answer": [
+     "num",
+     87.0
+    ],
+    "pred": 87,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 948,
+    "new_tokens": 54,
+    "truncated": false,
+    "seconds": 2.1737
+   },
+   "merged": {
+    "id": "val-3408-298",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Greece, Worse (87%)\"], \"rationale\": \"The blue (Worse) bar for Greece is labelled 87%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 87}",
+    "answer": [
+     "num",
+     87.0
+    ],
+    "pred": 87,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 948,
+    "new_tokens": 54,
+    "truncated": false,
+    "seconds": 0.9948
+   }
+  },
+  {
+   "id": "val-multi_col_101221-736",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_101221-736",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Year to end March 2018, Processor (blue) 40.6%\"], \"rationale\": \"The blue Processor segment for Year to end March 2018 is labelled 40.6%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 40.6}",
+    "answer": [
+     "num",
+     40.6
+    ],
+    "pred": 40.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 2.941
+   },
+   "merged": {
+    "id": "val-multi_col_101221-736",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Processor (blue) Year to end March 2018 = 40.6%\"], \"rationale\": \"The blue Processor segment for Year to end March 2018 is labelled 40.6%.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 40.6}",
+    "answer": [
+     "num",
+     40.6
+    ],
+    "pred": 40.6,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 725,
+    "new_tokens": 75,
+    "truncated": false,
+    "seconds": 1.3144
+   }
+  },
+  {
+   "id": "val-multi_col_20034-783",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_20034-783",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Services 2020 (64.07%)\", \"Agriculture 2020 (15.45%)\"], \"rationale\": \"64.07 - 15.45 = 48.62.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 48.62}",
+    "answer": [
+     "num",
+     48.62
+    ],
+    "pred": 48.62,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 724,
+    "new_tokens": 83,
+    "truncated": false,
+    "seconds": 3.2545
+   },
+   "merged": {
+    "id": "val-multi_col_20034-783",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Services 2020 (64.07%)\", \"Agriculture 2020 (15.45%)\"], \"rationale\": \"64.07 - 15.45 = 48.62.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 48.62}",
+    "answer": [
+     "num",
+     48.62
+    ],
+    "pred": 48.62,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 724,
+    "new_tokens": 83,
+    "truncated": false,
+    "seconds": 1.4536
+   }
+  },
+  {
+   "id": "val-2595-284-unans",
+   "answer_type": "unanswerable",
+   "reference": {
+    "id": "val-2595-284-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows obesity shares by country; there is no Labour group or UK economic situation.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 771,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 1.8853
+   },
+   "merged": {
+    "id": "val-2595-284-unans",
+    "answer_type": "unanswerable",
+    "raw": "{\"evidence\": [], \"rationale\": \"The chart shows obesity shares by country; there is no Labour group or UK economic situation.\", \"answer_type\": \"unanswerable\", \"unit\": null, \"answer\": null}",
+    "answer": [
+     "null"
+    ],
+    "pred": null,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": true,
+    "prompt_tokens": 771,
+    "new_tokens": 47,
+    "truncated": false,
+    "seconds": 0.8701
+   }
+  },
+  {
+   "id": "val-75598618006874-152",
+   "answer_type": "text",
+   "reference": {
+    "id": "val-75598618006874-152",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Orange bar labelled Europe (18%)\"], \"rationale\": \"The orange bar is the top one, labelled Europe.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Europe\"}",
+    "answer": [
+     "text",
+     "europe"
+    ],
+    "pred": "Europe",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 762,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 1.9273
+   },
+   "merged": {
+    "id": "val-75598618006874-152",
+    "answer_type": "text",
+    "raw": "{\"evidence\": [\"Orange bar labelled Europe (18%)\"], \"rationale\": \"The orange bar is the top one, labelled Europe.\", \"answer_type\": \"text\", \"unit\": null, \"answer\": \"Europe\"}",
+    "answer": [
+     "text",
+     "europe"
+    ],
+    "pred": "Europe",
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 762,
+    "new_tokens": 48,
+    "truncated": false,
+    "seconds": 0.8786
+   }
+  },
+  {
+   "id": "val-OECD_PENSION_FUNDS'_ASSETS_BEL_POL_000013-451",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-OECD_PENSION_FUNDS'_ASSETS_BEL_POL_000013-451",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Belgium (blue) 2017 ~39k\", \"Poland (red) ~50k\"], \"rationale\": \"Belgium's blue line is below Poland's red line until 2017; it passes above Poland in 2017.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2017}",
+    "answer": [
+     "num",
+     2017.0
+    ],
+    "pred": 2017,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 699,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 3.3451
+   },
+   "merged": {
+    "id": "val-OECD_PENSION_FUNDS'_ASSETS_BEL_POL_000013-451",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Belgium (blue) 2017 ~39k\", \"Poland (red) ~50k\"], \"rationale\": \"Belgium's blue line is below Poland's red line until 2017; it passes above Poland in 2017.\", \"answer_type\": \"number\", \"unit\": null, \"answer\": 2017}",
+    "answer": [
+     "num",
+     2017.0
+    ],
+    "pred": 2017,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 699,
+    "new_tokens": 86,
+    "truncated": false,
+    "seconds": 1.4909
+   }
+  },
+  {
+   "id": "val-multi_col_100304-935",
+   "answer_type": "number",
+   "reference": {
+    "id": "val-multi_col_100304-935",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Positive: Medical care 54%\", \"Rights of women 52%\", \"Protection against the Taliban 47%\"], \"rationale\": \"(54+52+47)/3 = 153/3 = 51.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 51}",
+    "answer": [
+     "num",
+     51.0
+    ],
+    "pred": 51,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 961,
+    "new_tokens": 77,
+    "truncated": false,
+    "seconds": 3.0372
+   },
+   "merged": {
+    "id": "val-multi_col_100304-935",
+    "answer_type": "number",
+    "raw": "{\"evidence\": [\"Positive: Medical care 54%\", \"Rights of women 52%\", \"Protection against the Taliban 47%\"], \"rationale\": \"(54+52+47)/3 = 153/3 = 51.\", \"answer_type\": \"number\", \"unit\": \"%\", \"answer\": 51}",
+    "answer": [
+     "num",
+     51.0
+    ],
+    "pred": 51,
+    "json_valid": true,
+    "schema_valid": true,
+    "correct": true,
+    "abstained": false,
+    "prompt_tokens": 961,
+    "new_tokens": 77,
+    "truncated": false,
+    "seconds": 1.375
+   }
+  }
+ ]
+}
