@@ -50,6 +50,20 @@ def test_plan_quantises_exactly_the_decoder_projections():
     assert plan["other_linear_kept"] == ["model.language_model.embed_tokens"]
 
 
+def test_tied_embeddings_let_the_lm_head_pattern_match_nothing(tmp_path):
+    """Qwen2.5-VL-3B ties lm_head to embed_tokens, so its checkpoint has no lm_head tensor (found on VM03)."""
+    untied = {n: v for n, v in header().items() if not n.startswith("lm_head")}
+    with pytest.raises(Q.QuantError, match="lm_head"):
+        Q.plan_targets(Q.linear_modules(untied))
+    plan = Q.plan_targets(Q.linear_modules(untied), tied_lm_head=True)
+    assert plan["keep"]["lm_head"].startswith("tied to embed_tokens") and len(plan["quantise"]) == 252
+    assert "model.language_model.embed_tokens" in plan["other_linear_kept"]
+    (tmp_path / "config.json").write_text(json.dumps({"text_config": {"tie_word_embeddings": True}}))
+    assert Q.tied_embeddings(tmp_path) is True
+    (tmp_path / "config.json").write_text(json.dumps({"tie_word_embeddings": False}))
+    assert Q.tied_embeddings(tmp_path) is False
+
+
 def test_linear_modules_ignores_1d_tensors():
     mods = Q.linear_modules(header())
     assert "model.language_model.norm" not in mods and "lm_head" in mods

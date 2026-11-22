@@ -95,12 +95,25 @@ def linear_modules(tensors):
                   if n.endswith(".weight") and len(h.get("shape", [])) == 2)
 
 
-def plan_targets(modules, keep=KEEP, expected=EXPECTED_DECODER_PROJ):
-    """{"quantise": [...], "keep": {...}} checked against this checkpoint's own names; raises QuantError."""
+def tied_embeddings(model_dir):
+    """Whether the checkpoint's config ties lm_head to embed_tokens (then no lm_head tensor is saved at all)."""
+    cfg = json.loads((Path(model_dir) / "config.json").read_text(encoding="utf-8"))
+    for c in (cfg, cfg.get("text_config") or {}):
+        if "tie_word_embeddings" in c:
+            return bool(c["tie_word_embeddings"])
+    return False
+
+
+def plan_targets(modules, keep=KEEP, expected=EXPECTED_DECODER_PROJ, tied_lm_head=False):
+    """{"quantise": [...], "keep": {...}} checked against this checkpoint's own names; raises QuantError.
+
+    With tied embeddings (Qwen2.5-VL-3B: tie_word_embeddings=true) lm_head is embed_tokens and has no tensor of its
+    own, so its pattern may match nothing; embed_tokens is then reported among the modules kept unquantised.
+    """
     kept, problems = {}, []
     for label, pattern in keep.items():
         hits = [m for m in modules if re.search(pattern, m)]
-        if not hits:
+        if not hits and not (label == "lm_head" and tied_lm_head):
             problems.append(f"skip pattern for {label} ({pattern}) matches no module of this checkpoint")
         kept[label] = hits
     kept_all = {m for hits in kept.values() for m in hits}
@@ -116,8 +129,11 @@ def plan_targets(modules, keep=KEEP, expected=EXPECTED_DECODER_PROJ):
     if problems:
         raise QuantError("quantisation targets are wrong for this checkpoint:\n  " + "\n  ".join(problems))
     other = [m for m in modules if m not in kept_all and m not in quantise]
-    return {"quantise": quantise, "keep": {k: len(v) for k, v in kept.items()}, "other_linear_kept": other,
-            "vision_modules": len(vision)}
+    keep_counts = {k: len(v) for k, v in kept.items()}
+    if tied_lm_head and not kept.get("lm_head"):
+        keep_counts["lm_head"] = "tied to embed_tokens (no separate tensor)"
+    return {"quantise": quantise, "keep": keep_counts, "other_linear_kept": other, "vision_modules": len(vision),
+            "tied_lm_head": tied_lm_head}
 
 
 def inspect_export(tensors, plan):
@@ -315,7 +331,7 @@ def preflight(args):
     manifest = json.loads((merged / mg.MANIFEST).read_text(encoding="utf-8"))
     if manifest.get("status") != "VERIFIED":
         raise QuantError(f"{merged}: merge status {manifest.get('status')!r}, not VERIFIED (task 4.1)")
-    plan = plan_targets(linear_modules(checkpoint_tensors(merged)))
+    plan = plan_targets(linear_modules(checkpoint_tensors(merged)), tied_lm_head=tied_embeddings(merged))
     ns = ev.parse_args(["--adapter", manifest["adapter"], "--split", HEADLINE_SPLIT, "--final-test"])
     s = ev.resolve(ns)
     items, _, fingerprint = ev.load_rows(s, HEADLINE_SPLIT, ns)
