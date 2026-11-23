@@ -25,7 +25,8 @@ def read(root, rel):
     return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
 
 
-def build(root=REPO):
+def build(root=REPO, with_gaps=False):
+    """The draft's text; with_gaps=True returns (text, the "did not establish" items) for the demo script (4.8)."""
     from serve import modelcard
     gaps, not_established = [], []
     out = ["# Week 4 results — generated draft", "",
@@ -149,8 +150,10 @@ def build(root=REPO):
     not_established += [g for g in card_gaps]
     out += ["## What Week 4 did not establish", "",
             "_Assembled from the gaps the results themselves declare._", ""]
-    out += [f"- {x}" for x in not_established + [f"{g}: {NM}" for g in gaps]] or ["- nothing"]
-    return "\n".join(out).rstrip() + "\n"
+    items = not_established + [f"{g}: {NM}" for g in gaps]
+    out += [f"- {x}" for x in items] or ["- nothing"]
+    text = "\n".join(out).rstrip() + "\n"
+    return (text, items) if with_gaps else text
 
 
 def main(argv=None):
