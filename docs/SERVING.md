@@ -143,10 +143,10 @@ sbatch slurm/serve_http_bench.sbatch          # -> results/serve/run_a_r16_http.
 
 ```bash
 sbatch slurm/serve.sbatch
-grep -m1 "Uvicorn running" logs/chartqa-serve-<JOB_ID>.out
+grep -m1 "Uvicorn running" logs/chartqa-serve-<JOB_ID>.err   # uvicorn logs to stderr
 curl -s localhost:8000/health
 python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
-ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>     # from a laptop: http://localhost:8000/docs
+# VM03 refuses SSH port forwarding: run clients (client.py, demo.py --live) on VM03 itself
 ```
 
 ## Quantisation (task 4.2)

@@ -2,9 +2,9 @@
 # Task 4.3: run the endpoint (FastAPI + transformers.generate) on the verified merge. Options go to scripts/serve/app.py.
 #
 #   sbatch slurm/serve.sbatch                                   # serves ~/merged/run_a_r16 on 127.0.0.1:8000
-#   grep -m1 Uvicorn logs/chartqa-serve-<JOB_ID>.out             # "Uvicorn running on ..." once the model is loaded
+#   grep -m1 Uvicorn logs/chartqa-serve-<JOB_ID>.err             # "Uvicorn running on ..." (uvicorn logs to stderr)
 #   curl -s localhost:8000/health                                # on VM03
-#   ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>      # from a laptop, then http://localhost:8000/docs
+#   (VM03 refuses SSH port forwarding: run clients such as scripts/serve/demo.py --live on VM03 itself)
 #   scancel <JOB_ID>                                             # stop it: it holds the GPU while it runs
 #
 # The app refuses a checkpoint whose merge_manifest.json is not VERIFIED (task 4.1).

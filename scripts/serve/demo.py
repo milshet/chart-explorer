@@ -314,14 +314,17 @@ def render(smoke, root=REPO):
     else:
         lines += [f"Smoke test in demo order: {NM}. Run `sbatch slurm/demo_smoke.sbatch` before rehearsing.", ""]
     lines += ["## Setup (before the audience arrives)", "", "```bash",
-              "sbatch slurm/serve.sbatch                                  # on VM03; wait for 'Uvicorn running'",
-              "ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>     # on the presenting laptop",
-              "python scripts/serve/demo.py --live                        # makes each request when you press Enter",
+              "# all on VM03, in the SSH session (VM03 refuses SSH port forwarding, so no tunnel to a laptop)",
+              "sbatch slurm/serve.sbatch                     # model loaded when the .out log prints the /health JSON",
+              "curl -s localhost:8000/health | head -c 200   # {\"status\": \"ok\" ...",
+              "python scripts/serve/demo.py --live           # makes each request when you press Enter",
+              "scancel $(squeue -u $USER -h -o %i -n chartqa-serve)   # afterwards: free the GPU",
               "```", "", "## Recording the video", "",
               "1. `python3 scripts/serve/video.py --segments` builds the narrated intro, results and close "
               "(`build/video/`; needs `brew install ffmpeg-full`).",
-              "2. Record only the live part: Cmd+Shift+5, *Record Selected Portion* around the terminal, Options → "
-              "your microphone, then run `demo.py --live` and narrate each step. Stop with the menu-bar button.",
+              "2. Record only the live part: Cmd+Shift+5, *Record Selected Portion* around the terminal holding the "
+              "SSH session to VM03, Options → your microphone, then run `demo.py --live` there and narrate each "
+              "step. Stop with the menu-bar button.",
               "3. `python3 scripts/serve/video.py --join ~/Desktop/<recording>.mov` writes "
               "`build/video/demo_video.mp4`: intro, your recording (captioned LIVE), results, close.",
               "", "## Live part (0:00 to 7:00)", ""]
