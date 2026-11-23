@@ -1,0 +1,54 @@
+{
+ "task": "4.7",
+ "commit": "8e6d00c251d6651e5d32565d9824b8994713564c",
+ "tracked_files": 2989,
+ "uncommitted_changes_not_checked": [],
+ "verdict": "PASS",
+ "checks": {
+  "requirements": "warning",
+  "absolute_paths": "warning",
+  "manifest_files": 1481,
+  "manifests": "ok",
+  "imports_skipped_missing_packages": [
+   "audit_import (openpyxl)",
+   "audit_kappa (openpyxl)",
+   "chartqa_10k (modal)",
+   "chartqa_modal (modal)",
+   "chartqa_test (modal)",
+   "make_audit (openpyxl)"
+  ],
+  "imports_without_data": "ok",
+  "generated_documents": "ok",
+  "hygiene": "warning",
+  "not_measured": "warning",
+  "tests_summary": "404 passed, 1 skipped, 1 warning in 10.66s",
+  "tests": "ok"
+ },
+ "blocking": [],
+ "warnings": [
+  {
+   "check": "requirements",
+   "detail": "requirements.txt has 14 unpinned line(s), e.g. ['transformers>=4.49.0', 'accelerate>=0.34.0', 'peft>=0.13.0']; the reproducible environment is requirements-vm03.lock"
+  },
+  {
+   "check": "absolute_paths",
+   "detail": "slurm/serve_smoke.sbatch:7: #   M=/storage/tracka/users/learner01/merged/run_a_r16_smoke                # ~7 GB: mind the 35 GB "
+  },
+  {
+   "check": "hygiene",
+   "detail": "README.md does not tell a reader how to set up the environment (no mention of requirements-vm03.lock)"
+  },
+  {
+   "check": "not_measured",
+   "detail": "the human data-quality audit \u03ba (3.0i): save scripts/audit_kappa.py output to results/audit/kappa.txt"
+  },
+  {
+   "check": "not_measured",
+   "detail": "human agreement with the LLM judge, Cohen \u03ba (3.7): run scripts/judge.py agree"
+  },
+  {
+   "check": "not_measured",
+   "detail": "the container image built and run with docker compose on a GPU (task 4.4); the image is specified and its rules tested, VM03 has no container runtime"
+  }
+ ]
+}
