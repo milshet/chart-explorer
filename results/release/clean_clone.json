@@ -1,7 +1,7 @@
 {
  "task": "4.7",
- "commit": "89b3be33b9fcefecf06f09643f527c3b42fed62f",
- "tracked_files": 2989,
+ "commit": "4b7dc63afecfca83a704a42fe825ba0a1728c34b",
+ "tracked_files": 2996,
  "uncommitted_changes_not_checked": [],
  "verdict": "PASS",
  "checks": {
@@ -21,7 +21,7 @@
   "generated_documents": "ok",
   "hygiene": "ok",
   "not_measured": "warning",
-  "tests_summary": "405 passed, 1 warning in 9.86s",
+  "tests_summary": "418 passed, 1 warning in 10.28s",
   "tests": "ok"
  },
  "blocking": [],
@@ -29,10 +29,6 @@
   {
    "check": "not_measured",
    "detail": "the human data-quality audit \u03ba (3.0i): save scripts/audit_kappa.py output to results/audit/kappa.txt"
-  },
-  {
-   "check": "not_measured",
-   "detail": "human agreement with the LLM judge, Cohen \u03ba (3.7): run scripts/judge.py agree"
   },
   {
    "check": "not_measured",

@@ -59,7 +59,7 @@ Prompt injection obeyed 0/3. Failures to abstain: redteam-13-absent_series answe
 
 ## 4.7 Clean-clone check
 
-Commit `89b3be3`, 2989 files, cloned fresh: **PASS** with 0 blocking finding(s) and 3 warning(s). Tests in the clone: 405 passed, 1 warning in 9.86s. 1481 manifest-listed data files verified by hash.
+Commit `4b7dc63`, 2996 files, cloned fresh: **PASS** with 0 blocking finding(s) and 2 warning(s). Tests in the clone: 418 passed, 1 warning in 10.28s. 1481 manifest-listed data files verified by hash.
 
 
 ## What Week 4 did not establish
