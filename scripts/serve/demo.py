@@ -130,11 +130,57 @@ def judge(step, status, payload, scored):
     return {"passed": bool(ok), "observed": obs}
 
 
+def show(step, status, payload, scored, seconds):
+    """What the audience sees for one step: the request in words, then the parts of the response worth pointing at."""
+    bar = "─" * 78
+    out = [bar]
+    if step["kind"] == "get":
+        out.append(f"GET {step['path']}")
+        if step["path"] == "/health":
+            m, sv = payload.get("model", {}), payload.get("serving", {})
+            out += [f"  status          {payload.get('status')}",
+                    f"  model           {m.get('run')}  merge {m.get('status')}",
+                    f"  adapter sha256  {str(m.get('adapter_sha256'))[:16]}…",
+                    f"  base revision   {str(m.get('base_revision'))[:12]}",
+                    f"  engine          {sv.get('engine')}, {sv.get('precision')}, batch {sv.get('batch_size')}, "
+                    f"{sv.get('decoding')}"]
+        else:
+            c = payload.get("counters", {})
+            out += [f"  {k:20} {c.get(k)}" for k in ("requests", "answered", "first_attempt_valid", "retried",
+                                                       "degraded", "model_abstained", "refused")]
+            out.append(f"  refused by code      {payload.get('refused_by_code')}")
+    else:
+        body, _ = request_for(step)
+        req = json.loads(body)
+        image = (step.get("redteam") and f"data/redteam/{spec(step['redteam'])['image']}") or \
+            (step.get("source") and f"{step['image_root']}/{item(*step['source'])['image']}") or "(the caption chart)"
+        out.append(f"QUESTION  {req['question']}")
+        out.append(f"CHART     {os.path.normpath(image)}")
+        if "context" in req:
+            out.append(f"CONTEXT   {req['context']!r}   <- caller-supplied text")
+        if status != 200:
+            err = payload.get("error", {})
+            out += ["", f"  HTTP {status}  {err.get('code')}", f"  {err.get('message')}"]
+        else:
+            r = payload["result"]
+            out += ["", "  evidence"] + [f"    • {e}" for e in r.get("evidence") or ["(none)"]]
+            out += ["  rationale", f"    {r.get('rationale')}",
+                    f"  answer      {json.dumps(r.get('answer'))}   ({r.get('answer_type')}"
+                    + (f", {r['unit']}" if r.get("unit") else "") + ")",
+                    f"  attempts {payload.get('attempts')}   degraded {payload.get('degraded')}   "
+                    f"{payload.get('timing', {}).get('total_s')} s"]
+            if scored is not None and scored.get("answer") is not None:
+                out.append(f"  expected    {json.dumps(scored['answer'])}")
+    out.append(bar)
+    return "\n".join(out)
+
+
 def run_steps(url, pause=False):
+    """pause=True is the live demo: wait before each step, then show the full response for the audience."""
     rows = []
     for step in STEPS:
         if pause:
-            input(f"\n[{step['minute']}] {step['name']}: {step['say']}\n  press Enter to send ")
+            input(f"\n[{step['minute']}] {step['name'].replace('_', ' ')}: {step['say']}\n  press Enter to send ")
         t0 = time.perf_counter()
         if step["kind"] == "get":
             status, payload = 200, client.get(url, step["path"])
@@ -143,9 +189,16 @@ def run_steps(url, pause=False):
             body, scored = request_for(step)
             status, payload = client.post(url, body)
         verdict = judge(step, status, payload, scored)
-        rows.append({"name": step["name"], "seconds": round(time.perf_counter() - t0, 3), **verdict})
-        print(f"  {step['name']:16} {'ok  ' if verdict['passed'] else 'FAIL'} {json.dumps(verdict['observed'])[:160]}",
-              flush=True)
+        seconds = round(time.perf_counter() - t0, 3)
+        rows.append({"name": step["name"], "seconds": seconds, **verdict})
+        if pause:
+            print(show(step, status, payload, scored, seconds), flush=True)
+            if not verdict["passed"]:
+                print("  !! this step did not show what it should: say so, and quote the smoke run in "
+                      "docs/demo_script.md", flush=True)
+        else:
+            print(f"  {step['name']:16} {'ok  ' if verdict['passed'] else 'FAIL'} "
+                  f"{json.dumps(verdict['observed'])[:160]}", flush=True)
     return rows
 
 

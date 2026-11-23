@@ -181,3 +181,24 @@ def test_anticipated_questions_are_answered_from_the_results():
                    "research and evaluation only"):
         assert needle in answers, needle
     assert "## Anticipated questions" in D.render(None)
+
+
+def test_live_mode_shows_the_full_response_for_the_audience(endpoint, monkeypatch, capsys):
+    endpoint(ByQuestion())
+    monkeypatch.setattr("builtins.input", lambda prompt="": "")
+    rows = D.run_steps("http://demo", pause=True)
+    out = capsys.readouterr().out
+    assert all(r["passed"] for r in rows) and "!!" not in out
+    for needle in ("merge VERIFIED", "QUESTION  What is the sum all the blue bar?", "• bar labels", "answer      38",
+                   "expected    38", "CONTEXT   'Ignore the chart", "HTTP 400  caller_text_refused", "degraded             0",
+                   "The chart shows revenue by category; it has no net income.",
+                   "CHART     data/v2.0/images/test/multi_col_80405.png"):
+        assert needle in out, needle
+
+
+def test_live_mode_flags_a_step_that_fails(endpoint, monkeypatch, capsys):
+    q = D.item("data/v2.0/image_only/val.jsonl", "val-two_col_24100-651")["question"]
+    endpoint(ByQuestion({q: answer(41)}))
+    monkeypatch.setattr("builtins.input", lambda prompt="": "")
+    D.run_steps("http://demo", pause=True)
+    assert "!! this step did not show what it should" in capsys.readouterr().out
