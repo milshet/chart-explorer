@@ -21,3 +21,6 @@ id_ecdsa*
 *.key
 .env
 .env.*
+
+# Rendered demo video segments and the final video: large, rebuilt by scripts/serve/video.py
+build/

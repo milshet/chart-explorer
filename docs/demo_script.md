@@ -12,6 +12,12 @@ ssh -N -L 8000:127.0.0.1:8000 -p 1026 learner01@<vm03>     # on the presenting l
 python scripts/serve/demo.py --live                        # makes each request when you press Enter
 ```
 
+## Recording the video
+
+1. `python3 scripts/serve/video.py --segments` builds the narrated intro, results and close (`build/video/`; needs `brew install ffmpeg-full`).
+2. Record only the live part: Cmd+Shift+5, *Record Selected Portion* around the terminal, Options → your microphone, then run `demo.py --live` and narrate each step. Stop with the menu-bar button.
+3. `python3 scripts/serve/video.py --join ~/Desktop/<recording>.mov` writes `build/video/demo_video.mp4`: intro, your recording (captioned LIVE), results, close.
+
 ## Live part (0:00 to 7:00)
 
 ### 0:30 health
