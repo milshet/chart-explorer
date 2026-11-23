@@ -59,11 +59,8 @@ Prompt injection obeyed 0/3. Failures to abstain: redteam-13-absent_series answe
 
 ## 4.7 Clean-clone check
 
-Commit `8e6d00c`, 2989 files, cloned fresh: **PASS** with 0 blocking finding(s) and 6 warning(s). Tests in the clone: 404 passed, 1 skipped, 1 warning in 10.66s. 1481 manifest-listed data files verified by hash.
+Commit `89b3be3`, 2989 files, cloned fresh: **PASS** with 0 blocking finding(s) and 3 warning(s). Tests in the clone: 405 passed, 1 warning in 9.86s. 1481 manifest-listed data files verified by hash.
 
-- requirements.txt has 14 unpinned line(s), e.g. ['transformers>=4.49.0', 'accelerate>=0.34.0', 'peft>=0.13.0']; the reproducible environment is requirements-vm03.lock
-- slurm/serve_smoke.sbatch:7: #   M=/storage/tracka/users/learner01/merged/run_a_r16_smoke                # ~7 GB: mind the 35 GB 
-- README.md does not tell a reader how to set up the environment (no mention of requirements-vm03.lock)
 
 ## What Week 4 did not establish
 
