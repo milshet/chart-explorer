@@ -392,7 +392,7 @@ def test_degradation_verdict(rag_correct, rag_abstain, expected, over):
 def test_week3_report_draft_is_generated_and_says_what_is_missing():
     import report_week3
     text = report_week3.build()
-    assert "1168 tables / 7675 rows" in text and "NOT MEASURED" in text
+    assert "1168 tables / 7675 rows" in text and "## What Week 3 has not yet established" in text
     assert (REPO / "docs/report_draft_week3.md").read_text(encoding="utf-8") == text
 
 

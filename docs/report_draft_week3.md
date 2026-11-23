@@ -78,7 +78,13 @@ Judge vs the scorer's `evidence_grounded`: 17 disagreements.
 
 **The judge checked against an exact answer:** declining is right if and only if the gold is null, so its abstention verdict can be scored without a human. It agrees on 63/80. By case: answerable, answered: judge no 17; answerable, answered: judge yes 34; unanswerable, answered: judge no 6; unanswerable, declined: judge yes 23. It graded correctness on 7 rows where the rubric says n/a.
 
-Human spot-check κ: NOT MEASURED.
+**Human spot-check** (30 rows, two graders working independently): Cohen's κ, raw agreement in brackets.
+
+| Axis | human vs human | judge vs grader 1 | judge vs grader 2 |
+|---|---|---|---|
+| correctness | κ 1.0 (raw 1.0) | κ 0.942 (raw 0.967) | κ 0.942 (raw 0.967) |
+| grounding | κ 0.873 (raw 0.933) | κ 0.547 (raw 0.767) | κ 0.418 (raw 0.7) |
+| abstention | κ 1.0 (raw 1.0) | κ 0.535 (raw 0.867) | κ 0.535 (raw 0.867) |
 
 ## Served latency (3.8, 3.14)
 
@@ -91,5 +97,4 @@ Merged bf16, `transformers.generate`, batch 1, one request at a time, the same 5
 
 ## What Week 3 has not yet established
 
-- human spot-check of the judge on run_a_r16: two graders, Cohen's κ (3.7)
 - data-quality audit kappa not reported (3.0i): needs two or three human reviewers

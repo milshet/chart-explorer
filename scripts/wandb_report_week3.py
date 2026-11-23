@@ -81,9 +81,12 @@ def judge_line():
         kappa = NM
         if agree.is_file():
             a = json.loads(agree.read_text(encoding="utf-8"))
-            kappa = "; ".join(f"{k} {v['human_vs_human']}" for k, v in a.items())
+            kap = lambda t: "undefined" if t[2] is None else t[2]
+            kappa = "; ".join(f"{k} {kap(v['human_vs_human'])} between the two graders, "
+                              f"{kap(v['judge_vs_grader_1'])} / {kap(v['judge_vs_grader_2'])} judge vs each"
+                              for k, v in a.items())
         out.append(f"- **LLM judge on {p.parent.name}** (`{s.get('judge_model')}`): abstention verdict agrees with the "
-                   f"exact answer on {x['agree']}/{x['n']} rows. Human-vs-human (n, raw, κ): {kappa}." if x else
+                   f"exact answer on {x['agree']}/{x['n']} rows. Human spot-check, Cohen's κ: {kappa}." if x else
                    f"- **LLM judge on {p.parent.name}**: exact-abstention check {NM}.")
     return out or [f"- **LLM judge:** {NM}."]
 
