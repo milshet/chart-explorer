@@ -286,8 +286,14 @@ def refusals(c):
               f"{frac(x['agree'], x['n'])} rows.")
     agree = c.read("results/judge/run_a_r16/agreement.json")
     if agree:
-        c.add("- **Human spot-check of the judge:** " + "; ".join(f"{k}: human vs human {v['human_vs_human']}"
-                                                              for k, v in agree.items()) + ".")
+        def k_(t):  # judge.py's (n, raw agreement, Cohen's kappa); kappa is None when only one category occurs
+            return f"κ {t[2]:.2f}" if t[2] is not None else f"κ undefined (raw {t[1]:.2f})"
+        n = next(iter(agree.values()))["human_vs_human"][0]
+        c.add(f"- **Human spot-check of the judge (3.7):** two graders, {n} rows, Cohen's κ. Trust the judge only on "
+              "the axes where it agrees with the humans about as well as they agree with each other:", "",
+              "| Axis | human vs human | judge vs grader 1 | judge vs grader 2 |", "|---|---|---|---|",
+              *[f"| {k} | {k_(v['human_vs_human'])} | {k_(v['judge_vs_grader_1'])} | {k_(v['judge_vs_grader_2'])} |"
+                for k, v in agree.items()], "")
     else:
         c.add(f"- **Human spot-check of the judge (κ):** "
               f"{c.nm('human agreement with the LLM judge, Cohen κ (3.7): run scripts/judge.py agree')}.")

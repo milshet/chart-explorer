@@ -173,7 +173,7 @@ def test_the_week4_draft_is_current():
 def test_the_draft_closes_with_what_the_week_did_not_establish():
     text = report_week4.build()
     closing = text.split("## What Week 4 did not establish")[1]
-    for needle in ("quantised deployment", "concurrent load", "reliable abstention", "Eval-B", "3.0i", "3.7", "4.4"):
+    for needle in ("quantised deployment", "concurrent load", "reliable abstention", "Eval-B", "3.0i", "4.4"):
         assert needle in closing, needle
 
 

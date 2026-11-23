@@ -44,6 +44,8 @@ def overlay(tmp_path, extra):
                 for child in real.iterdir():
                     (d / child.name).symlink_to(child)
             d.mkdir(exist_ok=True)
+        if p.is_symlink():  # a committed file of the same name: replace the link, never write through it
+            p.unlink()
         assert not any(q.is_symlink() for q in [p, *p.parents] if tmp_path in q.parents or q == tmp_path)
         p.write_text(content if isinstance(content, str) else json.dumps(content), encoding="utf-8")
     return tmp_path
@@ -71,10 +73,10 @@ def test_every_not_measured_in_the_body_is_listed_as_a_gap(card):
     assert all(f"- {g}" in text for g in gaps)
 
 
-def test_the_gaps_today_are_the_two_human_kappas_and_the_container(card):
+def test_the_gaps_today_are_the_audit_kappa_and_the_container(card):
     gaps = card[1]
-    assert len(gaps) == 3
-    assert any("3.0i" in g for g in gaps) and any("3.7" in g for g in gaps) and any("4.4" in g for g in gaps)
+    assert len(gaps) == 2  # the judge kappa (3.7) landed on 2026-11-23
+    assert any("3.0i" in g for g in gaps) and any("4.4" in g for g in gaps) and not any("3.7" in g for g in gaps)
 
 
 # --- numbers come from the files -----------------------------------------------------------------------------------
@@ -138,10 +140,16 @@ def test_the_audit_kappa_appears_once_its_output_is_committed(tmp_path):
 
 
 def test_the_judge_kappa_appears_once_agreement_is_computed(tmp_path):
-    agreement = {"correctness": {"human_vs_human": "(30, 0.9, 0.78)", "judge_vs_grader_1": "x", "judge_vs_grader_2": "y"}}
+    agreement = {"correctness": {"human_vs_human": [30, 0.9, 0.78], "judge_vs_grader_1": [30, 0.8, 0.5],
+                                 "judge_vs_grader_2": [30, 1.0, None]}}
     root = overlay(tmp_path, {"results/judge/run_a_r16/agreement.json": agreement})
     text, gaps = MC.build(root)
-    assert "human vs human (30, 0.9, 0.78)" in text and not any("3.7" in g for g in gaps)
+    assert "| correctness | κ 0.78 | κ 0.50 | κ undefined (raw 1.00) |" in text and not any("3.7" in g for g in gaps)
+
+
+def test_the_committed_judge_kappa_is_in_the_card(card):
+    a = json.loads((REPO / "results/judge/run_a_r16/agreement.json").read_text())
+    assert f"| grounding | κ {a['grounding']['human_vs_human'][2]:.2f} |" in card[0]
 
 
 def test_a_container_smoke_log_replaces_the_container_gap(tmp_path):

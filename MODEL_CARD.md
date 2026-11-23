@@ -94,7 +94,14 @@ Arithmetic and comparison questions carry most of them: 21 of the errors, agains
 
 - Adapting the vision tower as well abstains better (42/50 vs 31/50, McNemar p = 0.00098), but that model was not selected: the served model was chosen on val before Eval-C was scored.
 - **LLM judge (3.7)** (`arena-education/Llama-3.1-8B-Instruct-bnb-8bit`): its abstention verdict matches the exact answer on 63/80 (78.8%) rows.
-- **Human spot-check of the judge (κ):** NOT MEASURED.
+- **Human spot-check of the judge (3.7):** two graders, 30 rows, Cohen's κ. Trust the judge only on the axes where it agrees with the humans about as well as they agree with each other:
+
+| Axis | human vs human | judge vs grader 1 | judge vs grader 2 |
+|---|---|---|---|
+| correctness | κ 1.00 | κ 0.94 | κ 0.94 |
+| grounding | κ 0.87 | κ 0.55 | κ 0.42 |
+| abstention | κ 1.00 | κ 0.54 | κ 0.54 |
+
 
 ## Deployment
 
@@ -111,8 +118,7 @@ Arithmetic and comparison questions carry most of them: 21 of the errors, agains
 
 ## Not measured
 
-3 item(s) in this card are NOT MEASURED:
+2 item(s) in this card are NOT MEASURED:
 
 - the human data-quality audit κ (3.0i): save scripts/audit_kappa.py output to results/audit/kappa.txt
-- human agreement with the LLM judge, Cohen κ (3.7): run scripts/judge.py agree
 - the container image built and run with docker compose on a GPU (task 4.4); the image is specified and its rules tested, VM03 has no container runtime

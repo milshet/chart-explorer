@@ -84,5 +84,4 @@ Say these out loud; a question about any of them should get the answer below, no
 - Do not claim reliable abstention on adversarial charts: 4/9 abstain attacks resisted; the model states the information is missing and answers anyway
 - Do not claim generalisation to unseen chart styles: no out-of-distribution set (Eval-B) was built
 - Do not claim the human data-quality audit κ (3.0i): it is NOT MEASURED
-- Do not claim human agreement with the LLM judge, Cohen κ (3.7): it is NOT MEASURED
 - Do not claim the container image built and run with docker compose on a GPU (task 4.4): it is NOT MEASURED
