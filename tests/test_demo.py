@@ -153,7 +153,7 @@ def test_the_do_not_claim_list_comes_from_the_runs_own_gaps():
     items = D.do_not_claim()
     joined = " | ".join(items)
     for needle in ("vLLM", "vision-tower", "quantised deployment", "concurrent load", "reliable abstention",
-                   "Eval-B", "(3.0i)", "(task 4.4)"):
+                   "Eval-B", "(3.0i)", "(task 4.4)", "commercially"):
         assert needle in joined, needle
     assert len(items) == len(set(items))
 

@@ -35,6 +35,10 @@ Documents with numbers in them are generated from the committed results; regener
 
 ## Week 4: serving and the model card
 
+**Built with Qwen:** the model is fine-tuned from `Qwen/Qwen2.5-VL-3B-Instruct`, released under the Qwen Research
+License Agreement, which allows research and evaluation use only ([`MODEL_CARD.md`](MODEL_CARD.md), Licences). The data
+derives from ChartQA (GPL-3.0).
+
 The served model is Run A merged into bf16 weights and verified against the unmerged adapter, behind a FastAPI
 endpoint (`transformers.generate`, not vLLM: [`docs/SERVING.md`](docs/SERVING.md) has the reason). What it is for,
 how it was built, how it fails and when it refuses: [`MODEL_CARD.md`](MODEL_CARD.md). Week 4's numbers, and what the

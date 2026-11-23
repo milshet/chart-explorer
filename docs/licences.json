@@ -1,0 +1,37 @@
+{
+ "retrieved": "2026-11-23",
+ "how": "Hugging Face API (cardData.license / license_name) at the revision each component was used at; the Qwen licence text read from the repository's LICENSE file at that revision",
+ "components": [
+  {"name": "Qwen/Qwen2.5-VL-3B-Instruct", "kind": "model", "role": "served",
+   "use": "base model of the served checkpoint (merged with the Run A LoRA adapter)",
+   "revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+   "licence": "Qwen Research License Agreement (qwen-research)",
+   "source": "https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct/blob/66285546d2b821cf421d4f5eb2576359d3770cd3/LICENSE",
+   "non_commercial": true,
+   "obligations": [
+    "Non-commercial use only: research or evaluation purposes (sections 1i, 2a); commercial use needs a separate licence from Alibaba Cloud (2b).",
+    "Anyone receiving the model or a derivative must get a copy of the licence, modified files must say they were changed, and copies must carry the notice: \"Qwen is licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyright (c) Alibaba Cloud. All Rights Reserved.\" (section 3).",
+    "A model fine-tuned from it that is distributed or made available must display \"Built with Qwen\" or \"Improved using Qwen\" in its documentation (section 4b)."
+   ]},
+  {"name": "ahmed-masry/ChartQA", "kind": "dataset", "role": "data",
+   "use": "source of every chart and question in data/v2.0 and the evaluation sets",
+   "revision": "af8b6f5c08c95085271561c2a3f9d15f2b5a9031",
+   "licence": "GPL-3.0", "source": "https://huggingface.co/datasets/ahmed-masry/ChartQA",
+   "non_commercial": false,
+   "obligations": ["The derived dataset in data/ is built from GPL-3.0 data; redistributing it carries GPL-3.0's terms."]},
+  {"name": "arena-education/Llama-3.1-8B-Instruct-bnb-8bit", "kind": "model", "role": "evaluation only",
+   "use": "LLM judge (task 3.7); never part of the served system",
+   "revision": "dc7b239966c829a1e21fa9e2c7f59e89b3c2c306",
+   "licence": "Llama 3.1 Community License (llama3.1)",
+   "source": "https://huggingface.co/arena-education/Llama-3.1-8B-Instruct-bnb-8bit", "non_commercial": false,
+   "obligations": []},
+  {"name": "cross-encoder/ms-marco-MiniLM-L6-v2", "kind": "model", "role": "measured, not adopted",
+   "use": "reranker candidate (task 3.11); not used by the served system",
+   "revision": null, "licence": "Apache-2.0 (model); trained on MS MARCO, which plan task 3.11 records as licensed for non-commercial research only",
+   "source": "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2", "non_commercial": false, "obligations": []},
+  {"name": "BAAI/bge-reranker-base", "kind": "model", "role": "measured, not adopted",
+   "use": "reranker candidate (task 3.11); not used by the served system",
+   "revision": "2cfc18c9415c912f9d8155881c133215df768a70", "licence": "MIT",
+   "source": "https://huggingface.co/BAAI/bge-reranker-base", "non_commercial": false, "obligations": []}
+ ]
+}

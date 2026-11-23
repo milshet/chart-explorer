@@ -79,6 +79,7 @@ Say these out loud; a question about any of them should get the answer below, no
 
 - Do not claim that it is served with vLLM: it is served with `transformers.generate` behind FastAPI (vLLM did not fit the VM's quota); quote the measured latency, never vLLM figures
 - Do not claim that the vision-tower model is the one served: it abstains better on Eval-C but was not selected
+- Do not claim that it can be used commercially: it is built on `Qwen/Qwen2.5-VL-3B-Instruct` under the Qwen Research License Agreement (qwen-research), research and evaluation use only
 - Do not claim a quantised deployment: 4-bit was rejected (2.22-point drop against a 2.0-point tolerance), and it ran slower without compiled GPTQ kernels
 - Do not claim throughput under concurrent load: every latency is one request at a time (transformers.generate, no continuous batching)
 - Do not claim reliable abstention on adversarial charts: 4/9 abstain attacks resisted; the model states the information is missing and answers anyway

@@ -164,6 +164,11 @@ def do_not_claim(root=REPO):
         out.append(f"that it is served with vLLM: it is served with `{engine}` behind FastAPI (vLLM did not fit "
                    "the VM's quota); quote the measured latency, never vLLM figures")
     out.append("that the vision-tower model is the one served: it abstains better on Eval-C but was not selected")
+    lic = Path(root) / "docs/licences.json"
+    for x in (json.loads(lic.read_text())["components"] if lic.is_file() else []):
+        if x["role"] == "served" and x["non_commercial"]:
+            out.append(f"that it can be used commercially: it is built on `{x['name']}` under the {x['licence']}, "
+                       "research and evaluation use only")
     out += [i for i in items if i not in card_gaps]
     out += [f"{re.split(r'[:;]', g)[0]}: it is NOT MEASURED" for g in card_gaps]
     return out

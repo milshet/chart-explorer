@@ -12,7 +12,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 from serve import modelcard as MC  # noqa: E402
 from serve.quantise import mcnemar_exact  # noqa: E402
 
-SECTIONS = ["## Model", "## Intended use", "## Training data provenance", "## Evaluation", "## Failure modes",
+SECTIONS = ["## Model", "## Intended use", "## Training data provenance", "## Licences", "## Evaluation", "## Failure modes",
             "## Refusal behaviour", "## Deployment", "## Limitations", "## Not measured"]
 
 
@@ -167,3 +167,47 @@ def test_without_the_red_team_log_the_card_says_so(tmp_path):
             (tmp_path / "results" / sub.name).symlink_to(sub)
     text, gaps = MC.build(tmp_path)
     assert "Adversarial charts: NOT MEASURED" in text and any("4.5" in g for g in gaps)
+
+
+# --- licences ---------------------------------------------------------------------------------------------------------
+
+def test_the_card_states_the_base_models_non_commercial_licence_in_intended_use(card):
+    use = card[0].split("## Intended use")[1].split("## ")[0]
+    assert "**Research and evaluation only.**" in use and "Qwen Research License" in use
+
+
+def test_licences_are_recorded_for_the_revisions_actually_used(card):
+    lic = json.loads((REPO / "docs/licences.json").read_text())
+    merge = json.loads((REPO / "results/serve/merge_run_a_r16.json").read_text())
+    served = next(x for x in lic["components"] if x["role"] == "served")
+    data = next(x for x in lic["components"] if x["kind"] == "dataset")
+    assert served["revision"] == merge["base_check"]["base_revision"]
+    assert data["revision"][:12] in (REPO / "data/v2.0/README.md").read_text()
+    assert "differs from the revision used" not in card[0]
+
+
+def test_every_component_and_obligation_is_rendered(card):
+    lic = json.loads((REPO / "docs/licences.json").read_text())
+    section = card[0].split("## Licences")[1].split("## Evaluation")[0]
+    for x in lic["components"]:
+        assert x["name"] in section and all(o in section for o in x["obligations"])
+    assert "Built with Qwen" in section and "GPL-3.0" in section
+
+
+def test_a_licence_recorded_for_another_revision_is_flagged(tmp_path):
+    lic = json.loads((REPO / "docs/licences.json").read_text())
+    lic["components"][0]["revision"] = "0" * 40
+    root = overlay(tmp_path, {"docs/licences.json": lic})
+    assert "differs from the revision used" in MC.build(root)[0]
+
+
+def test_without_a_licence_record_the_card_says_so(tmp_path):
+    root = overlay(tmp_path, {})
+    text, gaps = MC.build(root)
+    assert any("docs/licences.json" in g for g in gaps) and "Licences: NOT MEASURED" in text
+
+
+def test_built_with_qwen_is_displayed_at_the_top_and_in_the_readme(card):
+    top = card[0].split("## Model")[0]
+    assert "**Built with Qwen.**" in top
+    assert "Built with Qwen" in (REPO / "README.md").read_text()

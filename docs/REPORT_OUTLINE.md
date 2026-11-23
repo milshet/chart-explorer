@@ -41,9 +41,9 @@ again; never edit a number in the report by hand.
 
 - [ ] Your teammate's 3.0i and 3.7 results are committed (`results/audit/kappa.txt`, `results/judge/run_a_r16/agreement.json`),
       and `MODEL_CARD.md`, both drafts and the W&B report are regenerated after them.
-- [ ] Licences: check and add to `MODEL_CARD.md` the licence of the base model `Qwen/Qwen2.5-VL-3B-Instruct` and of
-      ChartQA (from their Hugging Face model and dataset cards) and what they allow. Plan task 3.11 also asks the
-      card to note that the ms-marco reranker's training data is for non-commercial research only (it was measured,
-      not adopted).
+- [x] Licences: recorded in `docs/licences.json` (2026-11-23) and rendered in `MODEL_CARD.md`: the base model is under the
+      Qwen Research License (research and evaluation only; "Built with Qwen" shown), ChartQA under GPL-3.0. Put the
+      non-commercial restriction in the report's intended-use paragraph. **Open for the team:** the repository has no
+      LICENSE file of its own although it redistributes GPL-3.0-derived data; choose one deliberately.
 - [ ] `python scripts/serve/release.py --tests` passes on the commit you submit, and its result is committed.
 - [ ] Every number in the report appears in one of the generated files.
