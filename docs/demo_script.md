@@ -17,7 +17,7 @@ scancel $(squeue -u $USER -h -o %i -n chartqa-serve)   # afterwards: free the GP
 ## Recording the video
 
 1. `python3 scripts/serve/video.py --segments` builds the narrated intro, results and close (`build/video/`; needs `brew install ffmpeg-full`).
-2. Record only the live part: Cmd+Shift+5, *Record Selected Portion* around the terminal holding the SSH session to VM03, Options → your microphone, then run `demo.py --live` there and narrate each step. Stop with the menu-bar button.
+2. Record only the live part. Put the SSH terminal (VM03, running `demo.py --live`) on the left and, on the Mac, a small terminal running `python3 scripts/serve/demo.py --charts` with its Quick Look window on the right. Cmd+Shift+5, *Record Selected Portion* around both, Options → your microphone. For each step press Enter in the Mac terminal (the chart appears), then in the SSH terminal (the model answers), and narrate. Stop with the menu-bar button.
 3. `python3 scripts/serve/video.py --join ~/Desktop/<recording>.mov` writes `build/video/demo_video.mp4`: intro, your recording (captioned LIVE), results, close.
 
 ## Live part (0:00 to 7:00)

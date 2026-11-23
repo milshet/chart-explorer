@@ -202,3 +202,31 @@ def test_live_mode_flags_a_step_that_fails(endpoint, monkeypatch, capsys):
     monkeypatch.setattr("builtins.input", lambda prompt="": "")
     D.run_steps("http://demo", pause=True)
     assert "!! this step did not show what it should" in capsys.readouterr().out
+
+
+def test_every_chart_the_demo_sends_can_be_shown_on_the_mac():
+    import base64
+    for step in D.STEPS:
+        path = D.chart_path(step)
+        if step["kind"] == "get":
+            assert path is None
+            continue
+        assert path.is_file() and ".." not in path.parts, step["name"]
+        body, _ = D.request_for(step)
+        assert base64.b64decode(json.loads(body)["image_base64"]) == path.read_bytes(), step["name"]
+
+
+def test_the_chart_viewer_opens_each_chart_in_order_and_closes_the_last(monkeypatch):
+    opened, closed = [], []
+
+    class Viewer:
+        def __init__(self, cmd, **kw):
+            opened.append(cmd[-1])
+
+        def terminate(self):
+            closed.append(True)
+    monkeypatch.setattr(D.subprocess, "Popen", Viewer)
+    monkeypatch.setattr("builtins.input", lambda prompt="": "")
+    D.show_charts()
+    charts = [str(D.chart_path(s)) for s in D.STEPS if D.chart_path(s)]
+    assert opened == charts and len(opened) == 5 and len(closed) == 5

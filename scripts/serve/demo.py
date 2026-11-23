@@ -20,6 +20,7 @@ import base64
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -175,6 +176,37 @@ def show(step, status, payload, scored, seconds):
     return "\n".join(out)
 
 
+def chart_path(step):
+    """The chart image a step sends, as a repository path; None for /health and /metrics."""
+    if step["kind"] == "get":
+        return None
+    if "redteam" in step:
+        return REPO / "data/redteam" / spec(step["redteam"])["image"]
+    if "source" in step:
+        return Path(os.path.normpath(REPO / step["image_root"] / item(*step["source"])["image"]))
+    return REPO / "data/redteam/charts/redteam-15-caption_only_answer.png"  # the refused request's chart
+
+
+def show_charts(viewer=("qlmanage", "-p")):
+    """On the presenting Mac, beside the SSH terminal running --live: Enter opens each step's chart in a Quick Look
+    window (and closes the previous one), so the audience sees what the model is looking at."""
+    current = None
+    try:
+        for step in STEPS:
+            path = chart_path(step)
+            input(f"[{step['minute']}] {step['name'].replace('_', ' ')}: press Enter "
+                  + ("to show its chart " if path else "(no chart: closes the window) "))
+            if current:
+                current.terminate()
+                current = None
+            if path:
+                current = subprocess.Popen([*viewer, str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"  showing {path.relative_to(REPO)}")
+    finally:
+        if current:
+            current.terminate()
+
+
 def run_steps(url, pause=False):
     """pause=True is the live demo: wait before each step, then show the full response for the audience."""
     rows = []
@@ -322,9 +354,11 @@ def render(smoke, root=REPO):
               "```", "", "## Recording the video", "",
               "1. `python3 scripts/serve/video.py --segments` builds the narrated intro, results and close "
               "(`build/video/`; needs `brew install ffmpeg-full`).",
-              "2. Record only the live part: Cmd+Shift+5, *Record Selected Portion* around the terminal holding the "
-              "SSH session to VM03, Options → your microphone, then run `demo.py --live` there and narrate each "
-              "step. Stop with the menu-bar button.",
+              "2. Record only the live part. Put the SSH terminal (VM03, running `demo.py --live`) on the left and, "
+              "on the Mac, a small terminal running `python3 scripts/serve/demo.py --charts` with its Quick Look "
+              "window on the right. Cmd+Shift+5, *Record Selected Portion* around both, Options → your microphone. "
+              "For each step press Enter in the Mac terminal (the chart appears), then in the SSH terminal (the "
+              "model answers), and narrate. Stop with the menu-bar button.",
               "3. `python3 scripts/serve/video.py --join ~/Desktop/<recording>.mov` writes "
               "`build/video/demo_video.mp4`: intro, your recording (captioned LIVE), results, close.",
               "", "## Live part (0:00 to 7:00)", ""]
@@ -358,8 +392,13 @@ def main(argv=None):
     ap.add_argument("--smoke", action="store_true", help="make the demo's requests in order and record them")
     ap.add_argument("--live", action="store_true", help="the same requests, pausing before each one")
     ap.add_argument("--write", action="store_true", help="write docs/demo_script.md")
+    ap.add_argument("--charts", action="store_true",
+                    help="on the presenting Mac: show each step's chart in Quick Look as you press Enter")
     ap.add_argument("--wait", type=int, default=900)
     args = ap.parse_args(argv)
+    if args.charts:
+        show_charts()
+        return 0
     if args.smoke or args.live:
         from serve import http_bench
         http_bench.wait_for(args.url, args.wait)
