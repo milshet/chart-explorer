@@ -44,3 +44,22 @@ def test_every_slide_is_narrated_and_fits_on_screen():
 
 def test_video_output_is_never_committed():
     assert "build/" in (REPO / ".gitignore").read_text()
+
+
+def test_cues_keep_their_marks_unless_the_previous_line_runs_long():
+    cues = [{"at": 0.5}, {"at": 5.0}, {"at": 6.0}]
+    starts, end = V.place(cues, [3.0, 2.0, 1.0])
+    assert starts == [0.5, 5.0, 7.3] and end == 8.3   # the third waits for the second, plus a 0.3 s gap
+
+
+def test_the_committed_voiceover_cues_are_in_order_and_quote_what_the_recording_shows():
+    import json
+    spec = json.loads((REPO / "docs/demo_voiceover.json").read_text())
+    ats = [c["at"] for c in spec["cues"]]
+    assert ats == sorted(ats) and {c["step"] for c in spec["cues"]} >= {s["name"] for s in D.STEPS}
+    said = " ".join(c["text"] for c in spec["cues"])
+    smoke = {r["name"]: r["observed"] for r in json.loads((REPO / "results/demo/smoke.json").read_text())["steps"]}
+    assert smoke["answer"]["answer"] == 38 and "thirty-eight" in said
+    assert smoke["injection"]["answer"] == 60 and "sixty" in said
+    assert smoke["caption_failure"]["answer"] == 470 and "four hundred and seventy" in said
+    assert smoke["refused_context"]["status"] == 400 and "four hundred error" in said

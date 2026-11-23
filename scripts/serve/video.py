@@ -188,6 +188,50 @@ def join(live, out=OUT, recorded_on=None):
     return final
 
 
+def duration(path):
+    return float(run([tool("ffprobe"), "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)]))
+
+
+def place(cues, durations, gap=0.3):
+    """Start times for spoken cues: each at its mark, or just after the previous one ends if they would overlap."""
+    starts, end = [], 0.0
+    for cue, d in zip(cues, durations):
+        t = max(cue["at"], end + gap if starts else cue["at"])
+        starts.append(round(t, 2))
+        end = t + d
+    return starts, end
+
+
+def voiceover(video, cues_file, out):
+    """Narrate a screen recording: speak each cue with `say` at its time, mix them, and lay them over the video
+    (the last frame is held if the narration runs past the end)."""
+    spec = json.loads(Path(cues_file).read_text(encoding="utf-8"))
+    cues, voice = spec["cues"], spec.get("voice", VOICE)
+    length = duration(video)
+    with tempfile.TemporaryDirectory() as tmp:
+        clips = []
+        for i, cue in enumerate(cues):
+            a = Path(tmp) / f"cue{i:02d}.aiff"
+            run(["say", "-v", voice, "-o", str(a), cue["text"]])
+            clips.append(a)
+        durations = [duration(c) for c in clips]
+        starts, end = place(cues, durations)
+        for cue, t, d in zip(cues, starts, durations):
+            moved = "" if abs(t - cue["at"]) < 0.01 else f"  (moved from {cue['at']} s: the previous line ran long)"
+            print(f"  {t:6.1f}-{t + d:6.1f} s  {cue['step']:16} {cue['text'][:60]}{moved}")
+        hold = max(0.0, end + 1.0 - length)
+        inputs = [x for c in clips for x in ("-i", str(c))]
+        delays = ";".join(f"[{i + 1}:a]adelay={int(t * 1000)}:all=1[a{i}]" for i, t in enumerate(starts))
+        mix = "".join(f"[a{i}]" for i in range(len(clips)))
+        graph = (f"{delays};{mix}amix=inputs={len(clips)}:normalize=0:duration=longest,aresample=48000[aout];"
+                 f"[0:v]tpad=stop_mode=clone:stop_duration={hold:.2f},format=yuv420p[vout]")
+        run([tool("ffmpeg"), "-y", "-i", str(video), *inputs, "-filter_complex", graph, "-map", "[vout]",
+             "-map", "[aout]", "-c:v", "libx264", "-crf", "18", "-r", str(FPS), "-c:a", "aac", "-ar", "48000",
+             "-ac", "2", "-shortest" if hold == 0 else "-y", str(out)])
+    print(f"wrote {out} ({duration(out):.1f} s; narration ends at {end:.1f} s, video was {length:.1f} s)")
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--segments", action="store_true", help="build the intro, results and close segments")
@@ -195,6 +239,8 @@ def main(argv=None):
     ap.add_argument("--recorded-on", help="the date shown on the live caption (default: today)")
     ap.add_argument("--out", type=Path, default=OUT)
     ap.add_argument("--print", action="store_true", help="print every slide's text and narration, render nothing")
+    ap.add_argument("--voiceover", type=Path, help="a screen recording to narrate with --cues")
+    ap.add_argument("--cues", type=Path, default=REPO / "docs/demo_voiceover.json", help="timed narration for --voiceover")
     args = ap.parse_args(argv)
     if args.print:
         for name, slides in segments().items():
@@ -206,13 +252,19 @@ def main(argv=None):
     filters = subprocess.run([tool("ffmpeg"), "-hide_banner", "-filters"], capture_output=True, text=True).stdout
     if " drawtext " not in filters:
         sys.exit("this ffmpeg cannot draw text: run `brew install ffmpeg-full` (it installs beside plain ffmpeg)")
+    if args.voiceover:
+        src = args.voiceover.expanduser()
+        if not src.is_file():
+            sys.exit(f"{src} does not exist")
+        args.out.mkdir(parents=True, exist_ok=True)
+        voiceover(src, args.cues, args.out / f"{src.stem}_voiced.mp4")
     if args.segments:
         build_segments(args.out)
     if args.join:
         if not args.join.expanduser().is_file():
             sys.exit(f"{args.join} does not exist")
         join(args.join.expanduser(), args.out, args.recorded_on)
-    if not (args.segments or args.join):
+    if not (args.segments or args.join or args.voiceover):
         ap.print_help()
     return 0
 
