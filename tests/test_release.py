@@ -88,6 +88,12 @@ def test_an_absolute_path_in_a_job_scripts_comment_is_a_warning(tmp_path):
     assert len(f.warnings) == 1 and len(f.blocking) == 1 and "x.sbatch:2" in details(f.blocking)
 
 
+def test_a_file_that_does_not_parse_blocks_but_a_literal_naming_an_error_does_not(tmp_path):
+    write(tmp_path, {"scripts/broken.py": "def f(:\n", "scripts/ok.py": 'MSG = "SYNTAX ERROR in input"\n'})
+    f = findings(R.check_paths, tmp_path)
+    assert len(f.blocking) == 1 and "broken.py:1: does not parse" in details(f.blocking)
+
+
 def test_relative_and_home_relative_paths_pass(tmp_path):
     write(tmp_path, {"configs/run.yaml": "data_dir: data/v2.0\nout: ~/runs\n", "scripts/a.py": 'P = "results/x.json"\n'})
     assert not findings(R.check_paths, tmp_path).blocking

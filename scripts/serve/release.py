@@ -101,11 +101,11 @@ def check_requirements(root, f):
 
 
 def code_literals(path):
-    """String constants in a Python file, docstrings excluded (they are documentation, not behaviour)."""
-    try:
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-    except SyntaxError as e:
-        return [(e.lineno or 0, f"SYNTAX ERROR {e.msg}")]
+    """String constants in a Python file, docstrings excluded (they are documentation, not behaviour).
+
+    Raises SyntaxError for a file that does not parse; the caller reports it as its own finding.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"))
     docstrings = set()
     for node in ast.walk(tree):
         if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.body:
@@ -123,10 +123,13 @@ def check_paths(root, f):
             if ABS_PATH.search(line.split("#")[0]):
                 f.block("absolute_paths", f"{p.relative_to(root)}:{n}: {line.strip()[:100]}")
     for p in sorted([*root.glob("scripts/**/*.py"), *root.glob("tests/**/*.py")]):
-        for n, value in code_literals(p):
-            if value.startswith("SYNTAX ERROR"):
-                f.block("absolute_paths", f"{p.relative_to(root)}:{n}: {value}")
-            elif ABS_PATH.match(value):
+        try:
+            literals = code_literals(p)
+        except SyntaxError as e:
+            f.block("absolute_paths", f"{p.relative_to(root)}:{e.lineno}: does not parse ({e.msg})")
+            continue
+        for n, value in literals:
+            if ABS_PATH.match(value):
                 f.block("absolute_paths", f"{p.relative_to(root)}:{n}: string literal {value[:80]!r}")
     for p in sorted(root.glob("slurm/*.sbatch")):
         for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
