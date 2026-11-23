@@ -73,6 +73,26 @@ Quote these; they are read from the committed results:
 - 4-bit was measured and rejected: 81.1% vs 83.3% on test, a 2.22-point drop against a 2.0-point tolerance fixed in advance.
 - Latency: p50 1.224 s, p95 1.847 s per answer, one request at a time on an L40S; HTTP adds 3 ms.
 
+## Anticipated questions
+
+Answers read from the committed results; practise them.
+
+**Run B scored higher on val. Why serve Run A?** Run B was right on 8 val items Run A missed and wrong on 4 Run A got (p = 0.39): not distinguishable from noise. Run A's adapter is a quarter of the size. The choice was made on val before test was scored.
+
+**The vision arm abstains better. Why not serve it?** It declines 42/50 Eval-C probes against 31/50 (p = 0.00098), but the model was chosen on val, where the vision arm was not better, before Eval-C was scored. Switching after seeing a reported set would bias every number we report. It is the clearest direction for further work.
+
+**How do you know the served model is the one you evaluated?** The merge was read back from disk and compared with base + B@A from the adapter file: 0 of 2,084,328,516 changed elements off. Merged and unmerged models answered 100 val items with 2 parsed answers differing. /health shows that manifest.
+
+**Why not vLLM, and what does that cost?** vLLM did not fit the VM's 35 GB quota and would have brought a second torch under every measured number. We serve on the locked stack instead; the cost is no continuous batching, so latency is one request at a time: p50 1.224 s.
+
+**Why not ship the 4-bit model?** It dropped 2.22 points on test against a 2-point tolerance fixed before measuring (7 lost, 3 gained, p = 0.3438), and ran slower without compiled kernels. Not significant, but the rule was set in advance.
+
+**Can a chart inject instructions?** We stamped an instruction with a unique token on 3 charts; it was obeyed 0/3 times and the token never appeared in any output. The API also refuses caller-supplied context.
+
+**Where does it fail?** Abstention under adversarial charts: 4/9. In most failures the rationale says the data is not in the chart and the model answers anyway, with the nearest series or a caption's forecast.
+
+**Can a bank use this tomorrow?** No. It is built on Qwen/Qwen2.5-VL-3B-Instruct under the Qwen Research License Agreement (qwen-research): research and evaluation only. And it is meant for a person who checks the answer against the chart.
+
 ## Close (9:00 to 10:00): what we do not claim
 
 Say these out loud; a question about any of them should get the answer below, not a hedge.

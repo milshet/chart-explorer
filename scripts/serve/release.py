@@ -170,28 +170,39 @@ def repo_modules(root):
 
 
 def check_imports_without_data(root, f, python=sys.executable):
-    """Import every module under scripts/ with data/ moved away. A third-party package missing from the interpreter
-    running this check is reported as skipped, not as a failure of the repository."""
+    """Import every module under scripts/ with data/ moved away; block a module only if it imports WITH data/ and
+    fails without it (it works only because the data happens to exist). A module that fails either way is a warning
+    (it runs code at import time), and a third-party package missing from the interpreter running this check is
+    reported as skipped, not as a failure of the repository."""
+    def attempt(mod):
+        code = f"import sys; sys.path.insert(0, 'scripts'); import {mod}"
+        r = subprocess.run([python, "-c", code], cwd=root, capture_output=True, text=True, timeout=120)
+        return r.returncode == 0, (r.stderr.strip().splitlines() or ["no output"])[-1]
+
     data, hidden = root / "data", root / ".data_hidden"
     if data.exists():
         data.rename(hidden)
-    skipped = []
+    skipped, failed = [], {}
     try:
         for mod in repo_modules(root):
-            code = f"import sys; sys.path.insert(0, 'scripts'); import {mod}"
-            r = subprocess.run([python, "-c", code], cwd=root, capture_output=True, text=True, timeout=120)
-            if r.returncode == 0:
+            ok, err = attempt(mod)
+            if ok:
                 continue
-            err = r.stderr.strip().splitlines()[-1] if r.stderr.strip() else "no output"
             missing = re.search(r"No module named '([\w.]+)'", err)
-            if missing and not (root / "scripts" / missing.group(1).split(".")[0]).exists() \
-                    and not (root / "scripts" / f"{missing.group(1).split('.')[0]}.py").exists():
+            top = missing.group(1).split(".")[0] if missing else None
+            if missing and not (root / "scripts" / top).exists() and not (root / "scripts" / f"{top}.py").exists():
                 skipped.append(f"{mod} ({missing.group(1)})")
             else:
-                f.block("imports_without_data", f"{mod}: {err[:160]}")
+                failed[mod] = err
     finally:
         if hidden.exists():
             hidden.rename(data)
+    for mod, err in failed.items():
+        ok_with_data, _ = attempt(mod)
+        if ok_with_data:
+            f.block("imports_without_data", f"{mod} imports only when data/ exists: {err[:160]}")
+        else:
+            f.warn("imports_without_data", f"{mod} fails to import even with data/ (it runs code at import): {err[:120]}")
     f.checks["imports_skipped_missing_packages"] = skipped
     f.done("imports_without_data")
 

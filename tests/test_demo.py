@@ -171,3 +171,13 @@ def test_the_committed_script_is_current():
     smoke_file = D.SMOKE
     data = json.loads(smoke_file.read_text()) if smoke_file.is_file() else None
     assert path.read_text(encoding="utf-8") == D.render(data), "run scripts/serve/demo.py --write"
+
+
+def test_anticipated_questions_are_answered_from_the_results():
+    qa = D.questions()
+    assert len(qa) == 8 and all(a != D.NM for _, a in qa)
+    answers = " ".join(a for _, a in qa)
+    for needle in ("p = 0.39", "42/50", "31/50", "2,084,328,516", "1.224 s", "2.22 points", "0/3", "4/9",
+                   "research and evaluation only"):
+        assert needle in answers, needle
+    assert "## Anticipated questions" in D.render(None)

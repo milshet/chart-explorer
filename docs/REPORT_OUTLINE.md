@@ -1,5 +1,8 @@
 # 12-page report: outline and sources
 
+**The draft following this outline is [`docs/REPORT.md`](REPORT.md);** `tests/test_report.py` recomputes its key numbers
+from the committed results and fails if they drift.
+
 The report is the team's writing; its numbers are not. Every figure comes from one of the generated files below,
 copied as generated, so the report cannot drift from the runs. When a result changes, regenerate the file and copy
 again; never edit a number in the report by hand.

@@ -124,9 +124,11 @@ def test_a_missing_data_file_blocks(tmp_path):
 
 def test_a_module_that_reads_data_at_import_blocks_and_data_is_restored(tmp_path):
     write(tmp_path, {"scripts/good.py": "import json\n", "scripts/bad.py": "open('data/v1/f.txt').read()\n",
-                     "scripts/needs_pkg.py": "import some_absent_package_xyz\n", "data/v1/f.txt": "x"})
+                     "scripts/needs_pkg.py": "import some_absent_package_xyz\n", "data/v1/f.txt": "x",
+                     "scripts/cli.py": "import sys\nPATH = sys.argv[1]\n"})
     f = findings(R.check_imports_without_data, tmp_path)
-    assert details(f.blocking).startswith("bad:") and len(f.blocking) == 1
+    assert details(f.blocking).startswith("bad imports only when data/ exists") and len(f.blocking) == 1
+    assert "cli fails to import even with data/" in details(f.warnings)  # runs at import: hygiene, not data
     assert f.checks["imports_skipped_missing_packages"] == ["needs_pkg (some_absent_package_xyz)"]
     assert (tmp_path / "data/v1/f.txt").is_file() and not (tmp_path / ".data_hidden").exists()
 
