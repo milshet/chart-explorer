@@ -22,5 +22,5 @@ id_ecdsa*
 .env
 .env.*
 
-# Rendered demo video segments and the final video: large, rebuilt by scripts/serve/video.py
+# Local build output (never committed)
 build/

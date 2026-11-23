@@ -351,16 +351,7 @@ def render(smoke, root=REPO):
               "curl -s localhost:8000/health | head -c 200   # {\"status\": \"ok\" ...",
               "python scripts/serve/demo.py --live           # makes each request when you press Enter",
               "scancel $(squeue -u $USER -h -o %i -n chartqa-serve)   # afterwards: free the GPU",
-              "```", "", "## Recording the video", "",
-              "1. `python3 scripts/serve/video.py --segments` builds the narrated intro, results and close "
-              "(`build/video/`; needs `brew install ffmpeg-full`).",
-              "2. Record only the live part. Put the SSH terminal (VM03, running `demo.py --live`) on the left and, "
-              "on the Mac, a small terminal running `python3 scripts/serve/demo.py --charts` with its Quick Look "
-              "window on the right. Cmd+Shift+5, *Record Selected Portion* around both, Options → your microphone. "
-              "For each step press Enter in the Mac terminal (the chart appears), then in the SSH terminal (the "
-              "model answers), and narrate. Stop with the menu-bar button.",
-              "3. `python3 scripts/serve/video.py --join ~/Desktop/<recording>.mov` writes "
-              "`build/video/demo_video.mp4`: intro, your recording (captioned LIVE), results, close.",
+              "```",
               "", "## Live part (0:00 to 7:00)", ""]
     by_name = {r["name"]: r for r in (smoke or {}).get("steps", [])}
     for step in STEPS:
