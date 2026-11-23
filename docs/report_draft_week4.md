@@ -59,8 +59,10 @@ Prompt injection obeyed 0/3. Failures to abstain: redteam-13-absent_series answe
 
 ## 4.7 Clean-clone check
 
-Commit `9eeaf71`, 2997 files, cloned fresh: **PASS** with 0 blocking finding(s) and 2 warning(s). Tests in the clone: 424 passed, 1 warning in 10.43s. 1481 manifest-listed data files verified by hash.
+Commit `a1899a9`, 2999 files, cloned fresh: **PASS** with 0 blocking finding(s) and 4 warning(s). Tests in the clone: 437 passed, 1 warning in 11.43s. 1481 manifest-listed data files verified by hash.
 
+- audit_import fails to import even with data/ (it runs code at import): IndexError: list index out of range
+- audit_kappa fails to import even with data/ (it runs code at import): IndexError: list index out of range
 
 ## What Week 4 did not establish
 

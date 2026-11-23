@@ -79,3 +79,9 @@ def test_the_report_states_every_deviation_and_gap():
     for needle in ("not vLLM", "Eval-B", "4-bit", "never been built or run", "not carried out", "Qwen Research License",
                    "Built with Qwen", "one request at a time"):
         assert needle in REPORT, needle
+
+
+def test_the_clean_clone_figures_match_the_committed_check():
+    r = read("results/release/clean_clone.json")
+    passed = r["checks"]["tests_summary"].split(" passed")[0].split()[-1]
+    assert f"{r['checks']['manifest_files']:,}" in REPORT and f"{passed} tests passing inside the clone" in REPORT

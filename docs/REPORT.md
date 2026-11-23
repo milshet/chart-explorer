@@ -356,5 +356,5 @@ A clean-clone check (`scripts/serve/release.py`) clones the committed state into
 would get it, and checks that copy. Blocking findings include an unpinned lockfile, absolute machine paths in
 configs or code, data files that differ from their manifests, modules that import only because data happens to be
 present, a stale model card, and tracked secrets. On the submitted code it passes with no blocking findings: 1,481
-manifest-listed data files verified by hash, and 424 tests passing inside the clone. The setup steps and the Slurm
+manifest-listed data files verified by hash, and 437 tests passing inside the clone. The setup steps and the Slurm
 jobs in order are in the README.
