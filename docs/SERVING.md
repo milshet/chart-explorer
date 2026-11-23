@@ -190,6 +190,27 @@ The last log line is `QUANTISE_MEASURED_ACCEPT`, `QUANTISE_MEASURED_REJECT`, `QU
 or `QUANTISE_REFUSED: ...`. A refusal means the targets or the export were wrong, and it is never recorded as a
 downgrade.
 
+## Container (task 4.4)
+
+`docker/Dockerfile` and `compose.yaml` (at the repository root, so `docker compose up` works from a clean clone).
+Three rules, each enforced by `tests/test_container.py`:
+
+| Rule | How | Why |
+|---|---|---|
+| Installs from the lockfile and resolves nothing | `requirements-serve.txt` is 65 lines copied verbatim from `requirements-vm03.lock` (the closure of what the serving code imports), installed with `pip install --no-deps`, then `pip check` | a container that pulled a newer `transformers` would serve a different model than the one measured, with no trace in any log |
+| Weights mounted, never baked | the image holds `scripts/` and the requirements only (`.dockerignore` admits nothing else); the verified merge is bind-mounted read-only at `/model`, and compose refuses to start without `MODEL_DIR` | an image carrying a 3B checkpoint can't be rebuilt without re-pushing it, and ends up serving weights nobody can identify |
+| Healthy means VERIFIED | `HEALTHCHECK` runs `scripts/serve/healthcheck.py`: `/health` must say `ok` and the mounted `merge_manifest.json` must say `VERIFIED` | during a demo the question is whether what's running is what was measured, not whether a process is up |
+
+The image runs offline (`HF_HUB_OFFLINE=1`), as a non-root user, on Python 3.12.3 (the lock's interpreter), and
+publishes port 8000 on `127.0.0.1` only. It serves bf16: 4.2 rejected the 4-bit export.
+
+```bash
+MODEL_DIR=~/merged/run_a_r16 docker compose up --build      # needs an NVIDIA GPU and the NVIDIA container toolkit
+docker compose ps                                           # STATUS shows (healthy) once the model has loaded
+curl -s localhost:8000/health
+python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
+```
+
 ## Decision record
 
 | Date | Engine | Environment | Smoke log | Decision |
