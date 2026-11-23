@@ -12,3 +12,12 @@ ChartQA Dataset/
 # run outputs on the VM
 logs/
 .idea/
+
+# Private keys and credentials: never inside the repository (an SSH key once landed in results/demo/ via scp)
+id_rsa*
+id_ed25519*
+id_ecdsa*
+*.pem
+*.key
+.env
+.env.*
