@@ -1,0 +1,7 @@
+# The image holds code and the pinned requirements only (task 4.4). Weights are mounted at run time; data,
+# results and history never enter the build context.
+*
+!requirements-serve.txt
+!scripts/
+scripts/**/__pycache__
+scripts/**/*.pyc

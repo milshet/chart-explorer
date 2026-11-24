@@ -1,0 +1,43 @@
+{
+ "task": "4.7",
+ "commit": "a1899a94dedf55ff3b7475b7f7ea9c0cc8e1ebce",
+ "tracked_files": 2999,
+ "uncommitted_changes_not_checked": [],
+ "verdict": "PASS",
+ "checks": {
+  "requirements": "ok",
+  "absolute_paths": "ok",
+  "manifest_files": 1481,
+  "manifests": "ok",
+  "imports_skipped_missing_packages": [
+   "chartqa_10k (modal)",
+   "chartqa_modal (modal)",
+   "chartqa_test (modal)"
+  ],
+  "imports_without_data": "warning",
+  "generated_documents": "ok",
+  "hygiene": "ok",
+  "not_measured": "warning",
+  "tests_summary": "437 passed, 1 warning in 11.43s",
+  "tests": "ok"
+ },
+ "blocking": [],
+ "warnings": [
+  {
+   "check": "imports_without_data",
+   "detail": "audit_import fails to import even with data/ (it runs code at import): IndexError: list index out of range"
+  },
+  {
+   "check": "imports_without_data",
+   "detail": "audit_kappa fails to import even with data/ (it runs code at import): IndexError: list index out of range"
+  },
+  {
+   "check": "not_measured",
+   "detail": "the human data-quality audit \u03ba (3.0i): save scripts/audit_kappa.py output to results/audit/kappa.txt"
+  },
+  {
+   "check": "not_measured",
+   "detail": "the container image built and run with docker compose on a GPU (task 4.4); the image is specified and its rules tested, VM03 has no container runtime"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+# The endpoint in a container (task 4.4). From a clean clone, on a host with an NVIDIA GPU and the NVIDIA
+# container toolkit:
+#
+#   MODEL_DIR=/path/to/merged/run_a_r16 docker compose up --build
+#   curl -s localhost:8000/health
+#   python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
+#
+# MODEL_DIR is the verified merge from task 4.1 (scripts/serve/merge.py): weights plus merge_manifest.json. It is
+# mounted read-only and never copied into the image. Compose refuses to start without it.
+services:
+  chartqa:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: chartqa-serve:week4
+    ports:
+      - "127.0.0.1:8000:8000"   # local only: reach it from elsewhere through an SSH tunnel, not an open port
+    volumes:
+      - type: bind
+        source: ${MODEL_DIR:?set MODEL_DIR to the verified merge directory, e.g. ~/merged/run_a_r16}
+        target: /model
+        read_only: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: "no"

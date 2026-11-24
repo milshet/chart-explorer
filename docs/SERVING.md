@@ -50,6 +50,167 @@ correct (Runs A and B both answer it correctly on val, so a failure is the stack
 The merged checkpoint is a smoke artefact: task 4.1 does the verified merge. Delete
 `/storage/tracka/users/learner01/merged/run_a_r16_smoke` once the smoke log is committed if the quota is tight.
 
+## Verified merge on VM03 (task 4.1)
+
+Every Week 4 number comes from this checkpoint, so it is checked against the model that was measured before
+anything else uses it. `scripts/serve/merge.py` merges on CPU in bf16 (never 4-bit), writes the checkpoint, then runs
+three checks:
+
+| Check | What fails it | On failure |
+|---|---|---|
+| **Base** | `adapter_config.json` names another base, or the base revision in `run_summary.json` differs from the local snapshot. DoRA, rank/alpha patterns or `modules_to_save`, which the weight check can't reproduce | raises before merging (`MERGE_REFUSED`) |
+| **Weights** | The merged checkpoint, read back from disk, isn't base + (alpha/r)·B@A computed from the adapter file (not through PEFT) in exactly the modules the adapter names. Or a tensor outside them changed, or a dtype changed | raises (`MERGE_REFUSED`), manifest stays `UNVERIFIED` |
+| **Answers** | Merged vs unmerged base+adapter on 100 val items (seed 41001), through `scripts/serve/generation.py`, compared on parsed answers. More than 3 disagree, or more than 1 schema-valid answer lost. Tolerance fixed in code before the run | `MERGE_FAILED_ANSWER_CHECK`, manifest `FAILED_ANSWER_CHECK` |
+
+```bash
+cd ~/chart-explorer && git pull && mkdir -p logs && quota -s       # the merge writes ~7 GB
+A=/storage/tracka/users/learner01/runs/run_a_r16/adapter            # or your copy, with run_summary.json beside adapter/
+python scripts/serve/merge.py --adapter $A --dry-run                # login shell: base check, sample, provenance
+sbatch slurm/merge.sbatch --adapter $A                              # -> ~/merged/run_a_r16 + results/serve/merge_run_a_r16.json
+sbatch slurm/merge.sbatch --adapter $A --verify-only                # re-check an existing merge, no new weights
+```
+
+Pass: the log ends `MERGE_VERIFIED`. Commit `results/serve/merge_run_a_r16.json`. The checkpoint stays in
+`~/merged/run_a_r16` as the served model. `merge_manifest.json` beside its weights records the status, the adapter
+and weight hashes and both checks, and `/health` reports it (4.4). If you copied only `adapter/`, copy the run's
+`run_summary.json` next to it too; otherwise the base revision can't be verified and the job needs
+`--allow-unrecorded-revision`, which the manifest records. The 3.0f smoke merge
+(`/storage/tracka/users/learner01/merged/run_a_r16_smoke`) is unverified and is not the served model; delete it
+once this one passes if the quota is tight.
+
+The report also shows how often the batch-1 reference matches the committed batch-4 val evaluation of the same
+adapter (`reference_vs_committed_eval`). That figure is for information only: batching and padding change greedy
+decoding slightly, so it is not a gate.
+
+## The endpoint (task 4.3)
+
+FastAPI in front of `transformers.generate`, serving the verified merge (`~/merged/run_a_r16`). vLLM is not used
+(decision 12 above); the latency quoted is the measured one.
+
+| Piece | File | Role |
+|---|---|---|
+| Request path | `scripts/serve/service.py` | parsing, image limits, refusals, prompt, counters, `/health`; no web framework |
+| Validation and retry | `scripts/serve/decoding.py` | `scoring.contract_errors()`, re-ask with the errors quoted, fallback |
+| Engine | `scripts/serve/generation.py` | the one generation path (4.1 verified it) |
+| HTTP | `scripts/serve/app.py` | FastAPI routes only |
+| Client, bench | `scripts/serve/client.py`, `scripts/serve/http_bench.py` | standard-library client; the 3.14 requests over HTTP |
+
+**API.** `POST /v1/answer` with `{"question": str, "image_base64": str}` returns an envelope:
+
+```json
+{"result": {"evidence": [...], "rationale": "...", "answer_type": "number", "unit": null, "answer": 38},
+ "degraded": false, "attempts": 1, "retry_errors": [],
+ "model": {"run": "run_a_r16", "status": "VERIFIED", "adapter_sha256": "..."},
+ "usage": {"prompt_tokens": 702, "new_tokens": 70}, "timing": {"generate_s": 1.18, "total_s": 1.22}}
+```
+
+- **Contract.** `scoring.contract_errors()` is stricter than `schema_valid`, which stays unchanged so no
+  reported number moves. It requires exactly the contract's fields, and the cross-field rule both ways: the
+  answer is null if and only if `answer_type` is `unanswerable`. Every gold answer in the repo and every
+  schema-valid Run A output satisfies it.
+- **Retry.** A reply that fails the contract goes back as the assistant turn, the errors are quoted in a new user
+  turn, and the model answers again, up to 3 attempts in all.
+- **Fallback.** After 3 failures the caller gets a contract-valid abstention with `"degraded": true` in the
+  envelope, never inside `result`, so it can't be mistaken for the model's own refusal.
+- **Counters.** `GET /metrics` reports requests, first-attempt-valid, retried, recovered, degraded, the model's own
+  abstentions, refusals by code and engine errors. The report quotes them.
+- **Refused, not ignored.** Any field that would put caller text into the prompt (`context`, `table`, `messages`,
+  `system`, `prompt`, ...) returns 400 `caller_text_refused`. Unknown fields are refused too. Images must be
+  PNG/JPEG/WebP, at most 8 MB and 40 MP (checked from the header before decoding), and at least 28 px a side.
+  They're resized exactly as in training. Line breaks in the question become spaces.
+- **Health.** `GET /health` reports the merge manifest: status, adapter and weight hashes, base revision. The app
+  refuses to start on a checkpoint whose manifest isn't `VERIFIED`.
+
+**Install FastAPI and uvicorn once, without moving the locked stack.** The lockfile is passed as a constraints
+file, so pip either keeps every pinned package at its pinned version or fails. It never upgrades one:
+
+```bash
+source ~/.tracka_environment && source ~/venv/bin/activate && cd ~/chart-explorer
+pip install --dry-run fastapi uvicorn -c requirements-vm03.lock     # read the "Would install" line
+pip install fastapi uvicorn -c requirements-vm03.lock
+python scripts/evaluate.py --split val --targets answer_only --dry-run | grep -i warning   # must print nothing
+pip freeze | grep -iE "^(fastapi|uvicorn|starlette)=="              # these get added to the lockfile
+```
+
+**Measure served latency through HTTP** (the same 50 requests as 3.14):
+
+```bash
+python scripts/serve/http_bench.py --dry-run
+sbatch slurm/serve_http_bench.sbatch          # -> results/serve/run_a_r16_http.json; ends HTTP_BENCH_OK
+```
+
+**Run the endpoint** (for the demo; it holds the GPU, so `scancel` it when done):
+
+```bash
+sbatch slurm/serve.sbatch
+grep -m1 "Uvicorn running" logs/chartqa-serve-<JOB_ID>.err   # uvicorn logs to stderr
+curl -s localhost:8000/health
+python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
+# VM03 refuses SSH port forwarding: run clients (client.py, demo.py --live) on VM03 itself
+```
+
+## Quantisation (task 4.2)
+
+GPTQ, 4-bit, groups of 128, on the 252 decoder projections only. The vision tower, merger and `lm_head` are
+not quantised. `scripts/serve/quantise.py` decides by a measured delta, with the tolerance fixed in code before
+the run:
+- **ACCEPT** if test accuracy drops by at most 2 points (at most 3 more wrong answers of 180) and at most 1
+  contract-valid answer is lost against the bf16 merge, both scored through `serve/generation.py` in the same job.
+- **REJECT** otherwise, and bf16 is served.
+- **A backend failure** is recorded as `DOWNGRADE_BACKEND_FAILED` with its exception, and bf16 is served.
+
+**Backend: GPTQModel, chosen 2026-11-23 by probing VM03.**
+- GPTQModel 7.10.0 installs against `requirements-vm03.lock` without moving any locked package.
+- llm-compressor does not: `ResolutionImpossible` against the locked `pyyaml` and `numpy`.
+- transformers needs `optimum` (2.3.0, also clean against the lock) to load the GPTQ export.
+- VM03 has no `nvcc`, so GPTQModel's compiled CUDA kernels are unavailable and it runs on its Triton or PyTorch
+  kernels. That may make the quantised model slower than bf16; the report records both timings.
+
+Both go into a separate venv that sees the locked stack through `.pth` files and never touches `~/venv`:
+
+```bash
+source ~/.tracka_environment && cd ~/chart-explorer
+~/venv/bin/python -m venv ~/venv-quant
+SP=lib/python3.12/site-packages
+cp ~/venv/$SP/tracka_shared_runtime.pth ~/venv-quant/$SP/
+echo "$HOME/venv/$SP" > ~/venv-quant/$SP/learner_venv.pth
+source ~/venv-quant/bin/activate
+pip install gptqmodel optimum -c requirements-vm03.lock
+python scripts/evaluate.py --split val --targets answer_only --dry-run 2>&1 | grep -i "warning: a gpu"   # nothing
+```
+
+Run it (the export adds ~3 GB to the quota):
+
+```bash
+python scripts/serve/quantise.py --dry-run     # in ~/venv-quant: targets, calibration, backend settings
+sbatch slurm/quantise.sbatch                   # -> ~/merged/run_a_r16_w4 + results/serve/quantise_run_a_r16.json
+```
+
+The last log line is `QUANTISE_MEASURED_ACCEPT`, `QUANTISE_MEASURED_REJECT`, `QUANTISE_DOWNGRADE_BACKEND_FAILED_REJECT`
+or `QUANTISE_REFUSED: ...`. A refusal means the targets or the export were wrong, and it is never recorded as a
+downgrade.
+
+## Container (task 4.4)
+
+`docker/Dockerfile` and `compose.yaml` (at the repository root, so `docker compose up` works from a clean clone).
+Three rules, each enforced by `tests/test_container.py`:
+
+| Rule | How | Why |
+|---|---|---|
+| Installs from the lockfile and resolves nothing | `requirements-serve.txt` is 65 lines copied verbatim from `requirements-vm03.lock` (the closure of what the serving code imports), installed with `pip install --no-deps`, then `pip check` | a container that pulled a newer `transformers` would serve a different model than the one measured, with no trace in any log |
+| Weights mounted, never baked | the image holds `scripts/` and the requirements only (`.dockerignore` admits nothing else); the verified merge is bind-mounted read-only at `/model`, and compose refuses to start without `MODEL_DIR` | an image carrying a 3B checkpoint can't be rebuilt without re-pushing it, and ends up serving weights nobody can identify |
+| Healthy means VERIFIED | `HEALTHCHECK` runs `scripts/serve/healthcheck.py`: `/health` must say `ok` and the mounted `merge_manifest.json` must say `VERIFIED` | during a demo the question is whether what's running is what was measured, not whether a process is up |
+
+The image runs offline (`HF_HUB_OFFLINE=1`), as a non-root user, on Python 3.12.3 (the lock's interpreter), and
+publishes port 8000 on `127.0.0.1` only. It serves bf16: 4.2 rejected the 4-bit export.
+
+```bash
+MODEL_DIR=~/merged/run_a_r16 docker compose up --build      # needs an NVIDIA GPU and the NVIDIA container toolkit
+docker compose ps                                           # STATUS shows (healthy) once the model has loaded
+curl -s localhost:8000/health
+python scripts/serve/client.py data/v2.0/images/val/two_col_24100.png "What is the sum all the blue bar?"
+```
+
 ## Decision record
 
 | Date | Engine | Environment | Smoke log | Decision |

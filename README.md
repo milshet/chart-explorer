@@ -1,6 +1,49 @@
 # chart-explorer
 Ask a question about any chart image, get a grounded answer.
 
+## Reproduce
+
+Everything runs from a clone. The one thing outside it is the base model, `Qwen/Qwen2.5-VL-3B-Instruct`: download it
+once into the Hugging Face cache (`huggingface-cli download Qwen/Qwen2.5-VL-3B-Instruct`), because the jobs run
+offline. The environment is pinned: `requirements-vm03.lock` (Python 3.12.3, torch 2.14.1+cu126, transformers 5.22.1)
+is the only supported one, and every GPU job refuses to start if the installed packages differ from it.
+
+```bash
+git clone https://github.com/milshet/chart-explorer.git && cd chart-explorer
+python3.12 -m venv ~/venv && source ~/venv/bin/activate
+pip install -r requirements-vm03.lock --extra-index-url https://download.pytorch.org/whl/cu126
+python -m pytest -q tests                      # laptop-safe: no GPU, no model download
+python scripts/serve/release.py --tests        # the clean-clone check: clones HEAD and checks it as a stranger would
+```
+
+GPU work runs as Slurm jobs driven by committed scripts (`slurm/*.sbatch`), in this order:
+
+| Step | Job | Writes | Procedure |
+|---|---|---|---|
+| Train | `slurm/train.sbatch configs/run_a.yaml` | `~/runs/run_a_r16/` | [`docs/RUNS.md`](docs/RUNS.md) |
+| Evaluate | `slurm/eval.sbatch --adapter ... --split val` | `results/evals/` | [`docs/RUNS.md`](docs/RUNS.md) |
+| Merge and verify (4.1) | `slurm/merge.sbatch --adapter ~/runs/run_a_r16/adapter` | `~/merged/run_a_r16/`, `results/serve/merge_run_a_r16.json` | [`docs/SERVING.md`](docs/SERVING.md) |
+| Serve (4.3) | `slurm/serve.sbatch` | an endpoint on `127.0.0.1:8000` | [`docs/SERVING.md`](docs/SERVING.md) |
+| Latency over HTTP (4.3) | `slurm/serve_http_bench.sbatch` | `results/serve/run_a_r16_http.json` | [`docs/SERVING.md`](docs/SERVING.md) |
+| Quantise (4.2) | `slurm/quantise.sbatch` (in `~/venv-quant`) | `results/serve/quantise_run_a_r16.json` | [`docs/SERVING.md`](docs/SERVING.md) |
+| Red-team (4.5) | `slurm/redteam.sbatch` | `results/redteam/run_a_r16.{json,md}` | `scripts/serve/redteam.py` |
+
+Documents with numbers in them are generated from the committed results; regenerate them, never edit them:
+`MODEL_CARD.md` (`scripts/serve/modelcard.py --write`), [`docs/report_draft_week3.md`](docs/report_draft_week3.md)
+(`scripts/report_week3.py --write`) and [`docs/report_draft_week4.md`](docs/report_draft_week4.md)
+(`scripts/report_week4.py --write`). The tests fail when one of them is stale.
+
+## Week 4: serving and the model card
+
+**Built with Qwen:** the model is fine-tuned from `Qwen/Qwen2.5-VL-3B-Instruct`, released under the Qwen Research
+License Agreement, which allows research and evaluation use only ([`MODEL_CARD.md`](MODEL_CARD.md), Licences). The data
+derives from ChartQA (GPL-3.0).
+
+The served model is Run A merged into bf16 weights and verified against the unmerged adapter, behind a FastAPI
+endpoint (`transformers.generate`, not vLLM: [`docs/SERVING.md`](docs/SERVING.md) has the reason). What it is for,
+how it was built, how it fails and when it refuses: [`MODEL_CARD.md`](MODEL_CARD.md). Week 4's numbers, and what the
+week did not establish: [`docs/report_draft_week4.md`](docs/report_draft_week4.md).
+
 ## Dataset
 
 **ChartAudit-Fin v2.0** (`data/v2.0/`): 1,033 train / 124 val / 180 test finance and economics chart questions from ChartQA, selected by written rules and labelled blind (the labeller never saw the correct answers). Method, results and rebuild steps: [`data/v2.0/README.md`](data/v2.0/README.md).

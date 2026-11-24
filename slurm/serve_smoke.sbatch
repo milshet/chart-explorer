@@ -4,7 +4,7 @@
 # Decided 2026-11-19: transformers.generate, run from ~/venv (the locked training stack; nothing installed).
 # vLLM never goes into ~/venv: it would install its own torch over the measured stack.
 #
-#   M=/storage/tracka/users/learner01/merged/run_a_r16_smoke                # ~7 GB: mind the 35 GB quota
+#   M=~/merged/run_a_r16_smoke                                               # ~7 GB: mind the 35 GB quota
 #   SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --merge ~/runs/run_a_r16/adapter --merged $M --engine transformers
 #   SERVE_VENV=$HOME/venv sbatch slurm/serve_smoke.sbatch --model $M --engine transformers
 #   tail -f logs/chartqa-serve-smoke-<JOB_ID>.out
