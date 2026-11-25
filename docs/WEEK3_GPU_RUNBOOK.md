@@ -227,6 +227,21 @@ git push
 After this, the "not yet established" list in `docs/report_draft_week3.md` should hold only the human items: the
 audit κ (3.0i) and the judge spot-check κ (3.7).
 
+## 7. Lexical-overlap diagnostic (task 3.17) — added 2026-11-25
+
+Login shell, CPU, ~10 min, ~0.8 GB of models. It reads only the train freeze and changes no decision, so nothing
+downstream reruns. The script reloads each embedder at the exact revision 3.10 measured (from `retrieval.json`)
+and raises if a different snapshot loads. 6a deleted those models, so they download again.
+
+```bash
+cd ~/chart-explorer && git pull && git status --short          # must print nothing tracked
+ls ~/venv-embed/bin/python || echo "recreate it as in step 2"
+HF_HUB_OFFLINE=0 ~/venv-embed/bin/python scripts/rag/overlap.py --dense all --write
+grep -A6 '"verdict"' results/rag/overlap.json
+git add results/rag/overlap.json && git commit -m "Lexical-overlap diagnostic (3.17): dense half" && git push
+rm -rf ~/.cache/huggingface/hub/models--{BAAI,intfloat,sentence-transformers}--*   # then the 6b blob sweep
+```
+
 ## If something refuses to start
 
 | Message | Meaning | Fix |

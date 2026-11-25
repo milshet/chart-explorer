@@ -86,11 +86,11 @@ class Lexical:
         return Counter({i: v / (qn * self.norms[i]) for i, v in s.items()})
 
 
-def snapshot(model_id):
+def snapshot(model_id, revision=None):
     """The revision (commit sha) of the cached snapshot a model was loaded from; None if it cannot be resolved."""
     try:
         from huggingface_hub import try_to_load_from_cache
-        path = try_to_load_from_cache(model_id, "config.json")
+        path = try_to_load_from_cache(model_id, "config.json", revision=revision)
         parts = Path(str(path)).parts
         return parts[parts.index("snapshots") + 1]
     except Exception:  # noqa: BLE001 - provenance is best-effort; a missing sha is recorded as None, not guessed
@@ -98,13 +98,15 @@ def snapshot(model_id):
 
 
 class Embedding:
-    def __init__(self, chunks, name="minilm"):
+    def __init__(self, chunks, name="minilm", revision=None):
         from sentence_transformers import SentenceTransformer
         spec = EMBED_MODELS[name]
-        self.chunks, self.spec, self.model = chunks, spec, SentenceTransformer(spec["id"])
+        # revision pins a snapshot (task 3.17 reloads the exact ones 3.10 measured); None = whatever is cached
+        model = SentenceTransformer(spec["id"], revision=revision) if revision else SentenceTransformer(spec["id"])
+        self.chunks, self.spec, self.model = chunks, spec, model
         texts = [spec["passage"] + c["text"] for c in chunks]
         lengths = [len(x) for x in self.model.tokenizer(texts)["input_ids"]]
-        self.info = {"id": spec["id"], "revision": snapshot(spec["id"]), "query_prefix": spec["query"],
+        self.info = {"id": spec["id"], "revision": snapshot(spec["id"], revision), "query_prefix": spec["query"],
                      "passage_prefix": spec["passage"], "max_seq_length": self.model.max_seq_length,
                      "passages_truncated": sum(n > self.model.max_seq_length for n in lengths),
                      "passages": len(texts)}
