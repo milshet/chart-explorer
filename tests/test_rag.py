@@ -197,8 +197,9 @@ def fake_st(monkeypatch):
     class SentenceTransformer:
         max_seq_length = 4
 
-        def __init__(self, model_id):
+        def __init__(self, model_id, revision=None):
             self.tokenizer = _FakeTokenizer()
+            seen.setdefault("revisions", []).append(revision)
 
         def encode(self, texts, normalize_embeddings=True, batch_size=32):
             seen["encode"] += texts
@@ -412,3 +413,65 @@ def test_gpu_runbook_commands_match_the_code():
 def test_rag_decision_record_is_regenerated_not_edited():
     from rag import record
     assert record.build() == (REPO / "docs/RAG.md").read_text(encoding="utf-8")
+
+
+# --- task 3.17: lexical overlap ---------------------------------------------------------------------
+
+from rag import overlap as roverlap  # noqa: E402
+
+
+def test_overlap_counts_query_content_tokens_found_in_the_gold_table():
+    gold = set(rretrieve.tokens("Revenue EMEA Q3 2019"))
+    assert roverlap.overlap("What was the revenue in EMEA?", gold) == 1.0
+    assert roverlap.overlap("What was the revenue in APAC?", gold) == 0.5
+    assert roverlap.overlap("what is the", gold) == 0.0                   # stopwords only
+
+
+def test_delexicalised_query_drops_gold_tokens_and_keeps_the_rest():
+    gold = set(rretrieve.tokens("Revenue EMEA Q3 2019"))
+    out = roverlap.delexicalise("What was the Revenue in EMEA during 2019, by quarter?", gold)
+    assert out == "What was the in during , by quarter?"
+    assert not set(rretrieve.tokens(out)) & gold
+
+
+def test_overlap_only_expected_rank_splits_ties_and_flags_unreachable():
+    r = roverlap.OverlapOnly(TABLES)
+    assert r.expected_rank("revenue emea", "a") == (1.0, 0, 0)            # a matches 2, b and c match 1
+    assert r.expected_rank("revenue", "a") == (1.5, 0, 1)                 # a and b tie at 1
+    assert r.expected_rank("q3 emea", "c") == (2.5, 1, 1)                 # a first; b and c tie
+    assert r.expected_rank("apac", "a") is None
+
+
+def test_strata_put_zero_overlap_apart_and_halve_the_rest():
+    rows = [{"id": str(i), "overlap": {"p": v}} for i, v in enumerate([0, 0, .2, .4, .6, .8])]
+    bins, ranges = roverlap.strata(rows, "p")
+    assert bins == {"zero": {"0", "1"}, "low": {"2", "3"}, "high": {"4", "5"}}
+    assert ranges["high"] == [.6, .8]
+
+
+@pytest.mark.parametrize("gap, oo, dense, outcome", [
+    ({"zero": -.1, "low": .0, "high": .1}, .3, .2, "supported"),
+    ({"zero": -.1, "low": .0, "high": .1}, .1, .2, "partly"),
+    ({"zero": -.1, "low": .1, "high": .1}, .3, .2, "partly"),
+    ({"zero": -.1, "low": .2, "high": .1}, .1, .2, "refuted"),
+])
+def test_overlap_verdict_rule_ignores_the_zero_stratum(gap, oo, dense, outcome):
+    assert roverlap.verdict(gap, oo, dense)["outcome"] == outcome
+
+
+def test_overlap_run_reproduces_bm25_selection_figures_and_pins_dense_revisions(fake_st, monkeypatch):
+    pinned = {x["retriever"]: x["model"]["revision"] for x in json.loads(
+        (REPO / "results/rag/retrieval.json").read_text(encoding="utf-8"))["selection"]["results"]
+        if x["retriever"] == "embed:bge-base"}
+    monkeypatch.setattr(rretrieve, "snapshot", lambda model_id, revision=None: revision)
+    rep = roverlap.run(["bge-base"], write=False)
+    assert fake_st["revisions"] == [pinned["embed:bge-base"]]
+    committed = {(x["plan"], x["retriever"]): x["metrics"] for x in json.loads(
+        (REPO / "results/rag/retrieval.json").read_text(encoding="utf-8"))["selection"]["results"]
+        if x["chunking"] == "whole_table"}
+    for plan in rquery.PLANS:
+        got = rep["plans"][plan]["selection_set"]["bm25"]
+        assert (got["recall@1"], got["mrr"]) == (committed[(plan, "bm25")]["recall@1"], committed[(plan, "bm25")]["mrr"])
+        assert rep["plans"][plan]["delexicalised"]["bm25"]["recall@1"] == 0.0
+    assert rep["verdict"]["rule"]["outcome"] in ("supported", "partly", "refuted")
+    assert rep["plans"]["question_only"]["retrievers"]["bm25"]["zero"]["recall@1"] == 0.0
