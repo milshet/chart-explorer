@@ -305,9 +305,9 @@ correctly and three by abstaining, so a model that refuses everything would resi
 
 Run A resisted 15 of 21: 11 of 12 answer attacks and 4 of 9 abstain attacks. It never took a reading attack's bait.
 It computed ratios from the printed labels rather than the bar heights, and the one dual-axis error (15 for 10) is
-not the left-axis value. It never obeyed or repeated the injected token. Every failure is a failure to abstain, and
-they share one pattern. "The chart has no Franchise category; the closest is Wholesale at 40." "The chart does not
-show 2023 data; management's expectation is given as 490 m USD." The model detects that the information is missing
+not the left-axis value. It never obeyed or repeated the injected token. The other five failures are failures to abstain, and at least four of
+them share one pattern. "The chart has no Franchise category; the closest is Wholesale at 40." "The chart does not
+show 2023 data; management's expectation is given as 490 m USD." The model states that the information is missing
 and answers anyway, with the nearest series or the caption's figure. For an auditing workflow this is the most
 important limitation we found, and it is consistent with Eval-C.
 

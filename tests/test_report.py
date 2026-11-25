@@ -60,6 +60,13 @@ def test_red_team_and_abstention_numbers():
     assert f"| Run A (served) | {round(e['true_abstention'] * 50)} |" in REPORT
 
 
+def test_red_team_failures_are_described_as_counted():
+    o = read("results/redteam/run_a_r16.json")["summary"]["outcomes"]
+    assert (o["failed_to_abstain"], o["wrong"], o["misled"]) == (5, 1, 0)
+    assert "The other five failures are failures to abstain" in REPORT
+    assert "Every failure is a failure to abstain" not in REPORT
+
+
 def test_judge_kappa_table():
     a = read("results/judge/run_a_r16/agreement.json")
     for axis, v in a.items():
